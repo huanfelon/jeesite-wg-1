@@ -1,0 +1,53 @@
+﻿.homePage {
+  border: 1px solid #eee;
+  padding: 6px;
+  margin: 10px;
+  background: #fff;
+}
+.homePage .charsBox {
+  margin: 20px 1% 0;
+  overflow: hidden;
+  min-height: 334px;
+  padding: 0 2px;
+}
+.homePage .charsBox .chars {
+  width: 49%;
+  margin-bottom: 15px;
+}
+.homePage .charsBox .chars .echa {
+  width: 100%;
+  height: 350px;
+  background-color: #e6f1ec;
+}
+.homePage .charsBox .chars_left {
+  float: left;
+}
+.homePage .charsBox .chars_right {
+  float: right;
+}
+.homePage .chars_title {
+  height: 30px;
+  line-height: 30px;
+  font-size: 12px;
+  background-color: #66cad4;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: 'Sans-serif';
+}
+.homePage .chars_title div {
+  display: inline-block;
+}
+.homePage .chars_title .chars_title_left {
+  float: left;
+  margin-left: 4px;
+  cursor: default;
+}
+.homePage .chars_title .chars_title_right {
+  float: right;
+  margin-right: 4px;
+  cursor: pointer;
+}
+.homePage .content {
+  margin: 1%;
+  overflow: hidden;
+}

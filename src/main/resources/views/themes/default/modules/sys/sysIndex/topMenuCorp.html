@@ -1,0 +1,111 @@
+<li>
+	<a href="javascript:" id="officeChange">
+		<i class="fa icon-login"></i>&nbsp;&nbsp;
+		<span id="officeName" class="hidden-xs"></span>
+		<span id="officeCode" class="hidden-xs hide"></span>
+	</a>
+</li>
+<li id="dateShow">
+	<a href="javascript:">
+		<span class="hidden-xs">业务日期：</span>
+		<span id="dateChange" class="hidden-xs"></span>
+	</a>
+</li>
+<div class="hide"><#form:treeselect id="officeSelect" title="${text('组织切换')}" allowClear="false"
+	url="${ctx}/sys/office/treeData?officeTypes=1,2&isShowCode=true" callbackFuncName="officeSelectCallback" 
+	/>
+</div>
+<div class="hide"><#form:input path="ywdate" class="form-control Wdate" dataFormat="date" 
+	onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',isShowClear:false});" />
+</div>
+<script>
+var times=0;
+	$(document).ready(function() {
+		//获取键的值
+		var r1,r2;
+		r1=localStorage.getItem(getLoginUserCode());
+		r2=localStorage.getItem(r1);
+		if(r1==null||r2==null){
+			var jsonData={};
+			jsonData["userCode"]=getLoginUserCode();
+			$.ajax({
+				url: "/js/a/sys/empUser/getUserOffice",
+				datatype: 'json',
+				data: jsonData,
+				contentType: 'application/json;charset=utf-8',
+				success: function (data) {
+					if(data.officeCode!=undefined){
+						$("#officeCode").html(data.officeCode);
+					}else{
+						$("#officeName").html("未选择主组织");
+					}
+					if(data.officeName!=undefined){
+						$("#officeName").html(data.officeName);
+					}
+				},
+				error: function(e){
+					console.log(e);
+				}
+			});
+		}else{
+			$("#officeName").html(r2);
+			$("#officeCode").html(r1);
+		}
+		$("#dateChange").html(getNowFormatDate());
+	});
+	$('#officeChange').click(function(){
+		$('#officeSelectButton').click();
+	});
+	$('#dateChange').click(function(){
+		$('#ywdate').click();
+		var divs=document.getElementsByClassName("div_RightMenu");
+		var divdate=divs[divs.length-1].nextElementSibling;
+		if(times==0){
+			var headh=$(".main-header .navbar").height();
+			var showl=$("#dateShow").offset().left;
+			divdate.style.top=headh+"px";
+			divdate.style.left=showl+"px";
+			divdate.style.display="none";
+		}else{
+			var headh=$(".main-header .navbar").height();
+			var showl=$("#dateShow").offset().left;
+			divdate.style.top=headh+"px";
+			divdate.style.left=showl+"px";
+			divdate.style.display="block";
+		}
+		times++;
+	});
+	function officeSelectCallback(id, act, index, layero, nodes){
+		if (act == 'ok'){
+			var officeName = $('#officeSelectName').val();
+			var officeCode = $('#officeSelectCode').val();
+			$("#officeName").html(officeName);
+			$("#officeCode").html(officeCode);
+				 
+			//设置键的值
+			localStorage.setItem(getLoginUserCode(), officeCode);
+			localStorage.setItem(officeCode, officeName);
+		}
+	}
+	//获取当前登录人主键
+	function getLoginUserCode(){
+		var obj=window.parent.document.getElementById('userCode').innerText;//获取当前登录人主键
+		return obj;
+	}
+	//获取当前时间，格式YYYY-MM-DD
+	function getNowFormatDate() {
+		 var date = new Date();
+		 var seperator1 = "-";
+		 var seperator2 = ":";
+		 var month = date.getMonth() + 1;
+		 var strDate = date.getDate();
+		 if (month >= 1 && month <= 9) {
+		     month = "0" + month;
+		 }
+		 if (strDate >= 0 && strDate <= 9) {
+		      strDate = "0" + strDate;
+		 }
+		 var currentdate = date.getFullYear() + seperator1 + month + seperator1 + strDate;
+		 return currentdate;
+	}
+</script>

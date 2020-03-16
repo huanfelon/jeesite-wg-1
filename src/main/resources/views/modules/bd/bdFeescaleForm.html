@@ -1,0 +1,180 @@
+<% layout('/layouts/default.html', {title: '收费标准管理', libs: ['validate']}){ %>
+<link href="${ctxStatic}/css/zlFormShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-left">
+				<% if (isEdit=="true"){ %>
+					<a href="javascript:void(0);" class="btn btn-sm" id="btnSubmit1" title="${text('保 存')}"><i class="fa fa-check"></i> ${text('保存')}</a>
+				<% } %>
+				<a href="javascript:void(0);" class="btn btn-sm" onclick="js.closeCurrentTabPage()" title="${text('关闭')}"><i class="fa fa-reply-all"></i> ${text('关闭')}</a>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${bdFeescale}" action="${ctx}/bd/bdFeescale/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="isNewRecord"/>
+				<#form:hidden path="pkFeescale"/>
+				<span id="isEdit" class="hide">${isEdit}</span>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData"
+									class="required" allowClear="true"  readonly="${!bdFeescale.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							<#form:input path="code" maxlength="255" class="form-control" readonly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							<#form:input path="name" maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('收费项目')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							<#form:treeselect id="pkProject" title="${text('收费项目选择')}"
+									path="pkProject.pkProject" labelPath="pkProject.name"
+									url="${ctx}/bd/bdProject/treeData"
+									class="required" allowClear="true" canSelectParent="true"  canSelectRoot="true" readonly="${!bdFeescale.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('计算方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							<#form:select path="caMethod" dictType="wg_ca_method"  class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('计算数额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							<#form:input path="caAmount" maxlength="38" class="form-control number  color-money-input required" readonly="${!bdFeescale.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('舍入方式')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+							<#form:select path="round" dictType="wg_round"  class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-unit cw_btn_taggle">${text('人员信息')}
+					<button type="button" class="btn btn-box-tool pull-left btn_taggle" data-show='true' ><i class="fa fa-minus"></i></button>
+				</div>
+				<div class=''>
+					<div class="row">
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required ">*</span> ${text('创建人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8 cedit">
+										<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('创建日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:input path="createDate" readonly="true" disabled="disabled" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required ">*</span> ${text('修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8 cedit">
+										<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('修改日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:input path="updateDate" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('bd:bdFeescale:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/bd/bdFeescale/bdFeescale.js"></script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+//延迟加载计算方式、舍入方式不可编辑
+setTimeout(function(){
+	 if(${!bdFeescale.isNewRecord}==true){
+			$('#caMethod').attr('disabled','disabled');//input参照不可选择(disabled)
+			$('#round').attr('disabled','disabled');
+			//$('input.sr').attr('style', 'background:#F6F6F6!important');
+			//$('select').attr('disabled','disabled');//select不可选择(disabled)
+		  }
+},10); 
+</script>
+<script src="${ctxStatic}/bd/bdFeescale/bdFeescaleForm.js"></script>

@@ -1,0 +1,183 @@
+﻿<% layout('/layouts/default.html', {title: '人员基本信息管理', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/css/c_search.css">
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('人员基本信息管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('base:bdPsndoc:edit')){ %>
+					<a href="${ctx}/base/bdPsndoc/form" class="btn btn-default btnTool" title="${text('新增人员基本信息')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default" id="c_btnRefresh" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+				<% if(hasPermi('base:bdPsndoc:edit')){ %>
+					<a href="javascript:" id="edit" onclick="editBtn()" class="btn btn-default" title="${text('修改人员基本信息')}"><i class="fa fa-pencil"></i> ${text('修改')}</a>
+					<a href="javascript:" id="del" onclick="delBtn()" class="btn btn-default" title="${text('删除人员基本信息')}"><i class="fa fa-trash-o"></i> ${text('删除')}</a>
+					<div class="btn-group">
+						<a href="javascript:" class="btn btn-default dropdown-toggle" title="${text('数据控制按钮组')}" data-toggle="dropdown">
+						 	<i class="fa fa-navicon"></i> 数据控制 <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu" style="min-width:auto">
+							<li><a href="javascript:" onclick="enableBtn()"><i class="glyphicon glyphicon-ok-circle" style="color:green">&nbsp;启用</i></a></li>
+							<li><a href="javascript:" onclick="stopBtn()"><i class="glyphicon glyphicon-ban-circle" style="color:red">&nbsp;停用</i></a></li>
+						</ul>
+					</div>
+					<div class="btn-group">
+						<a href="javascript:" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+							<i class="fa fa-navicon"></i> 导入导出 <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:" id="btnExport"><i class="glyphicon glyphicon-export"></i> 导出</a></li>
+							<li><a href="javascript:" id="btnImport"><i class="glyphicon glyphicon-import"></i> 导入</a></li>
+						</ul>
+					</div>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${bdPsndoc}" action="${ctx}/base/bdPsndoc/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="c_form_group">
+					<#form:hidden path="pkPsndoc"/>
+					<div class="form-group">
+						<label class="control-label"><span class="required ">*</span>${text('组织')}：</label>
+						<div class="control-inline width-120" >
+							<#form:treeselect id="pkOrg" title="${text('组织选择')}"
+								path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+								url="${ctx}/sys/office/treeData" allowClear="true" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('人员编码')}：</label>
+						<div class="control-inline">
+							<#form:input path="code" maxlength="64" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('姓名')}：</label>
+						<div class="control-inline">
+							<#form:input path="name" maxlength="200" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('出生日期')}：</label>
+						<div class="control-inline">
+							<#form:input path="birthdate_gte" readonly="true" class="form-control Wdate-date" dataFormat="date" placeholder="开始时间" 
+								onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(birthdate_lte)}',isShowClear:true});"/>
+							&nbsp;--&nbsp;
+							<#form:input path="birthdate_lte" readonly="true" class="form-control Wdate-date" dataFormat="date" placeholder="结束时间" 
+								onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(birthdate_gte)}',isShowClear:true});"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('性别')}：</label>
+						<div class="control-inline width-120">
+							<#form:select path="sex" dictType="sys_user_sex" blankOption="true" class="form-control"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('身份证号')}：</label>
+						<div class="control-inline">
+							<#form:input path="idno" maxlength="64" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('电话')}：</label>
+						<div class="control-inline">
+							<#form:input path="phone" maxlength="64" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('数据权限')}：</label>
+						<div class="control-inline width-120">
+							<#form:select path="datacontrol" dictType="wg_datacontrol" blankOption="true" class="form-control"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('状态')}：</label>
+						<div class="control-inline width-120">
+							<#form:select path="status" dictType="sys_search_status" blankOption="true" class="form-control"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<button type="button" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+						<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+					</div>
+				</div>
+				<div class="c_search">
+					<div class="c_title_search pull-left">
+						<i class="fa fa-filter"></i> <span>查询</span>
+					</div>
+					<div class="pull-right">
+						<span class="c_close">x</span>
+					</div>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"left"},
+		{header:'${text("人员编码")}', name:'code', index:'a.code', width:120, align:"left"},
+		{header:'${text("姓名")}', name:'name', index:'a.name', width:150, align:"left"},
+		{header:'${text("出生日期")}', name:'birthdate', index:'a.birthdate', width:150, align:"left"},
+		{header:'${text("人员类别")}', name:'psntype', index:'a.psntype', width:80, align:"left", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_psntype')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("所属部门")}', name:'pkDept.deptName', index:'a.pk_dept', width:100, align:"left"},
+		{header:'${text("数据权限")}', name:'datacontrol', index:'a.datacontrol', width:80, align:"left", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_datacontrol')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("权限部门")}', name:'pkDeptall.deptName', index:'a.pk_deptall', width:100, align:"left"},
+		{header:'${text("状态")}', name:'status', index:'a.status', width:80, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_search_status')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("创建人")}', name:'creator.userName', index:'a.create_by', width:100, align:"center"},
+		{header:'${text("创建时间")}', name:'createDate', index:'a.create_date', width:100, align:"center"},
+		{header:'${text("修改人")}', name:'modifier.userName', index:'a.update_by', width:100, align:"center"},
+		{header:'${text("修改时间")}', name:'updateDate', index:'a.update_date', width:100, align:"center"},
+	],
+	sortableColumn : false,//根据列排序
+	showCheckbox:false,
+	lazyLoad: true, 	    // 是否懒加载Grid数据，默认初始列表后不及时加载数据，（仅对url远程请求数据有效），当调用 dataGrid.refresh()时再进行加载。
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+	onSelectRow: function(id, isSelect, event){//单击方法
+		
+	},
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "查看人员基本信息", "${ctx}/base/bdPsndoc/form?pkPsndoc="+id+"&noEdit=true", null, null);//弹出新的标签页
+	},
+});
+
+</script>
+<script id="importTpl" type="text/template">//<!--
+<form id="inputForm" action="${ctx}/base/bdPsndoc/importData" method="post" enctype="multipart/form-data"
+	class="form-horizontal mt20 mb10" style="overflow:auto;max-height:200px;">
+	<div class="row">
+		<div class="col-xs-12 col-xs-offset-1">
+			<input type="file" id="file" name="file" class="form-file"/>
+			<div class="mt10 pt5">
+				<#form:checkbox name="updateSupport" label="${text('是否更新已经存在的数据')}" class="form-control"
+					title="${text('如果编码已经存在，更新这条数据。')}"/> &nbsp;
+				<a href="${ctx}/dfbase/bdCar/importTemplate" class="btn btn-default btn-xs"><i class="fa fa-file-excel-o"></i> ${text('下载模板')}</a>
+			</div>
+			<font color="red" class="pull-left mt10">
+				${text('提示：仅允许导入“xls”或“xlsx”格式文件！')}
+			</font>
+		</div>
+	</div>
+</form>
+//--></script>
+<script src="${ctxStatic}/base/bdPsndoc/bdPsndocList.js"></script>

@@ -1,0 +1,125 @@
+<% layout('/layouts/default.html', {title: '房源信息管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-body">
+			<#form:form id="searchForm" model="${zlHousesource}" action="${ctx}/zl/zlHousesource/listMerge?pk=${pk}&bsum=${bsum}&isum=${isum}&zst=${zst}" method="post" class="form-inline hide"
+					 data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('房产编号')}：</label>
+					<div class="control-inline">
+						<#form:input path="estatecode" maxlength="50" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('房产名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="estatename" maxlength="50" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('项目名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="projectname" maxlength="20" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('楼栋')}：</label>
+					<div class="control-inline">
+						<#form:input path="buildname" maxlength="20" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('制单日期')}：</label>
+					<div class="control-inline">
+						<#form:input path="dbilldate" readonly="true" maxlength="20" class="form-control Wdate"
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<!-- <script src="${ctxStatic}/js/zl.js"></script> -->
+<script>
+console.log(${toJson(zlHousesource)})
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+	    {header:'${text("组织名称")}', name:'pkOrg.officeName', index:'a.pk_org', width:150},
+		{header:'${text("项目名称")}', name:'projectname.name', index:'a.projectname', width:150},
+		{header:'${text("楼栋")}', name:'buildname.name', index:'a.buildname', width:150, align:"left"},
+		{header:'${text("单元")}', name:'unit', index:'a.unit', width:150, align:"left", editable:true, edittype:'text', editoptions:{'class':'form-control '}},
+		{header:'${text("楼层")}', name:'floorn', index:'a.floorn', width:150, align:"left", editable:true, edittype:'text', editoptions:{'class':'form-control '}},
+		{header:'${text("房号")}', name:'roomnumber', index:'a.roomnumber', width:150, align:"left", editable:true, edittype:'text', editoptions:{'class':'form-control '}},
+		{header:'${text("房产编号")}', name:'estatecode', index:'a.estatecode', width:150, align:"left"},
+		{header:'${text("房产名称")}', name:'estatename',index:'a.estatename', width:150, align:"left"},
+		{header:'${text("租赁面积")}', name:'buildarea', index:'a.buildarea', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("产证面积")}', name:'innerarea', index:'a.innerarea', width:150, align:"right",formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("户型信息")}', name:'pkFamilyfile', width:150, 
+			formatter: function(val, obj, row, act){
+			return js.val(row, 'pkFamilyfile.pkFamilyfile')+'|'+js.val(row, 'pkFamilyfile.name');
+		},editable: true, edittype: "custom", editoptions: {
+			custom_element: function(val, editOptions) {
+				return js.template('listselectTpl', {
+					id: 'pkFamilyfile_'+editOptions.id, title: '户型信息选择', 
+					path: 'pkFamilyfile.pkFamilyfile', value: val.split('|')[0], 
+					labelPath: 'pkFamilyfile.name', labelValue: val.split('|')[1],
+					itemCode:'pkFamilyfile', itemName :'name',
+					boxWidth:$(top.window).width()*8/10,boxHeight:$(top.window).height()*4/5,
+					url: '${ctx}/zl/zlFamilyfile/familySelect?family='+val.split('|')[0], cssClass: ''
+				});
+			  }
+		  }
+		},
+		{header:'${text("房源状态")}', name:'housestate', index:'a.housestate', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('zl_housestatus')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("业态")}', name:'pkFormattype.name', index:'a.pk_formattype', width:150, align:"left"},
+		{header:'${text("上级房号")}', name:'parentroom', index:'a.parentroom', width:100, align:"center"},
+		{header:'${text("合并拆分状态")}', name:'hbcfstatus', index:'a.hbcfstatus', width:100, align:"center"},
+		{header:'${text("主实体房号")}', name:'zstroom',index:'a.zstroom', width:100, align:"center"},
+		/* {header:'${text("制单日期")}', name:'dbilldate', index:'a.dbilldate', width:150, align:"center"},
+		 {header:'${text("创建人")}', name:'creator.userName', index:'a.create', width:150, align:"left"},
+		{header:'${text("创建时间")}', name:'creationtime', index:'a.creationtime', width:150, align:"left"},
+		{header:'${text("修改人")}', name:'modifier.userName', index:'a.modifier', width:150, align:"left"},
+		{header:'${text("修改时间")}', name:'modifiedtime', index:'a.modifiedtime', width:150, align:"left"},  */
+
+	],
+
+	shrinkToFit : false,//自动分配单元格宽度
+	editGrid: true,				// 是否是编辑表格
+	// 加载成功后执行事件
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		$("#1_unit").change(function(){
+			var rowData=$('#dataGrid').dataGrid('getRowData','1');//获取行数组id
+			
+		})
+		$("#1_roomnumber").change(function(){
+			var rowData=$('#dataGrid').dataGrid('getRowData','1');//获取行数组id
+			
+			
+		})
+	}
+});
+
+ var name=$('#projectname').val();
+
+</script>
+<script id="listselectTpl" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.path}}" value="{{d.value}}"
+	labelName="{{d.labelPath}}" labelValue="{{d.labelValue}}" url="{{d.url}}" checkbox="{{d.checkbox}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}" boxWidth="{{d.boxWidth}}" boxHeight="{{d.boxHeight}}"
+	class="{{d.cssClass}}" btnClass="btn-sm" allowClear="true"/>
+</div>//--></script>

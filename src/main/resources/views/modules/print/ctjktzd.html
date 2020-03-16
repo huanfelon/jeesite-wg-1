@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>房租、物业缴款通知单</title>
+    <link rel="stylesheet" href="${ctxStatic}/css/moban.css">
+</head>
+
+<body>
+    <div class="moban moban_jiaokuan">
+        <h2 style="padding:0 0 20px 0;">房租、物业缴款通知单</h2>
+        <div class="danju">
+            <div> <span class="under_line2">${cjd.CUSTNAME}</span>客户您好：</div>
+            <div class="suojin">
+                根据您与我公司签订的《房屋租赁合同》约定：您应于<span class="under_line2">${cjd.YFYEAR}</span>年<span class="under_line2">${cjd.YFMONTH}</span>月<span class="under_line2">${cjd.YFDAY}</span>日
+                前向我公司支付您所承租的${cjd.PRONAME}·${cjd.BUILDNAME}<span class="under_line2">${cjd.ROOM}</span>室房屋的费用，此期费用合计RMB<span class="under_line2">${cjd.ALLMNY}</span>元。
+            </div>
+            <div class="suojin">特此通知！ 顺颂商祺！</div>
+            <div>
+                交款账户：<span class="width150 margin_right30">${cjd.ORGNAME}</span>账号：<span class="under_line2">${cjd.BANKNO}</span>
+            </div>
+            <div>开户银行：${cjd.BANKNAME}</div>
+            <div>附：费用交纳费用明细表</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="8%">房号</th>
+                        <th width="16%">此期应付房租金额（元）</th>
+                        <th width="16%">此期应付物业金额（元）</th>
+                        <th>缴费期间</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${cjd.ROOM}</td>
+                        <td>${cjd.FZMNY}</td>
+                        <td>${cjd.WYMNY}</td>
+                        <td>
+                            <div>租金时段：${cjd.FZQJ}</div>
+                            <div>物业时段：${cjd.WYQJ}</div>
+                        </td>
+                        <td>
+                            <div>${cjd.ZJ}</div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text_left">此通知单仅作提示，交款日期及金额以合同为准。</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="jiaokaun_footer">
+            <div>
+                <p><span>${cjd.ORGNAME}</span></p>
+                <p><span class="under_line2">${cjd.YFYEAR}</span>年<span class="under_line2">${cjd.YFMONTH}</span>月<span class="under_line2">${cjd.YFDAY}</span>日</p>
+            </div>
+        </div>
+        <h2 style="padding:80px 0 20px 0;">回执单</h2>
+        <div class="danju">
+            <div class="suojin">
+                根据您与我公司签订的《房屋租赁合同》约定：您应于<span class="under_line2">${cjd.YFYEAR}</span>年<span class="under_line2">${cjd.YFMONTH}</span>月<span class="under_line2">${cjd.YFDAY}</span>日
+                前向我公司支付您所承租的${cjd.PRONAME}·${cjd.BUILDNAME}<span class="under_line2">${cjd.ROOM}室</span>房屋的费用，此期费用合计RMB<span class="under_line2">${cjd.ALLMNY}</span>元。
+            </div>
+            <div class="suojin">特此通知！ 顺颂商祺！</div>
+            <div>
+                交款账户：<span class="width150 margin_right30">${cjd.ORGNAME}</span>账号：<span class="under_line2">${cjd.BANKNO}</span>
+            </div>
+            <div>开户银行：${cjd.BANKNAME}</div>
+            <div>附：费用交纳费用明细表</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th width="8%">房号</th>
+                        <th width="16%">此期应付房租金额（元）</th>
+                        <th width="16%">此期应付物业金额（元）</th>
+                        <th>缴费期间</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>${cjd.ROOM}</td>
+                        <td>${cjd.FZMNY}</td>
+                        <td>${cjd.WYMNY}</td>
+                        <td>
+                            <div>租金时段：${cjd.FZQJ}</div>
+                            <div>物业时段：${cjd.WYQJ}</div>
+                        </td>
+                        <td>
+                            ${cjd.ZJ}
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="5" class="text_left">此通知单仅作提示，交款日期及金额以合同为准。</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div>已收到费用缴款通知书，并尽快缴费！</div>
+            <div>公司名称：<span class="width150"></span> 签字：<span class="width150"></span>日期：</div>
+        </div>
+
+    </div>
+</body>
+<script type="text/javascript" src="${ctxStatic}/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+	    window.print();
+	    var index = parent.layer.getFrameIndex(window.name);
+	    parent.layer.close(index);
+    };
+</script>
+</html>

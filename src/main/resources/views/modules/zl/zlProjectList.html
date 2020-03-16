@@ -1,0 +1,117 @@
+﻿<% layout('/layouts/default.html', {title: '项目信息管理', libs: ['dataGrid']}){ %>
+<link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('项目信息管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('zl:zlProject:edit')){ %>
+					<a href="${ctx}/zl/zlProject/form?isEdit=true" class="btn btn-default btnTool" title="${text('新增项目信息')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+					<a href="javascript:void(0);" class="btn btn-default" onclick="c_xinzenDown('/js/a/zl/zlProject/form')" title="${text('新增')}"><i class="fa fa-plus"></i> ${text('新增下级')}</a>
+					<a href="javascript:" id="edit" onclick="c_editBtn('/js/a/zl/zlProject/bianji?pkProject')" class="btn btn-default" title="${text('修改')}"><i class="fa fa-pencil"></i> ${text('修改')}</a>
+					<a href="#" class="btn btn-default" onclick="c_delete('pkProject')" title="${text('删除')}"><i class="fa fa-trash-o"></i> 删除 </a>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default" id="btnRefreshTree" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+				<a href="#" class="btn btn-default" id="btnExpandTreeNode" title="${text('展开一级')}"><i class="fa fa-angle-double-down"></i> ${text('展开')}</a>
+				<a href="#" class="btn btn-default" id="btnCollapseTreeNode" title="${text('折叠全部')}"><i class="fa fa-angle-double-up"></i> ${text('折叠')}</a>
+				
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${zlProject}" action="${ctx}/zl/zlProject/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('组织')}：</label>
+					<div class="control-inline">
+	                  <#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData"
+									class="" allowClear="true"/>					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('编码')}：</label>
+					<div class="control-inline">
+						<#form:input path="code" maxlength="50" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="50" class="form-control width-120"/>
+					</div>
+				</div>
+				<!-- <div class="form-group">
+					<label class="control-label">${text('制单日期')}：</label>
+					<div class="control-inline">
+						  查询单个日期
+						<#form:input path="dbilldate" readonly="true" maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+							
+							日期范围查询 
+						<#form:input path="dbilldate_gte" readonly="true"  maxlength="20" class="form-control Wdate-date"
+						     dataFormat="date" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(dbilldate_lte)}',isShowClear:true});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="dbilldate_lte" readonly="true"  maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(dbilldate_gte)}',isShowClear:true});"/> 
+					</div>
+				</div> -->
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/zl.js"></script>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+      /*   {header:'${text("节点名称")}', name:'name', index:'a.name', width:250, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '( '+row.code+' ) '+'<a href="${ctx}/zl/zlProject/form?pkProject='+row.pkProject+'&isEdit=true" class="btnList" data-title="${text("编辑项目信息")}">'+(val||row.id)+'</a>';
+		}} */
+	    {header:'${text("组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"center"},
+		{header:'${text("编码")}', name:'code', index:'a.code', width:150, align:"left"},
+		{header:'${text("名称")}', name:'name', index:'a.name', width:150, align:"left"},
+		{header:'${text("项目总面积")}', name:'totalarea', index:'a.totalarea', width:150, align:"right",classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("状态")}', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_search_status')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("制单人")}', name:'creator.userName', index:'a.creator', width:150, align:"center"},
+		{header:'${text("制单日期")}', name:'dbilldate', index:'a.dbilldate', width:150, align:"center"},
+		{header:'${text("修改人")}', name:'modifier.userName', index:'a.modifier', width:150, align:"center"},
+		{header:'${text("修改日期")}', name:'modifiedtime', index:'a.modifiedtime', width:150, align:"center"},
+		{header:'${text("操作")}', name:'actions',hidden:true, width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('zl:zlProject:edit')){ %>
+				actions.push('<a href="javascript:void(0);" data-url="${ctx}/zl/zlProject/bianji?pkProject='+row.pkProject+'&isEdit=true" onclick="bianji34(this, false)" title="${text("编辑项目信息")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/zl/zlProject/delete?pkProject='+row.pkProject+'" class="btnList" title="${text("删除项目信息")}" data-confirm="${text("确认要删除该项目信息及所有子项目信息吗？")}" data-deltreenode="'+row.id+'"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/zl/zlProject/form?parentCode='+row.id+'&isEdit=true" class="btnList" title="${text("新增项目信息")}"><i class="fa fa-plus-square"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	treeGrid: true,			// 启用树结构表格
+	defaultExpandLevel: 0,	// 默认展开的层次
+	expandNodeClearPostData: 'code,name,dbilldate,modifier,projecthp,totalarea,', // 展开节点清理请求参数数据（一般设置查询条件的字段属性，否则在查询后，不能展开子节点数据）	// 加载成功后执行事件
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "查看项目信息", "/js/a/zl/zlProject/form?pkProject="+id+"&isEdit=false", null, null);//弹出新的标签页
+	},
+	ajaxSuccess: function(data){
+		var treeName=$("#name").val();
+		if(treeName!=""){
+			$('#dataGrid').dataGrid('expandTreeNode', data.length);
+		}
+	}
+});
+</script>
+<script src="${ctxStatic}/zl/zlProject/zlProjectList.js"></script>

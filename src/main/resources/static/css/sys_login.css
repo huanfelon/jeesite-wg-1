@@ -1,0 +1,123 @@
+.login-page{
+	/* background-image: url("../img/back.png"); */
+	background-size: 100%;
+    background-repeat:no-repeat;
+    background: #0681CF;
+}
+.no_codeId2{
+	position: relative;
+}
+.card_back{
+	position:absolute;
+	right: 0px;
+	bottom: 0px;
+    color: #5587a5;
+    cursor: pointer;
+}
+.erweima{
+   	height: 255px !important;
+}
+.login-page .login-box-body{
+    /* background: -webkit-linear-gradient(top,#5587a5,#0681CF); */
+    background: #8DD5EE;
+}
+
+.c_hide{
+    display: none;
+}
+#cw_login{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin: 0;
+    /* margin-top: -220px; */
+    margin-top: -240px;
+    margin-left: -410px;
+    height: 420px;
+    width: 820px;
+    background: url(/js/static/img/login_back2.png) no-repeat;
+    background-size: 100%;
+}
+
+#cw_login .login-logo,#cw_login .login-copyright{
+    display: none;
+}
+
+#cw_login .login-box-body{
+    position: absolute;
+    right: 110px;
+    top: 160px;
+    width: 260px;
+    padding: 0;
+    box-shadow:none;
+    background: #7fddf200;
+}
+/* #cw_login .login-page .form-group{
+    margin-top: 0px;
+    margin-bottom: 0px;
+} */
+#cw_login  .form-group{
+    margin-top: 0px;
+    margin-bottom: 10px;
+}
+
+#cw_login .mt5{
+    margin-top: 10px;
+    padding-bottom: 6px;
+}
+#cw_login .mt5 label{
+    height: 22px;
+    padding: 0;
+    margin: 0 20px;
+    color: #000;
+}
+#cw_login .mt5 .icheckbox_square-blue,#cw_login .mt5 .iradio_square-blue{
+    width: 16px;
+    height: 16px;
+    background: url(/js/static/img/blue.png) no-repeat;
+}
+#cw_login .icheckbox_square-blue.checked{
+    background-position: -34px 0;
+}
+#cw_login .form-control-feedback{
+    right:none;
+    left: 0;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    color: rgb(99, 194, 255) !important;
+}
+#cw_login .has-feedback .form-control{
+    height: 30px;
+    padding: 0;
+    text-indent: 90px;
+    box-shadow: 0 0 1000px #fff inset;
+}
+#cw_login .form-group .btn{
+    margin-left: 20px;
+}
+#cw_login .btn{
+    padding: 4px 0 !important;
+    width: 100px;
+    display: inline-block;
+    /* margin: 0 10px; */
+    
+}
+#cw_login .btn-primary{
+    background: -webkit-linear-gradient(top,#c7f0f8,#1faddf);
+    border: none;
+    color: black;
+    font-weight: bold;
+}
+#cw_login .cw_forget{
+    padding: 0;
+    width: 100px;
+}
+
+#cw_login .cw_span{
+    position: absolute;
+    top: 6px;
+    left: 30px;
+    color: black !important;
+    font-weight: bold;
+}

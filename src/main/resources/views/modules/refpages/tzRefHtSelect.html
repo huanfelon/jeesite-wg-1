@@ -1,0 +1,153 @@
+<% layout('/layouts/default.html', {title: '合同管理', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/css/c_search.css">
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('合同管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')} </a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${wgContract}" action="${ctx}/wght/wgContract/tzReflistData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="c_form_group">
+				<div class="form-group">
+					<label class="control-label">${text('所属组织')}：</label>
+					<div class="control-inline">
+						<#form:treeselect id="pkOrg" title="${text('组织选择')}" 
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData?officeTypes=1,2&isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('单据号')}：</label>
+					<div class="control-inline">
+						<#form:input path="vbillno" maxlength="200" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('客户名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="vdef5" maxlength="200" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('项目信息')}：</label>
+					<div class="control-inline">
+						<#form:treeselect id="pkProject" title="${text('项目选择')}" 
+							path="pkProject.pkProject" labelPath="pkProject.name" 
+							url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('合同编号')}：</label>
+					<div class="control-inline">
+						<#form:input path="htcode" maxlength="200" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('合同类型')}：</label>
+					<div class="control-inline">
+						<#form:treeselect id="httype" title="${text('项目选择')}" 
+							path="httype.pkHttype" labelPath="httype.name" 
+							url="${ctx}/bd/bdHttype/treeData?isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('签租日期')}：</label>
+					<div class="control-inline">
+						<#form:input path="dqzdate_gte" readonly="true" maxlength="20" class="form-control Wdate-date" placeholder="开始日期" 
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(dqzdate_lte)}'});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="dqzdate_lte" readonly="true" maxlength="20" class="form-control Wdate-date" placeholder="结束日期" 
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,minDate:'#F{$dp.$D(dqzdate_gte)}'});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="button" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+				</div>
+				<div class="c_search">
+					<div class="c_title_search pull-left">
+						<i class="fa fa-filter"></i> <span>查询</span>
+					</div>
+					<div class="pull-right">
+						<span class="c_close">x</span>
+					</div>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("主键")}', name:'id', hidden:true},
+		{header:'${text("所属组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"left"},
+		{header:'${text("单据号")}', name:'vbillno', index:'a.vbillno', width:150, align:"left"},
+		{header:'${text("合同编号")}', name:'htcode', index:'a.htcode', width:150, align:"left"},
+		{header:'${text("客户名称")}', name:'custname', index:'a.custname', width:150, align:"left"},
+		{header:'${text("项目信息")}', name:'pkProject.name', index:'a.pk_project', width:150, align:"left"},
+		{header:'${text("部门")}', name:'pkDept.deptName', index:'a.pk_dept', width:150, align:"left"},
+		{header:'${text("合同类型")}', name:'httype.name', index:'a.httype', width:150, align:"left"},
+		{header:'${text("签租日期")}', name:'dqzdate', index:'a.dqzdate', width:150, align:"left"},
+		{header:'${text("合同起始日")}', name:'dstartdate', index:'a.dstartdate', width:150, align:"left"},
+		{header:'${text("合同终止日")}', name:'denddate', index:'a.denddate', width:150, align:"left"},
+		{header:'${text("租赁方式")}', name:'renttype', index:'a.renttype', width:150, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_renttype')}, val, '${text("")}', true);
+		}},
+		{header:'${text("合同税率")}', name:'ntaxrate', index:'a.ntaxrate', width:150, align:"right", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+		}},
+		{header:'${text("租金单价")}', name:'nprice', index:'a.nprice', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("附加条款")}', name:'exremarks', index:'a.exremarks', width:150, align:"left"},
+		{header:'${text("日租金")}', name:'ndayprice', index:'a.ndayprice', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("月租金")}', name:'nmonthprice', index:'a.nmonthprice', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("年租金")}', name:'nyearprice', index:'a.nyearprice', width:150, align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("合同状态")}', name:'htstatus', index:'a.htstatus', width:150, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_htstatus')}, val, '${text("")}', true);
+		}},
+		{header:'${text("单据状态")}', name:'vbillstatus', index:'a.vbillstatus', width:150, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_billstatus')}, val, '${text("")}', true);
+		}},
+		{header:'${text("单据类型")}', name:'billtype', index:'a.billtype', width:150, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_billtype')}, val, '${text("")}', true);
+		}},
+		{header:'${text("制单人")}', name:'creator.userName', index:'a.creator', width:150, align:"left"},
+		{header:'${text("制单时间")}', name:'createdtime', index:'a.createdtime', width:150, align:"left"},
+		{header:'${text("最后修改人")}', name:'modifier.userName', index:'a.modifier', width:150, align:"left"},
+		{header:'${text("最后修改时间")}', name:'modifiedtime', index:'a.modifiedtime', width:150, align:"left"},
+		{header:'${text("审核人")}', name:'approver.userName', index:'a.approver', width:150, align:"left"},
+		{header:'${text("审核时间")}', name:'approvedtime', index:'a.approvedtime', width:150, align:"left"},
+	],
+	lazyLoad: true, 	    // 是否懒加载Grid数据，默认初始列表后不及时加载数据，（仅对url远程请求数据有效），当调用 dataGrid.refresh()时再进行加载。
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	showCheckbox: false,
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+});
+</script>
+<script src="${ctxStatic}/wght/wgContract/wgContractSelect.js"></script>

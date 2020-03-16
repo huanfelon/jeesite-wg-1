@@ -1,0 +1,47 @@
+<% layout('/layouts/default.html', {title: '上传文件', libs: ['validate','fileupload']}){ %>
+<div class="box box-main">
+	<#form:form id="inputForm" model="${filemanager}" action="${ctx}/filemanager/appSave" method="post" class="form-horizontal">
+		<div class="box-body" style="padding:30px 50px;min-height:320px;">
+			<#form:fileupload id="uploadFile" bizKey="" bizType="${filemanager.bizType}"
+					uploadType="image" class="" readonly="false" preview="weboffice"/>
+			<#form:hidden path="folderId"/><#form:hidden path="groupType"/>
+		</div>
+		<div class="box-footer">
+			<div class="row">
+				<div class="col-sm-offset-2 col-sm-10">
+					<% if (hasPermi('filemanager:filemanager:edit')){ %>
+						<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('确定')}</button>&nbsp;
+					<% } %>
+					<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('取消')}</button>
+				</div>
+			</div>
+		</div>
+	</#form:form>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			/* js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.$('#dataGrid').dataGrid('refreshTreeChildren',
+							$('#parentCode').val(), '${filemanager.id}');
+				});
+			} */
+			
+			try{
+				window.parent.postMessage(data,'*');
+			}catch(e){
+				console.log(e);
+			}
+		}, "json");
+    }
+});
+$(function(){
+	setTimeout(function(){
+		window.webuploaderRefresh();
+	},500);
+})
+</script>

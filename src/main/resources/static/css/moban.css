@@ -1,0 +1,345 @@
+* {
+  margin: 0;
+  padding: 0;
+  line-height: 24px;
+}
+th {
+  font-weight: normal;
+}
+.c_hide {
+  display: none;
+}
+.moban.zhineng {
+  font-family: "微软雅黑";
+}
+.moban {
+  padding: 40px 30px;
+  font-family: "宋体";
+}
+.moban h2 {
+  text-align: center;
+}
+.moban .bianhao {
+  padding: 10px;
+}
+.moban .bianhao p {
+  overflow: hidden;
+}
+.moban .bianhao span {
+  display: block;
+  width: 350px;
+  float: right;
+}
+.moban .bianhao1 {
+  padding: 10px;
+  text-align: right;
+}
+.moban .htxx {
+  margin-top: 20px;
+  overflow: hidden;
+}
+.moban .htxx .left {
+  float: left;
+  width: 49%;
+}
+.moban .htxx .right {
+  float: right;
+  width: 49%;
+}
+.moban .htxx .htxx_jia span,
+.moban .htxx .htxx_yi span {
+  display: block;
+}
+.moban .htxx_jiacu_left {
+  margin-top: 20px;
+}
+/* .moban .htxx_jiacu_left span {
+  display: block;
+  font-weight: bold;
+} */
+.moban .xuyan {
+  margin-top: 20px;
+}
+.moban .zhuti .wasd {
+  text-indent: -2em;
+  padding-left: 2em;
+}
+.moban .zhuti2 .wd .wdtitle {
+  display: block;
+  font-weight: bold;
+}
+.moban .zhuti2 .wd .wdn {
+  text-indent: 2em;
+}
+.moban .zhuti2 .wd .title {
+  font-weight: bold;
+}
+.moban .zhuti2 .wd .wasd {
+  text-indent: -2em;
+  padding-left: 2em;
+}
+.moban .zhuti2 table {
+  margin: 6px 0 6px 40px;
+  border-collapse: collapse;
+  border: 1px solid #4d4b4b;
+}
+.moban .zhuti2 table tr,
+.moban .zhuti2 table th,
+.moban .zhuti2 table td {
+  border: 1px solid #4d4b4b;
+}
+.moban .zhuti2 table td,
+.moban .zhuti2 table th {
+  padding: 0 10px;
+  line-height: 34px;
+  text-indent: 0;
+  text-align: center;
+}
+.moban .fujian {
+  margin-top: 140px;
+}
+.moban .fujian .fujian_box table {
+  border-collapse: collapse;
+  border: 1px solid #4d4b4b;
+}
+.moban .fujian .fujian_box table tr,
+.moban .fujian .fujian_box table td {
+  border: 1px solid #4d4b4b;
+}
+.moban .fujian .fujian_box table tr {
+  height: 40px;
+  line-height: 24px;
+}
+.moban .fujian .fujian_box table tr td {
+  padding: 4px;
+}
+.moban .fujian .fujian_box table tr td:first-child {
+  width: 14%;
+  text-align: center;
+}
+.moban .xieyi {
+  padding: 10px;
+}
+.moban .moban_footer {
+  margin-top: 30px;
+  overflow: hidden;
+}
+.moban .moban_footer .footer_left {
+  float: left;
+  width: 49%;
+}
+.moban .moban_footer .footer_left span {
+  display: block;
+  line-height: 40px;
+}
+.moban .fuze_biao {
+  margin-top: 70vh;
+}
+.moban .fuze_biao .bold {
+  font-weight: bold;
+}
+.moban .fuze_biao .text_left {
+  text-align: left !important;
+}
+.moban .fuze_biao .fubiao_list div {
+  font-size: 18px;
+  line-height: 30px;
+  font-weight: 500;
+}
+.moban .fuze_biao .fubiao .fubiao_title {
+  font-weight: bold;
+}
+.moban .fuze_biao .fubiao table {
+  font-size: 12px;
+  margin: 6px 0 6px 10px;
+  border-collapse: collapse;
+  border: 1px solid #4d4b4b;
+}
+.moban .fuze_biao .fubiao table tr,
+.moban .fuze_biao .fubiao table th,
+.moban .fuze_biao .fubiao table td {
+  border: 1px solid #4d4b4b;
+}
+.moban .fuze_biao .fubiao table td {
+  padding: 0 4px;
+  height: 34px;
+  text-indent: 0;
+  text-align: center;
+}
+.moban .fuze_biao .fubiao .fujian2_table {
+  width: 100%;
+}
+.moban .fuze_biao .fubiao .fujian2_table tr {
+  height: 40px;
+  line-height: 40px;
+}
+.moban .fuze_biao .fubiao .fujian3_table {
+  width: 100%;
+}
+.moban .fuze_biao .fubiao .fujian3_table tr {
+  height: 40px;
+  line-height: 40px;
+}
+.moban .fuze_biao .fubiao .bg_gray tr th {
+  background: #EEECE1;
+  padding: 0 4px;
+  height: 34px;
+}
+.moban .fuze_biao .fubiao .fubiao_img {
+  width: 100%;
+  text-align: center;
+}
+.moban .fuze_biao .fubiao .fubiao_img img {
+  display: inline-block;
+  max-width: 100%;
+  max-height: 80%;
+}
+.backg {
+  position: fixed;
+  right: 20px;
+  top: 0px;
+  z-index: -1;
+}
+.backg img {
+  width: 168px;
+  height: 48px;
+}
+.vh80 {
+  min-height: 80vh;
+}
+.vh90 {
+  min-height: 90vh;
+}
+.vh100 {
+  min-height: 100vh;
+}
+.shouye {
+  height: 100vh;
+  font-family: "宋体";
+  position: relative;
+}
+.shouye .bianhao1 {
+  margin-top: 20px;
+  text-align: right;
+}
+.shouye .bianhao1 span {
+  width: 220px;
+  display: inline-block;
+  text-align: left;
+}
+.shouye .ht_title {
+  font-size: 40px;
+  text-align: center;
+  margin: 120px 0;
+}
+.shouye .suoshu {
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+.shouye .qianzi {
+  position: absolute;
+  left: 30px;
+  bottom: 140px;
+}
+.shouye .qianzi div {
+  padding: 10px 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+.shouye .qianzi div .width150 {
+  min-width: 150px;
+}
+.shouye .qianzi div .width50 {
+  min-width: 50px;
+}
+.under_line {
+  display: inline-block;
+  border-bottom: 1px solid black;
+  padding: 0 10px;
+}
+.under_line2 {
+  border-bottom: 1px solid black;
+  padding: 0 10px;
+}
+.fengchao .zhuti2 .wdsd {
+  text-indent: -2em;
+  padding-left: 2em;
+}
+.fengchao .zhuti2 .wdsd .xiayiji {
+  padding-left: 2em;
+}
+.moban_jiaokuan {
+  font-family: "FangSong";
+}
+.moban_jiaokuan .suojin {
+  text-indent: 2em;
+}
+.moban_jiaokuan .margin_right30 {
+  margin-right: 30px;
+}
+.moban_jiaokuan .width150 {
+  min-width: 150px;
+}
+.moban_jiaokuan .back_green {
+  background: greenyellow;
+  padding: 1px 6px;
+}
+.moban_jiaokuan table {
+  font-size: 12px;
+  margin: 6px 0 6px 10px;
+  border-collapse: collapse;
+  border: 1px solid #4d4b4b;
+}
+.moban_jiaokuan table tr,
+.moban_jiaokuan table th,
+.moban_jiaokuan table td {
+  border: 1px solid #4d4b4b;
+}
+.moban_jiaokuan table td {
+  padding: 0 4px;
+  height: 34px;
+  text-indent: 0;
+  text-align: center;
+}
+.moban_jiaokuan table td div {
+  text-align: left;
+}
+.moban_jiaokuan .text_left {
+  text-align: left;
+}
+.moban_jiaokuan .jiaokaun_footer {
+  position: relative;
+}
+.moban_jiaokuan .jiaokaun_footer div {
+  position: absolute;
+  right: 20px;
+  top: 0;
+  text-align: left;
+  display: inline-block;
+}
+.moban_jiaokuan .jiaokaun_footer div .back_green {
+  background: #05b631;
+}
+.moban_jiaokuan .width150 {
+  min-width: 150px;
+  display: inline-block;
+}
+.width200 {
+  min-width: 200px;
+}
+.width220 {
+  min-width: 220px;
+}
+.width250 {
+  min-width: 250px;
+}
+.width300 {
+  min-width: 300px;
+}
+.width400 {
+  min-width: 400px;
+}
+.width500 {
+  min-width: 500px;
+}

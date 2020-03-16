@@ -1,0 +1,178 @@
+﻿<% layout('/layouts/default.html', {title: '项目信息管理', libs: ['validate']}){ %>
+<script src="${ctxStatic}/zl/zlProject/zlProjectForm.js"></script>
+<link href="${ctxStatic}/css/zlFormShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(zlProject.isNewRecord ? '新增项目信息' : isEdit=='true'?'编辑项目信息':'项目信息详情')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('zl:zlProject:edit')&& isEdit=='true'){ %>
+					<a herf="javascript:void(0);"   class="btn btn-sm" id="btnSubmit4"><i class="fa fa-check"></i> ${text('保存')}</a>
+				<% } %>
+			    <button type="button" class="btn btn-sm" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关闭')}</button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${zlProject}" action="${ctx}/zl/zlProject/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkProject"/>
+				<span id="isEdit" class="hide">${isEdit}</span>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5">${text('上级项目信息')}：</label>
+							<div class="col-sm-7">
+					        	<#form:input path="parent.id" maxlength="50"  class="form-control hidden"  />
+								<#form:input path="parent.name"  maxlength="50"  class="form-control " readOnly="true"  />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+							<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData?officeTypes=1,2"
+									class="required"  allowClear="true" readonly="${!zlProject.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="code" maxlength="50" class="form-control required" readonly="${!zlProject.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="name" maxlength="50" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				
+			
+				</div>
+			         <div class="row">
+			       	<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required  hide">*</span> ${text('项目总面积')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="totalarea" class="form-control number  color-area-input" defaultValue="0.00"  readOnly="true" />
+							</div>
+						</div>
+					</div>
+					</div>
+				<div class="form-unit cw_btn_taggle">${text('人员信息')}
+					<button type="button" class="btn btn-box-tool pull-left btn_taggle" data-show='true' ><i class="fa fa-minus"></i></button>
+				</div>
+				<div class=''>
+					<div class="row">
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7 cedit">
+										<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('制单日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="dbilldate" readonly="true" disabled="disabled" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7 cedit">
+										<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+							<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('修改日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="modifiedtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('zl:zlProject:edit')&& isEdit=='true'){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/zl.js"></script>
+<script src="${ctxStatic}/js/htmlview.js"></script>
+<script>
+var zlProject = (${toJson(zlProject)});
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.$('#dataGrid').dataGrid('refreshTreeChildren',
+							$('#parentCode').val(), '${zlProject.id}');
+				});
+			}
+		}, "json");
+    }
+});
+
+// 选择父级菜单回调方法
+function treeselectCallback(id, act, index, layero){
+	if (id == 'parent' && (act == 'ok' || act == 'clear')){
+		// 创建并初始化下一个节点信息，如：排序号、默认值
+		$.get('${ctx}/zl/zlProject/createNextNode?parentCode='
+				+$('#parentCode').val(), function(data){
+			$('#treeSort').val(data.treeSort);
+		});
+	}
+}
+</script>
+<script>
+$(function(){
+	 var is =$("#isEdit").text();
+	 if(is=="false"){
+    	$('#totalarea').val(js.formatNumber($('#totalarea').val(), 2, true, '0.00'));
+	 }
+})
+</script>

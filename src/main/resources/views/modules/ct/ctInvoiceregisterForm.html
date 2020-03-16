@@ -1,0 +1,447 @@
+<% layout('/layouts/default.html', {title: '开票登记管理', libs: ['validate','dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-left">
+				<% if (hasPermi('ct:ctInvoiceapply:edit')){ %>
+					<a href="javascript:void(0);" class="btn btn-default ${noEdit?'hidden':''}" id="c_btnSubmit" title="${text('保 存')}"><i class="fa fa-check"></i> ${text('保 存')}</a>
+				<% } %>
+				<a href="javascript:void(0);" class="btn btn-default" onclick="js.closeCurrentTabPage()" title="${text('关闭')}"><i class="fa fa-reply-all"></i> ${text('关 闭')}</a>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${ctInvoiceregister}" action="${ctx}/ct/ctInvoiceregister/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body" style="padding-bottom:110px;">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkInvoiceregister"/>
+				<#form:hidden path="vsrcid"/>
+				<#form:hidden path="vsrcno"/> <!-- 来源单据信息，不可删除 -->
+				<span id="isRef" class="hide">${isRef}</span>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('所属组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData" readonly="${isRef}"
+									class="required" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('单据号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+									<#form:input path="vbillno" readonly="true" maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('开票日期')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="dkpdate" readonly="true" maxlength="20" class="form-control Wdate required disabled"
+									dataFormat="date"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('部门')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="pkDept" title="${text('部门选择')}"
+								path="pkDept.id" labelPath="pkDept.deptName" readonly="${isRef}"
+								url="${ctx}/base/bdDept/treeData" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="pkProject" title="${text('项目选择')}"
+								path="pkProject.pkProject" labelPath="pkProject.name" 
+								url="${ctx}/zl/zlProject/treeData" allowClear="true" readonly="${isRef}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('开票金额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="nkpmny" readonly="true" class="form-control number"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('开票人')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="pkKpr" title="${text('用户选择')}"
+									path="pkKpr.userCode" labelPath="pkKpr.userName"
+									url="${ctx}/sys/office/treeData?isLoadUser=true"
+									class="" allowClear="true" readonly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('来源单据类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="vsrctype" readonly="true" maxlength="255" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('单据状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="vbillstatus" readonly="true" dictType="wg_billstatus" blankOption="false" class="form-control digits" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<h4 class="form-unit cw_btn_taggle">${text('收款明细')}
+					<% if (hasPermi('ct:ctInvoiceregister:edit')&&!noEdit&&!isRef){ %>
+						<a href="#" title="增行" id="ctInvoiceregisterSkmxDataGridAddRowBtn" class="btn-plus pull-right"><i class="fa fa-plus"></i></a>
+					<% } %>
+				</h4>
+				<div class="ml10 mr10">
+					<table id="ctInvoiceregisterSkmxDataGrid"></table>
+				</div>
+				<h4 class="form-unit cw_btn_taggle">${text('开票信息')}
+					<!-- <% if (hasPermi('ct:ctInvoiceregister:edit')){ %>
+						<a href="#" title="增行" id="ctInvoiceregisterKpxxDataGridAddRowBtn" class="btn-plus pull-right"><i class="fa fa-plus"></i></a>
+					<% } %> -->
+				</h4>
+				<div class="ml10 mr10">
+					<table id="ctInvoiceregisterKpxxDataGrid"></table>
+				</div>
+				<div class="c_footer_box">
+					<h4 class="form-unit">${text('表尾信息')}</h4>
+					<div class="row">
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+										<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('制单时间')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:input path="creationtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('修改时间')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:input path="modifiedtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('审核人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:treeselect id="approver" title="${text('用户选择')}"
+										path="approver.userCode" labelPath="approver.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('审核时间')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:input path="approvetime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('ct:ctInvoiceregister:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/htmlview.js"></script>
+<script>
+var flag = ${noEdit};
+if(flag){
+	setHtmlView();
+}
+var canRef= ${isRef};
+//初始化开票信息DataGrid对象
+$("#ctInvoiceregisterKpxxDataGrid").dataGrid({
+
+	data: ${toJson(ctInvoiceregister.ctInvoiceregisterKpxxList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkInvoiceregisterKpxx', editable:true, hidden:true},
+		{header:'${text("父主键")}', name:'pkInvoiceregister.pkInvoiceregister', editable:true, hidden:true},
+		{header:'${text("公司名称")}', name:'pkOrg', width:250, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control required' ,'readonly':'true'}},
+		{header:'${text("id")}', name:'vsrcid', width:150, editable: true,hidden:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':true}},
+		{header:'${text("税号")}', name:'taxno', width:150, editable: true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':true}},
+		{header:'${text("地址")}', name:'addr', width:150, editable: true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':true}},
+		{header:'${text("电话")}', name:'phone', width:150, editable: true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':true}},
+		{header:'${text("开户行")}', name:'bankname', width:150, editable: true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':true}},
+		{header:'${text("账户")}', name:'accnum', width:150, editable: true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':true}},
+		{header:'${text("操作")}', name:'actions',hidden:true, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#ctInvoiceregisterKpxxDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#ctInvoiceregisterKpxxDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: !flag,				// 是否是编辑表格
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#ctInvoiceregisterKpxxDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {pkInvoiceregisterKpxx: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'ctInvoiceregisterKpxxList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkInvoiceregisterKpxx,pkInvoiceregister.pkInvoiceregister,pkOrg,taxno,addr,phone,bankname,accnum,ts,dr,vsrcid,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化收款明细DataGrid对象
+$("#ctInvoiceregisterSkmxDataGrid").dataGrid({
+
+	data: ${toJson(ctInvoiceregister.ctInvoiceregisterSkmxList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkInvoiceregisterSkmx', editable:true, hidden:true},
+		{header:'${text("父主键")}', name:'pkInvoiceregister.pkInvoiceregister', editable:true, hidden:true},
+		{header:'${text("客户名称")}', name:'pkCustomer', width:250,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCustomer.name');
+			},unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkCustomer') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template(canRef?'listselectTpl2':'listselectTpl', {
+						id: 'cust_'+editOptions.id, title: '客户选择', 
+						name: 'pkCustomer.id', value: val.split('|')[0], 
+						labelName: 'pkCustomer.name', labelValue: val.split('|')[1],
+						itemCode :'id' ,itemName:'name', 
+						url: '${ctx}/base/bdCustomer/bdCustomerSelect', cssClass: 'required pkCustomer'
+					});
+				}
+			}
+		},
+		{header:'${text("楼栋")}', name:'pkBuilding', width:250,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkBuilding.name');
+			},unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkBuildingfile') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template(canRef?'listselectTpl2':'listselectTpl', {
+						id: 'build_'+editOptions.id, title: '楼栋选择', 
+						name: 'pkBuilding.id', value: val.split('|')[0], 
+						labelName: 'pkBuilding.name', labelValue: val.split('|')[1],
+						itemCode :'id' ,itemName:'name',
+						url: '${ctx}/zl/zlBuildingfile/buildingSelect', cssClass: ''
+					});
+				}
+			}
+		},
+		{header:'${text("房产信息")}', name:'pkHouse', width:250,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkHouse.estatename');
+			},unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkHousesource') + '|' + js.val(obj.colModel.data[obj.rowId], 'estatename');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template(canRef?'listselectTpl2':'listselectTpl', {
+						id: 'house_'+editOptions.id, title: '房产选择', 
+						name: 'pkHouse.id', value: val.split('|')[0], 
+						labelName: 'pkHouse.estatename', labelValue: val.split('|')[1],
+						itemCode :'id' ,itemName:'estatename',
+						url: '${ctx}/zl/zlHousesource/housesourceSelect', cssClass: ''
+					});
+				}
+			}
+		},
+		{header:'${text("收费项目")}', name:'pkYsproject', width:250,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkYsproject.name');
+			},unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template(canRef?'treeselectTpl2':'treeselectTpl', {
+						id: 'ysproj_'+editOptions.id, title: '收费项目选择', 
+						name: 'pkYsproject.id', value: val.split('|')[0], 
+						labelName: 'pkYsproject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/bd/bdProject/treeData', cssClass: ''
+					});
+				}
+			}
+		},
+		{header:'${text("费用开始日期")}', name:'dstartdate', width:150, 
+			formatter:'date', formatoptions:{srcformat:'Y-m-d H:i:s',newformat:'Y-m-d'},
+			editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true',
+				dataInit: function(element){ /* $(element).on('focus', function(){
+					WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});
+				});*/
+			}}
+		},
+		{header:'${text("费用截止日期")}', name:'denddate', width:150, 
+			formatter:'date', formatoptions:{srcformat:'Y-m-d H:i:s',newformat:'Y-m-d'},
+			editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true',
+				dataInit: function(element){ /* $(element).on('focus', function(){
+					WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});
+				}); */
+			}}
+		},
+                {header:'${text("id")}', name:'vsrcid', width:150, editable:true,hidden:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		{header:'${text("会计年月")}', name:'kjqj', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':true}},
+		{header:'${text("剩余开票金额")}', name:'nsykpmny',align:'right', width:150, editable:true, edittype:'text', formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		} ,editoptions:{'class':'form-control number','readonly':true}},
+		{header:'${text("开票金额")}', name:'nkpmny',align:'right', width:150, editable:true, edittype:'text', formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		} ,editoptions:{'class':'form-control number required nkpmny'}},
+		{header:'${text("税率")}', name:'taxrate',align:'right', width:150, editable:true, edittype:'text', formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		} ,editoptions:{'class':'form-control number required taxrate'}},
+		{header:'${text("税额")}', name:'ntaxmny',align:'right', width:150, editable:true, edittype:'text', formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		},editoptions:{'class':'form-control number','readonly':true}},
+		{header:'${text("无税金额")}', name:'nnotaxmny',align:'right', width:150, editable:true, edittype:'text', formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}, editoptions:{'class':'form-control number','readonly':true}},
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		{header:'${text("操作")}', name:'actions', width:80,hidden:flag||canRef, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#ctInvoiceregisterSkmxDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#ctInvoiceregisterSkmxDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: !flag,				// 是否是编辑表格
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#ctInvoiceregisterSkmxDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {pkInvoiceregisterSkmx: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'ctInvoiceregisterSkmxList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkInvoiceregisterSkmx,pkInvoiceregister.pkInvoiceregister,'+
+	'pkCustomer.id,pkCustomer.pkCustomer,pkCustomer.name,pkBuilding.id,pkBuilding.name,'+
+	'pkHouse.id,pkHouse.estatename,pkYsproject.id,pkYsproject.name,dstartdate,denddate,kjqj,nkpmny,'+
+	'taxrate,ntaxmny,nnotaxmny,vmemo,ts,dr,vsrcid,nsykpmny,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script id="treeselectTpl" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	class="{{d.cssClass}}" btnClass="" allowClear="true"/>
+</div>//--></script>
+<script id="listselectTpl" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}"
+	class="{{d.cssClass}}" btnClass="" boxWidth="900" boxHeight="650" allowClear="true"/>
+</div>//--></script>
+<script id="treeselectTpl2" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	class="{{d.cssClass}}" btnClass="" allowClear="true" readonly="true"/>
+</div>//--></script>
+<script id="listselectTpl2" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}" readonly="true"
+	class="{{d.cssClass}}" btnClass="" boxWidth="900" boxHeight="650" allowClear="true"/>
+</div>//--></script>
+<script>
+form_jine();//金额格式化
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>
+<script src="${ctxStatic}/ct/ctInvoiceregister/ctInvoiceregisterForm.js"></script>

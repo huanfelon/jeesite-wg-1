@@ -1,0 +1,332 @@
+﻿<% layout('/layouts/default.html', {title: '客户信息中心管理', libs: ['validate','dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa icon-note"></i> ${text(bdCustomer.isNewRecord ? '新增客户信息中心' : '编辑客户信息中心')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('base:bdPsndoc:edit')){ %>
+					<a href="javascript:void(0);" class="btn btn-sm ${noEdit?'hidden':''}" id="ly_btnSubmit" title="${text('保 存')}"><i class="fa fa-check"></i> ${text('保存')}</a>
+				<% } %>
+				<a href="javascript:void(0);" class="btn btn-sm" onclick="js.closeCurrentTabPage()" title="${text('关闭')}"><i class="fa fa-reply-all"></i> ${text('关闭')}</a>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${bdCustomer}" action="${ctx}/base/bdCustomer/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkCustomer"/>
+				<#form:hidden path="isNewRecord"/>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('所属组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+									<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData" 
+									class="required" allowClear="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('客户编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="code" readonly="true"  maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('客户名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="name" maxlength="255" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('客户类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+									<#form:treeselect id="pkCusttype" title="${text('客户类型')}"
+									path="pkCusttype.id" labelPath="pkCusttype.name"
+									url="${ctx}/bd/bdCusttype/treeData"
+									class="required" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('业务员')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+									<#form:listselect id="pkPsndoc" title="${text('人员选择')}"
+									path="pkPsndoc.id" labelPath="pkPsndoc.name"
+									itemCode="id" itemName="name"
+									boxWidth="900" boxHeight="$(top.window).height()*3/4"
+									url="${ctx}/base/bdPsndoc/bdPsndocSelect"
+									class="required" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('身份证号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="idno" maxlength="255" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('社会统一信用代码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="creditcode" maxlength="255" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('客户状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="custstatus" readonly="true" dictType="wg_custstatus" blankOption="false" class="form-control" />
+							</div>
+						</div>
+					</div>
+				<!-- <div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('备注')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:textarea path="remarks" rows="4" maxlength="255" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div> -->
+			</div>
+			<h4 class="form-unit cw_btn_taggle">${text('项目信息')}
+				<% if (hasPermi('base:bdCustomer:edit')&&!noEdit){ %>
+					<a href="#" title="增行" id="bdCustomerProjDataGridAddRowBtn" class="btn-plus pull-right hide"><i class="fa fa-plus"></i></a>
+				<% } %>
+			</h4>
+			<div class="ml10 mr10">
+				<table id="bdCustomerProjDataGrid"></table>
+			</div>
+			
+			<h4 class="form-unit">${text('开票信息')}
+				<!-- <% if (hasPermi('base:bdCustomer:edit')){ %>
+					<a href="#" title="增行" id="bdCustomerKpxxDataGridAddRowBtn" class="btn-plus pull-right"><i class="fa fa-plus"></i></a>
+				<% } %> -->
+			</h4>
+			<div class="ml10 mr10">
+				<table id="bdCustomerKpxxDataGrid"></table>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('base:bdCustomer:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/htmlview.js"></script>
+<script>
+var flag = ${noEdit};
+if(flag){
+	setHtmlView();//页面不可编辑
+}
+//初始化项目信息DataGrid对象
+$("#bdCustomerProjDataGrid").dataGrid({
+
+	data: ${toJson(bdCustomer.bdCustomerProjList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkCustomerProj', editable:true, hidden:true},
+		{header:'${text("父主键")}', name:'pkCustomer.pkCustomer', editable:true, hidden:true},
+		{header:'${text("项目名称")}', name:'pkProject', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkProject.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('treeselectTpl', {
+						id: 'proj_'+editOptions.id, title: '项目信息', 
+						name: 'pkProject.pkProject', value: val.split('|')[0], 
+						labelName: 'pkProject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/zl/zlProject/treeData', cssClass: 'required'
+					});
+				}
+			}
+		},
+		{header:'${text("项目编码")}', name:'code',index:'a.code', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control','readonly':'true'}},
+		{header:'${text("操作")}', name:'actions',hidden:flag, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#bdCustomerProjDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				//actions.push('<a href="#" data-id="'+obj.rowId+'" onclick="checkProjIsRef(this)"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				//actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#bdCustomerProjDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				actions.push('<a href="#" data-id="'+obj.rowId+'" onclick="checkProjIsRef(this);return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	shrinkToFit: false,
+	editGrid: !flag,				// 是否是编辑表格
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#bdCustomerProjDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: true,	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkCustomerProj: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'bdCustomerProjList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkCustomerProj,pkCustomer.pkCustomer,pkProject.name,pkProject.pkProject,pkProject.id,code,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化开票信息DataGrid对象
+$("#bdCustomerKpxxDataGrid").dataGrid({
+
+	data: ${toJson(bdCustomer.bdCustomerKpxxList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkCustomerKpxx', editable:true, hidden:true},
+		{header:'${text("父主键")}', name:'pkCustomer.pkCustomer', editable:true, hidden:true},
+		/* {header:'${text("公司名称")}', name:'pkOrg', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkOrg.officeName');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'officeCode') + '|' + js.val(obj.colModel.data[obj.rowId], 'officeName');
+			},editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('treeselectTpl', {
+						id: 'office_'+editOptions.id, title: '公司选择',
+						name: 'pkOrg.officeCode', value: val.split('|')[0], 
+						labelName: 'pkOrg.officeName', labelValue: val.split('|')[1],
+						url: '${ctx}/sys/office/treeData', cssClass: 'required',
+					});
+				}
+			}
+		}, */
+		{header:'${text("公司名称")}', name:'pkOrg', width:250, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		{header:'${text("税号")}', name:'taxno', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		{header:'${text("地址")}', name:'addr', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		{header:'${text("电话")}', name:'phone', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		{header:'${text("开户行")}', name:'bankname', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		{header:'${text("账户")}', name:'accnum', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'255', 'class':'form-control'}},
+		/* {header:'${text("操作")}', name:'actions', width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#bdCustomerKpxxDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#bdCustomerKpxxDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}} */
+	],
+	
+	// 编辑表格参数
+	editGrid: !flag,				// 是否是编辑表格
+	editGridInitRowNum: 1,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#bdCustomerKpxxDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {pkCustomerKpxx: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'bdCustomerKpxxList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkCustomerKpxx,pkCustomer.pkCustomer,pkOrg,taxno,addr,phone,bankname,accnum,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script id="treeselectTpl" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	class="{{d.cssClass}}" btnClass="" readonly="{{d.readonly}}" allowClear="true"/>
+</div>//--></script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+//删除表体项目行数据判断项目是否被引用
+function checkProjIsRef(data){
+	var rowid=$(data).attr("data-id");
+	js.confirm('${text("你确认要删除这条数据吗？")}', 
+		function(){
+		//此处预留校验项目是否被引用
+		var flag=false;
+		var xmcode="proj_"+rowid+"_pkProjectCode";
+		var xmid=$('#'+xmcode).val();
+		$.ajax({
+			type : "post",
+			url : "${ctx}/base/bdCustomer/getXmIsRef",
+			contentType : "application/json;charset=UTF-8",
+			dataType : 'json',
+			data : xmid,
+			async : false,
+			success : function(data) {
+				if(data.result == Global.TRUE){
+					flag=false;
+				}else if(data.result == Global.FALSE){
+					flag=true;
+				}
+			},
+		    error : function (data) {
+		    	alert("请求失败！");
+		    }
+		});
+		if(flag){
+			js.showMessage("项目已被引用，不可删除！",'','warning',3000);
+			return;
+		}
+		$('#bdCustomerProjDataGrid').dataGrid('setRowData',rowid,null,{display:'none'});
+		$('#'+rowid+'_status').val(Global.STATUS_DELETE);
+		}
+	);
+	
+}
+</script>
+<script src="${ctxStatic}/base/bdCustomer/bdCustomerForm.js"></script>

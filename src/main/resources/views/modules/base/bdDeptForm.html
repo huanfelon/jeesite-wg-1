@@ -1,0 +1,175 @@
+<% layout('/layouts/default.html', {title: '部门管理', libs: ['validate']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(bdDept.isNewRecord ? '新增部门' : '编辑部门')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('base:bdDept:edit')){ %>
+					<a href="javascript:void(0);" class="btn btn-default" id="c_btnSubmit" title="${text('保 存')}"><i class="fa fa-check"></i> ${text('保 存')}</a>
+				<% } %>
+				<a href="javascript:void(0);" class="btn btn-default" onclick="js.closeCurrentTabPage()" title="${text('关闭')}"><i class="fa fa-reply-all"></i> ${text('关 闭')}</a>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${bdDept}" action="${ctx}/base/bdDept/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4">${text('上级部门')}：</label>
+							<div class="col-sm-8">
+								<#form:treeselect id="parent" title="${text('上级部门')}"
+									path="parent.id" labelPath="parent.deptName"
+									url="${ctx}/base/bdDept/treeData?excludeCode=${bdDept.id}" readonly="true" 
+									class="" allowClear="true" canSelectRoot="true" canSelectParent="true"/>
+							</div>
+						</div>
+					</div>
+					<#form:hidden path="pkDept"/>
+					<#form:hidden path="isNewRecord"/>
+						<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData?officeTypes=1,2" readonly="${!bdDept.isNewRecord}"
+									class="required" allowClear="true" canSelectParent="true" canSelectRoot="false" />
+							</div>
+						</div>
+					</div>
+				</div>
+				
+			
+				<div class="row">
+						<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('部门编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="deptCode" maxlength="50" readonly="${!bdDept.isNewRecord}" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('部门名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="deptName" maxlength="50" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+				
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('本级排序号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="treeSort" class="form-control required digits"/>
+							</div>
+						</div>
+					</div>
+						<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('部门管理员')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="deptAdmin" title="${text('用户选择')}"
+									path="deptAdmin.userCode" labelPath="deptAdmin.userName"
+									url="${ctx}/sys/office/treeData?isLoadUser=true"
+									class="" allowClear="true" checkbox="true"/>
+							</div>
+						</div>
+					</div>
+					</div>
+		       <div class="row">
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('备注信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:textarea path="remarks" rows="4" maxlength="255" class="form-control"/>
+							</div>
+						</div>
+					</div>
+				</div>
+	
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('base:bdDept:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+// 选择父级菜单回调方法
+function treeselectCallback(id, act, index, layero){
+	if (id == 'parent' && (act == 'ok' || act == 'clear')){
+		// 创建并初始化下一个节点信息，如：排序号、默认值
+		$.get('${ctx}/base/bdDept/createNextNode?parentCode='
+				+$('#parentCode').val(), function(data){
+			$('#treeSort').val(data.treeSort);
+		});
+	}
+}
+</script>
+<script>
+
+var pageBd = ${toJson(bdDept)};// 页面跳转时的数据
+
+var url = window.location.href;
+var pk_url = js.getParam('parentCode', url);
+if(pk_url!=null ){
+	var JSONDATA={'pk_url':pk_url};
+	$.ajax({
+	    type: "GET",
+	    url: "/js/a/base/bdDept/getOrg",
+	    datatype: 'json',
+	    data: JSONDATA,
+	    contentType: 'application/json;charset=utf-8',
+	    success: function (res) {
+	    	if (res.length>0) {
+	             //新增下级部门时组织塞值
+	    		 $("#pkOrgName").val(res[0].OFFICE_NAME);
+	             $("#pkOrgCode").val(res[0].OFFICE_CODE);
+	             $("#pkOrgName").addClass("disabled");
+	             $("#pkOrgName").attr("readonly","true");
+	             $("#pkOrgName").unbind('click');
+	             $("#pkOrgButton").addClass("disabled");
+	             $("#pkOrgButton").unbind('click');
+	        }else{
+	        	alert("组织选取错误，请联系管理员！");
+	        }
+	    }
+
+	});
+}
+</script>

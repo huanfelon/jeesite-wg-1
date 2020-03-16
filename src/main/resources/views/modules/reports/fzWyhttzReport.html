@@ -1,0 +1,132 @@
+<% layout('/layouts/default.html', {title: '租赁合同台账', libs: ['dataGrid']}){ %>
+<style>
+.ui-jqgrid .ui-jqgrid-htable .ui-jqgrid-labels th {
+    border: 1px solid #fff !important;
+}
+.url_underline{
+	text-decoration: underline;
+}
+</style>
+<link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-tools pull-left">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')} </a>
+				<a href="#" class="btn btn-default hide" id="btnExport"><i class="glyphicon glyphicon-export"></i> 导出</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${fzWyhttz}" action="${ctx}/reports/fzWyhttz/listData" method="post" class="form-inline hide" data-order-by="${parameter.orderBy}">
+				<div class="query-group">
+					<label class="query-label"><span class="required">*</span>${text('所属组织')}：</label>
+					<div class="query-input">
+						<#form:treeselect id="pkOrg" title="${text('组织选择')}" 
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData?officeTypes=1,2&isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="query-group">
+					<label class="query-label"><span class="required">*</span>${text('项目信息')}：</label>
+					<div class="query-input">
+						<#form:treeselect id="pkProject" title="${text('项目选择')}" 
+							path="pkProject.pkProject" labelPath="pkProject.name" 
+							url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" checkbox="true" />
+					</div>
+				</div>
+				<div class="query-group">
+					<label class="query-label">${text('合同编号')}：</label>
+					<div class="query-input">
+						<#form:input path="htcode" maxlength="200" class="form-control"/>
+					</div>
+				</div>
+				<div class="query-group">
+					<label class="query-label">${text('企业名称')}：</label>
+					<div class="query-input">
+						<#form:input path="custname" maxlength="200" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="button" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("合同主键")}', name:'pkContract', hidden:true},
+		{header:'${text("合同编号")}', name:'htcode', index:'', width:200, align:"left", formatter: function(val, obj, row, act){
+			return '<a href="#" onclick="showPlanMny(\''+row.pkContract+'\')" class="url_underline"}">'+(val||row.pkContract)+'</a>';
+		}},
+		{header:'${text("租赁楼层及室号")}', name:'room', index:'', width:150, align:"left"},
+		{header:'${text("合同状态")}', name:'htstatus', index:'', width:100, align:"left"},
+		{header:'${text("签订日期")}', name:'qydate', index:'', width:100, align:"left"},
+		{header:'${text("企业名称")}', name:'custname', index:'', width:250, align:"left"},
+		{header:'${text("合同面积/㎡")}', name:'htarea', index:'', width:100, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("免租区间")}', name:'mzddate', index:'', width:300, align:"left"},
+		{header:'${text("合同开始日期")}', name:'htdstart', index:'', width:100, align:"left"},
+		{header:'${text("合同结束日期")}', name:'htdend', index:'', width:100, align:"left"},
+		{header:'${text("合同实际结束日期")}', name:'htsjdend', index:'', width:120, align:"left"},
+		{header:'${text("租期/年")}', name:'nhtyear', index:'', width:80, align:"left"},
+		{header:'${text("付款方式")}', name:'paystyle', index:'', width:250, align:"left"},
+		{header:'${text("房租合同总价")}', name:'nfzallhtmny', index:'', width:100, align:"left"},
+		{header:'${text("单价(/天/平)")}', name:'nfzprice', index:'', width:120, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 3, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("月租金")}', name:'nfzmonthmny', index:'', width:120, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("年租金")}', name:'nfzyearmny', index:'', width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("租金递增情况")}', name:'vzjtz', index:'', width:250, align:"left"},
+		{header:'${text("物业合同总价")}', name:'nwyallhtmny', index:'', width:100, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("单价(/平/月)")}', name:'nwyprice', index:'', width:120, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("月物业费")}', name:'nwymonthmny', index:'', width:120, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("年物业费")}', name:'nwyyearmny', index:'', width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("合同押金")}', name:'nyjht', index:'', width:120, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("设备押金")}', name:'nyjsb', index:'', width:120, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("续签情况")}', name:'vxq', index:'', width:100, align:"left"},
+		{header:'${text("退押金")}', name:'tyj', index:'', width:100, align:"left"},
+		{header:'${text("备注")}', name:'vmemo', index:'', width:250, align:"left"},
+		{header:'${text("楼号")}', name:'build', index:'', width:150, align:"left"},
+	],
+	lazyLoad: true,		// 是否懒加载Grid数据，默认初始列表后不及时加载数据，（仅对url远程请求数据有效），当调用 dataGrid.refresh()时再进行加载。
+	shrinkToFit: false,		// 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	sortableColumn: true,		// 列表是否允许排序（设置为false后，整个列表不允许排序）
+	groupHeaders: {
+     	twoLevel:[
+     		{startColumnName: 'nfzallhtmny', numberOfColumns:5, titleText:'租赁费'},
+     		{startColumnName: 'nwyallhtmny', numberOfColumns:4, titleText:'物业费'}
+     	],
+    },
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+});
+</script>
+<script src="${ctxStatic}/reports/fzWyhttzReport.js"></script>

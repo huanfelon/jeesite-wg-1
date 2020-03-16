@@ -1,0 +1,294 @@
+<% layout('/layouts/default.html', {title: '人员基本信息管理', libs: ['validate','dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(bdPsndoc.isNewRecord ? '新增人员基本信息' : '编辑人员基本信息')}
+			</div>
+			<div class="box-tools pull-right">
+				<button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('base:bdPsndoc:edit')){ %>
+					<a href="javascript:void(0);" class="btn btn-sm ${noEdit?'hidden':''}" id="c_btnSubmit" title="${text('保 存')}"><i class="fa fa-check"></i> ${text('保存')}</a>
+				<% } %>
+				<a href="javascript:void(0);" class="btn btn-sm" onclick="js.closeCurrentTabPage()" title="${text('关闭')}"><i class="fa fa-reply-all"></i> ${text('关闭')}</a>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${bdPsndoc}" action="${ctx}/base/bdPsndoc/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkPsndoc"/>
+				<#form:hidden path="isNewRecord"/>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('所属组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="pkOrg" title="${text('组织选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName" readonly="${!bdPsndoc.isNewRecord}"
+									url="${ctx}/sys/office/treeData" allowClear="true" class="required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('人员编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="code" maxlength="64" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('姓名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="name" maxlength="200" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('昵称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="netname" maxlength="200" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('曾用名')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="nameused" maxlength="200" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('出生日期')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="birthdate" readonly="true" maxlength="20" class="form-control Wdate"
+									dataFormat="date" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('性别')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="sex" dictType="sys_user_sex" blankOption="true" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('身份证号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="idno" maxlength="64" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('电话')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="phone" maxlength="64" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required">*</span> ${text('人员类别')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="psntype" dictType="wg_psntype" blankOption="false" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('所属部门')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="pkDept" title="${text('部门选择')}"
+									path="pkDept.pkDept" labelPath="pkDept.deptName" class="required" 
+									url="${ctx}/base/bdDept/treeData" allowClear="false" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('数据权限')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="datacontrol" dictType="wg_datacontrol" blankOption="false" class="form-control"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-12">
+						<div class="form-group">
+							<label class="control-label col-sm-2" title="">
+								<span class="required hide">*</span> ${text('权限部门')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-10">
+								<#form:treeselect id="pkDeptall" title="${text('部门选择')}"
+									path="pkDeptall.id" labelPath="pkDeptall.deptName" class=""
+									url="${ctx}/base/bdDept/treeData" allowInput="false" 
+									allowClear="true" checkbox="true" placeholder="不选默认全部"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+            <h4 class="form-unit cw_btn_taggle">${text('任职信息')}
+				<% if (hasPermi('base:bdPsndoc:edit')&&!noEdit){ %>
+					<a href="#" title="增行" id="bdPsndocJobDataGridAddRowBtn" class="btn-plus pull-right hide"><i class="fa fa-plus"></i></a>
+				<% } %>
+			</h4>
+			<div class="ml10 mr10">
+				<table id="bdPsndocJobDataGrid"></table>
+			</div>
+			
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('base:bdPsndoc:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/htmlview.js"></script>
+<script>
+var flag = ${noEdit};
+if(flag){
+	setHtmlView();//页面不可编辑
+}
+//初始化任职信息DataGrid对象
+$("#bdPsndocJobDataGrid").dataGrid({
+
+	data: ${toJson(bdPsndoc.bdPsndocJobList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkPsndocJob', editable:true, hidden:true},
+		{header:'${text("父主键")}', name:'pkPsndoc.pkPsndoc', editable:true, hidden:true},
+		
+		{header:'${text("任职业务单元")}',align:'left', name:'pkOrg', width:250,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkOrg.officeName');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'officeCode') + '|' + js.val(obj.colModel.data[obj.rowId], 'officeName');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('treeselectTpl', {
+						id: 'office_'+editOptions.id, title: '机构选择', 
+						name: 'pkOrg.officeCode', value: val.split('|')[0], 
+						labelName: 'pkOrg.officeName', labelValue: val.split('|')[1],
+						url: '${ctx}/sys/office/treeData', cssClass: 'required',
+					});
+				}
+			}
+		},
+		{header:'${text("任职部门")}', name:'pkDeptc', width:250,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkDeptc.deptName');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'id') + '|' + js.val(obj.colModel.data[obj.rowId], 'deptName');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('treeselectTpl', {
+						id: 'office_'+editOptions.id, title: '部门选择', 
+						name: 'pkDeptc.id', value: val.split('|')[0], 
+						labelName: 'pkDeptc.deptName', labelValue: val.split('|')[1],
+						url: '${ctx}/base/bdDept/treeData', cssClass: 'required',
+					});
+				}
+			}
+		},
+		{header:'${text("权限部门")}', name:'pkDeptcall', width:450,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkDeptcall.deptName');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkDept') + '|' + js.val(obj.colModel.data[obj.rowId], 'deptName');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('treeselectTpl2', {
+						id: 'office_'+editOptions.id, title: '部门选择', placeHolder:'不选默认全部',
+						name: 'pkDeptcall.pkDept', value: val.split('|')[0], 
+						labelName: 'pkDeptcall.deptName', labelValue: val.split('|')[1],
+						url: '${ctx}/base/bdDept/treeData', cssClass: '',
+					});
+				}
+			}
+		},
+		{header:'${text("操作")}', name:'actions',hidden:flag, width:120, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#bdPsndocJobDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#bdPsndocJobDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: !flag,				// 是否是编辑表格
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#bdPsndocJobDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: true,	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkPsndocJob: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'bdPsndocJobList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkPsndocJob,pkPsndoc.pkPsndoc,pkOrg.officeCode,pkOrg.officeName,pkDeptc.id,pkDeptc.pkDept,pkDeptc.deptName,pkDeptcall.id,pkDeptcall.pkDept,pkDeptcall.deptName,', // 提交数据列表的属性字段
+	
+	//shrinkToFit : false,		// 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script id="treeselectTpl" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	class="{{d.cssClass}}" btnClass="" readonly="{{d.readonly}}" allowClear="true" checkbox="false"/>
+</div>//--></script>
+<script id="treeselectTpl2" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}"
+	class="{{d.cssClass}}" btnClass="" placeholder="{{d.placeHolder}}" allowClear="true" checkbox="true"/>
+</div>//--></script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>
+<script src="${ctxStatic}/base/bdPsndoc/bdPsndocForm.js"></script>

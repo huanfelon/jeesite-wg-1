@@ -1,0 +1,242 @@
+﻿<% layout('/layouts/default.html', {title: '房源信息管理', libs: ['dataGrid']}){ %>
+<!-- <link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/> -->
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('房源信息管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('zl:zlHousesource:edit')){ %>
+					<a href="${ctx}/zl/zlHousesource/form?isEdit=true" class="btn btn-default btnTool" title="${text('新增房源信息')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default" id="c_btnRefresh" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+				<a href="javascript:" class="btn btn-default"  onclick="correct()" id="correct"  title="${text('批改')}"><i class="fa fa-sign-in"> ${text('批改')}</i></a>
+				<a href="javascript:" id="edit" onclick="c_editBtn2('/js/a/zl/zlHousesource/bianji?pkHousesource')" class="btn btn-default" title="${text('修改房源')}"><i class="fa fa-pencil"></i> ${text('修改')}</a>
+				<a href="javascript:" onclick="delData()"  class="btn btn-default" title="${text('批量删除')}"><i class="fa fa-trash-o"></i> ${text('批量删除')}</a>
+				<a href="javascript:" class="btn btn-default" id="btnImport"  title="${text('导入')}"><i class="fa fa-sign-in"> ${text('导入')}</i></a>
+				<a href="${ctx}/zl/zlHousesource/exportTemplate" class="btn btn-default" id="btnExport1"  title="${text('导出')}"><i class="fa fa-sign-in"> ${text('导出')}</i></a>
+				<a href="javascript:" class="btn btn-default"  onclick="merge()" id="merge"  title="${text('合并')}"><i class="fa fa-sign-in">${text('合并')}</i></a>
+			    <a href="javascript:" class="btn btn-default"  onclick="split()" id="split"  title="${text('拆分')}"><i class="fa fa-sign-in">${text('拆分')}</i></a>  
+				<a href="javascript:" class="btn btn-default"  onclick="btnCk()" id="btnCk"  title="${text('版本查看')}"><i class="fa fa-sign-in">${text('版本查看')}</i></a> 
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${zlHousesource}" action="${ctx}/zl/zlHousesource/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+					<div class="form-group">
+					<label class="control-label">${text('组织')}：</label>
+					<div class="control-inline ">
+	                  <#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData"
+			   						class="" allowClear="true"/>					</div>
+				    </div>
+					<div class="form-group">
+						<label class="control-label">${text('房产编号')}：</label>
+						<div class="control-inline">
+							<#form:input path="estatecode" maxlength="50" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('房产名称')}：</label>
+						<div class="control-inline">
+							<#form:input path="estatename" maxlength="50" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('项目名称')}：</label>
+						<div class="control-inline">
+								 <#form:treeselect id="projectname" title="${text('项目选择')}"
+										path="projectname.pkProject" labelPath="projectname.name"
+										url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true"
+										chkboxType="{'Y':'ps','N':'ps'}"
+										class="" checkbox="true" canSelectParent="true" canSelectRoot="true" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('楼栋')}：</label>
+						<div class="control-inline">
+						    <#form:listselect id="buildname" title="楼栋选择" 
+	                                	path="buildname.pkBuildingfile" labelPath="buildname.name"
+									    url="${ctx}/zl/zlBuildingfile/buildingSelect" allowClear="false" 
+									    boxWidth="900" boxHeight="$(top.window).height()*3/4"
+									    checkbox="true" itemCode="pkBuildingfile" itemName="name" class="form-control   required"/>  
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('户型')}：</label>
+						<div class="control-inline">
+								  <#form:listselect id="pkFamilyfile" title="户型选择" 
+	                                	path="pkFamilyfile.pkFamilyfile" labelPath="pkFamilyfile.name"
+									    url="${ctx}/zl/zlFamilyfile/familySelect" allowClear="false" 
+									    boxWidth="900" boxHeight="$(top.window).height()*3/4"
+									    checkbox="true" itemCode="pkFamilyfile" itemName="name" class="form-control required" /> 
+						</div>
+					</div>
+				<!-- 	<div class="form-group">
+						<label class="control-label">${text('业态')}：</label>
+						<div class="control-inline width-120">
+								 <#form:treeselect id="pkFormattype" title="${text('业态选择')}"
+										path="pkFormattype.pkFormattype" labelPath="pkFormattype.name"
+										url="${ctx}/zl/zlFormattype/treeData?isShowCode=true&officeTypes=1,2" allowClear="true"
+										class="" checkbox="true" />
+						</div>
+					</div> -->
+			
+		<!-- 			<div class="form-group">
+						<label class="control-label">${text('制单日期')}：</label>
+						<div class="control-inline">
+						  查询单个日期
+							<#form:input path="dbilldate" readonly="true" maxlength="20" class="form-control Wdate-date"
+								dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+								
+								日期范围查询 
+							<#form:input path="dbilldate_gte" readonly="true"  maxlength="20" class="form-control Wdate-date" placeholder="起始时间" 
+							     dataFormat="date" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(dbilldate_lte)}',isShowClear:true});"/>
+							&nbsp;--&nbsp;
+							<#form:input path="dbilldate_lte" readonly="true"  maxlength="20" class="form-control Wdate-date" placeholder="终止时间" 
+								dataFormat="date" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(dbilldate_gte)}',isShowClear:true});"/> 
+						</div>
+					</div> -->
+		         <div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+		<div id="showRefData">
+			<ul>
+				<!-- 动态存放参照模糊查询数据 -->
+			</ul>
+		</div>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/zl/zlHousesource/zlHousesourceList.js"></script>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+	     {header:'${text("组织名称")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"left"},
+		{header:'${text("项目名称")}', name:'projectname.name', index:'a.projectname', width:150, align:"left"},
+		{header:'${text("楼栋")}', name:'buildname.name',hidden:true, index:'a.buildname', width:150, align:"left"},
+		{header:'${text("单元")}', name:'unit', index:'a.unit', width:60, align:"left"},
+		{header:'${text("楼层")}', name:'floorn', index:'a.floorn', width:60, align:"left"},
+		{header:'${text("房号")}', name:'roomnumber', index:'a.roomnumber', width:60, align:"left"},
+		{header:'${text("房产编号")}', name:'estatecode', index:'a.estatecode', width:170, align:"left"},
+		{header:'${text("房产名称")}', name:'estatename',editable:true, index:'a.estatename', width:170, align:"left"},
+		{header:'${text("面积")}', name:'buildarea', index:'a.buildarea', width:60, align:"right",classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("产证面积")}', name:'innerarea',hidden:true,  index:'a.innerarea', width:150, align:"right", classes:"color-area-label",formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("户型信息")}', name:'pkFamilyfile.name', index:'a.pk_familyfile', width:150, align:"left"},
+		{header:'${text("业态")}', name:'pkFormattype.name', index:'a.pk_formattype', width:150, align:"left"},
+		{header:'${text("组织名称编码")}', name:'pkOrg.officeCode', hidden:true,index:'a.pk_org', width:150, align:"left"},
+		{header:'${text("项目名称编码")}', name:'projectname.pkProject', hidden:true,index:'a.projectname', width:150, align:"left"},
+		{header:'${text("业态编码")}', name:'pkFormattype.pkFormattype', hidden:true,index:'a.pk_formattype', width:150, align:"left"},
+		{header:'${text("楼栋编码")}', name:'buildname.pkBuildingfile', hidden:true, index:'a.buildname', width:150, align:"left"},
+		{header:'${text("户型信息")}', name:'pkFamilyfile.pkFamilyfile', hidden:true,index:'a.pk_familyfile', width:150, align:"left"},
+		{header:'${text("房源状态")}', name:'housestate',index:'a.housestate', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('zl_housestatus')}, val, '${text("未知")}', true);
+		}},
+		
+		{header:'${text("主实体房号")}', name:'zstroom', hidden:true,index:'a.zstroom', width:100, align:"center"},
+        {header:'${text("主实体主键")}', name:'zstpk',hidden:true,index:'a.zstpk', width:100, align:"center"},
+		{header:'${text("制单人")}', name:'creator.userName', index:'a.creator', width:100, align:"left"},
+		{header:'${text("制单日期")}', name:'dbilldate', index:'a.dbilldate', width:120, align:"center"},
+		{header:'${text("修改人")}', name:'modifier.userName', index:'a.modifier', width:100, align:"left"},
+		{header:'${text("修改日期")}', name:'modifiedtime', index:'a.modifiedtime', width:120, align:"center"}, 
+		{header:'${text("操作")}', name:'actions',hidden:true, width:100, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('zl:zlHousesource:edit')){ %>
+				//actions.push('<a href="${ctx}/zl/zlHousesource/form?pkHousesource='+row.pkHousesource+'&isEdit=true" class="btnList" title="${text("编辑房源信息")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="javascript:void(0);" data-url="${ctx}/zl/zlHousesource/bianji?pkHousesource='+row.pkHousesource+'&isEdit=true" onclick="bianji33(this, false)" title="${text("编辑房源信息")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/zl/zlHousesource/delete?pkHousesource='+row.pkHousesource+'" class="btnList" title="${text("删除房源信息")}" data-confirm="${text("确认要删除该房源信息吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+
+	lazyLoad: true,//懒加载，当调用 dataGrid.refresh()时再进行加载
+	showCheckbox :true ,
+	shrinkToFit : false,//自动分配单元格宽度
+
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "查看房源信息", "/js/a/zl/zlHousesource/form?pkHousesource="+id+"&isEdit=false", null, null);//弹出新的标签页
+	},
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+	onSelectRow: function(id, isSelect, event){//判断是否有数据选择
+	},
+});
+</script>
+<script id="importTpl" type="text/template">
+<form id="inputForm" action="${ctx}/zl/zlHousesource/importData" method="post" enctype="multipart/form-data"
+	class="form-horizontal mt20 mb10" style="overflow:auto;max-height:200px;">
+	<div class="row">
+		<div class="col-xs-12 col-xs-offset-1">
+			<input type="file" id="file" name="file" class="form-file"/>
+			<div class="mt10 pt5">
+				<a href="${ctx}/zl/zlHousesource/importTemplate" class="btn btn-default btn-xs"><i class="fa fa-file-excel-o"></i> ${text('下载模板')}</a>
+			</div>
+			<font color="red" class="pull-left mt10">
+				${text('提示：仅允许导入“xls”或“xlsx”格式文件！')}
+			</font>
+		</div>
+	</div>
+</form>
+</script>
+<script>
+//根据项目过滤户型
+$("#projectnameDiv").change(function(){
+	 var proj = $("#projectnameCode").val();
+	 $("#pkFamilyfileName").val("");
+	 $("#pkFamilyfileCode").val("");
+	 $("#pkFormattypeName").val("");
+	 $("#pkFormattypeCode").val("");
+	 $("#buildarea").val("");
+	 $("#innerarea").val("");
+	 $("#pkFamilyfileDiv").attr('data-url',"${ctx}/zl/zlFamilyfile/familySelect?pkProjectid="+proj);
+}); 
+//根据项目过滤楼栋
+$("#projectnameDiv").change(function(){
+	 var proj = $("#projectnameCode").val();
+	 $("#buildnameName").val("");
+	 $("#buildnameCode").val("");
+	 $("#buildnameDiv").attr('data-url',"${ctx}/zl/zlBuildingfile/buildingSelect?pkProjectid="+proj);
+}); 
+//根据项目或户型过滤业态
+$("#projectnameDiv").change(function(){
+	 var proj = $("#projectnameCode").val();
+	 var fam = $("#pkFamilyfileCode").val();
+	 
+	 $("#pkFormattypeName").val("");
+	 $("#pkFormattypeCode").val("");
+	 $("#pkFormattypeDiv").attr('data-url',"${ctx}/zl/zlFormattype/treeData1?pkProjectid="+proj);
+}); 
+
+//根据户型过滤业态(选择户型时)
+$("#pkFamilyfileDiv").change(function(){
+	 var fam = $("#pkFamilyfileCode").val();
+	 $("#pkFormattypeName").val("");
+	 $("#pkFormattypeCode").val("");
+	 $("#pkFormattypeDiv").attr('data-url',"${ctx}/zl/zlFormattype/treeData1?pkFamily="+fam);
+}); 
+//不点击项目的情况下过滤户型、楼栋、业态
+var proj = $("#projectnameCode").val();
+var fam = $("#pkFamilyfileCode").val();
+ $("#buildnameDiv").attr('data-url',"${ctx}/zl/zlBuildingfile/buildingSelect?pkProjectid="+proj);
+ $("#pkFamilyfileDiv").attr('data-url',"${ctx}/zl/zlFamilyfile/familySelect?pkProjectid="+proj);
+ $("#pkFormattypeDiv").attr('data-url',"${ctx}/zl/zlFormattype/treeData1?pkProjectid="+proj+'&pkFamily='+fam);
+ 
+</script>
+<script src="${ctxStatic}/js/refPBFF.js"></script>

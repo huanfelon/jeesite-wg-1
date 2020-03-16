@@ -1,0 +1,149 @@
+<% layout('/layouts/default.html', {title: '房源信息管理', libs: ['validate']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<#form:form id="inputForm" model="${zlHousesource}" action="${ctx}/zl/zlHousesource/save" method="post" class="form-horizontal">
+			<div class="box-body">
+				<#form:hidden path="pkHousesource"/>
+				<#form:hidden path="projectname"/>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('房产名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="estatename" maxlength="50" readOnly="true" class="form-control "/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6 hide">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								 <#form:treeselect id="projectname" title="${text('项目选择')}"
+									path="projectname.pkProject" labelPath="projectname.name"
+									url="${ctx}/zl/zlProject/treeData"
+									class="" canSelectParent="true" canSelectRoot="true" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6 hide">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('项目编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								 <#form:treeselect id="projectcode" title="${text('项目选择')}"
+									path="projectcode.pkProject" labelPath="projectcode.name"
+									url="${ctx}/zl/zlProject/treeData"
+									class="" canSelectParent="true" canSelectRoot="true" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('户型信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+                           <#form:listselect id="pkFamilyfile" title="户型选择" 
+                                	path="pkFamilyfile.pkFamilyfile" labelPath="pkFamilyfile.name"
+								    url="${ctx}/zl/zlFamilyfile/familySelect" allowClear="false" 
+								    checkbox="false" itemCode="pkFamilyfile" itemName="name" class="form-control required"/> 
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('租赁面积')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="buildarea" class="form-control number required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('产证面积')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="innerarea" class="form-control number required"/>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('房源状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:select path="housestate" dictType="zl_housestatus2" readOnly="true"  class="form-control digits required" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hidden">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('zl:zlHousesource:edit')){ %>
+						<a herf="javascript:void(0);"  class="btn btn-sm btn-primary" id="btnSubmit2" ><i class="fa fa-check"></i> ${text('保 存')}</a>&nbsp;
+							<button type="submit" class="btn btn-sm btn-primary  hidden" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default hidden " id="btnCancel"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+			
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+
+
+ var proj = $("#projectnameCode").val();
+$("#pkFamilyfileName").val("");
+$("#pkFamilyfileCode").val("");
+$("#pkFamilyfileDiv").attr('data-url',"${ctx}/zl/zlFamilyfile/familySelect?pkProjectid="+proj);
+//选择户型带出业态、租赁、产证
+$("#pkFamilyfileDiv").change(function(){
+	 var proj = $("#pkFamilyfileCode").val();
+		var JSONDATA={'pkFamilyfileCode':proj};
+		$.ajax({
+			url: '/js/a/zl/zlFamilyfile/out',
+			datatype: 'json',
+			data: JSONDATA,
+			async:false,
+			contentType: 'application/json;charset=utf-8',
+			success: function (msg) {
+			     $("#pkFormattypeName").val(msg.pkFormattypeid.name);
+			     $("#pkFormattypeCode").val(msg.pkFormattypeid.id);
+			     $("#buildarea").val(msg.builtuparea);
+			     $("#innerarea").val(msg.innerarea);
+			     $("#buildarea").attr('disabled','disabled');
+			     $("#innerarea").attr('disabled','disabled');
+			}
+		});
+}); 
+
+ 	$('#pkFormattypeButton').unbind('click');//移除参照选择
+ 	$('#pkFormattypeName').unbind('click');//移除参照选择
+     $("#pkFormattypeName").attr('disabled','disabled');
+ 	 var name=$('#projectname').val();
+</script>
+
+<script src="${ctxStatic}/zl/zlHousesource/zlHousesourceList.js"></script>

@@ -1,0 +1,314 @@
+﻿<% layout('/layouts/default.html', {title: '应确认收入管理', libs: ['validate']}){ %>
+<link href="${ctxStatic}/css/zlFormShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<div class="box-tools pull-left">
+				<% if (isEdit=="true"){ %>
+				<a href="javascript:void(0);" class="btn btn-sm" id="btnSubmit1" title="${text('保 存')}"><i class="fa fa-check"></i> ${text('保存')}</a>
+				<% } %>
+				<a href="javascript:void(0);" class="btn btn-sm" onclick="js.closeCurrentTabPage()" title="${text('关闭')}"><i class="fa fa-reply-all"></i> ${text('关闭')}</a>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${ctChargeYqrsr}" action="${ctx}/ct/ctChargeYqrsr/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body" style="padding-bottom:110px;">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkChargeYqrsr"/>
+				<span id="isEdit" class="hide">${isEdit}</span>
+				<div class="row" style="margin: 4px 4px 0 2px !important;">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData"
+									class="required" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('部门')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+							<#form:treeselect id="pkDept" title="${text('部门选择')}"
+									path="pkDept.pkDept" labelPath="pkDept.deptName"
+									url="${ctx}/base/bdDept/treeData"
+									class="required"  canSelectRoot="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+                                    <#form:treeselect id="pkProject" title="${text('项目选择')}"
+									path="pkProject.pkProject" labelPath="pkProject.name"
+									url="${ctx}/zl/zlProject/treeData?isShowCode=true"
+									class=""  class="form-control required" allowClear="true"/>							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('合同号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+							<#form:input path="htcode" maxlength="200" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('客户名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+                                    <#form:listselect id="pkCustomer" title="客户选择" 
+                                	path="pkCustomer.pkCustomer" labelPath="pkCustomer.name"
+								    url="${ctx}/base/bdCustomer/bdCustomerSelect" allowClear="false"
+								     boxWidth="900" boxHeight="$(top.window).height()*3/4" 
+								    checkbox="false" itemCode="pkCustomer" itemName="name" class="form-control required"/>  							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('楼栋')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+                                    <#form:listselect id="pkBuild" title="楼栋选择" 
+                                	path="pkBuild.pkBuildingfile" labelPath="pkBuild.name"
+								    url="${ctx}/zl/zlBuildingfile/buildingSelect" allowClear="false"
+								     boxWidth="900" boxHeight="$(top.window).height()*3/4" 
+								    checkbox="false" itemCode="pkBuildingfile" itemName="name" class="form-control required"/>  							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('房产名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+                                   <#form:listselect id="pkHouse" title="房产选择" 
+                                	path="pkHouse.pkHousesource" labelPath="pkHouse.estatename"
+								    url="${ctx}/zl/zlHousesource/housesourceSelect" allowClear="false"
+								     boxWidth="900" boxHeight="$(top.window).height()*3/4" 
+								    checkbox="false" itemCode="pkHousesource" itemName="estatename" class="form-control required"/>  							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('收费项目')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+                                    <#form:treeselect id="pkSfProject" title="${text('项目选择')}"
+									path="pkSfProject.pkProject" labelPath="pkSfProject.name"
+									url="${ctx}/bd/bdProject/treeData"
+									class="required" allowClear="true"/>								</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('费用开始日期')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+									<#form:input path="fyksdate" readonly="true" maxlength="20" class="form-control Wdate"
+									dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('费用截止日期')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+									<#form:input path="fyjzdate" readonly="true" maxlength="20" class="form-control Wdate"
+									dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('会计年月')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="kjyears" readonly="true" maxlength="20" class="form-control Wdate"
+									dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM',isShowClear:true});"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('应确认收入金额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="nyqrsrmny" maxlength="28" class="form-control number required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('税率')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="taxRate" maxlength="28" class="form-control number required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('应确认收入无税金额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="noTaxAmount" maxlength="28" class="form-control number required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('税额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="taxAmount" maxlength="28" class="form-control number required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('收入确认金额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="nsrqrmny" maxlength="28" class="form-control number" defaultValue="0" readonly="true"/>
+							</div>
+						</div>
+					</div>
+						<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('欠收金额')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="nqsmny" maxlength="28" class="form-control number" readonly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('来源单据类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="lyvbilltype" dictType="wg_billtype"  class="form-control" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('单据状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="vbillstatus" dictType="wg_billstatus"  class="form-control" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="c_footer_box">
+					<h4 class="form-unit">${text('表尾信息')}</h4>
+					<div class="row">
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('制单时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+										<#form:input path="creationtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('审核人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="approver" title="${text('用户选择')}"
+										path="approver.userCode" labelPath="approver.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('审核时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="approvetime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('修改时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+							<#form:input path="modifiedtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('ct:ctChargeYqrsr:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+form_jine();//金额格式化
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>
+<script src="${ctxStatic}/ct/ctChargeYqrsr/ctChargeYqrsrForm.js"></script>
