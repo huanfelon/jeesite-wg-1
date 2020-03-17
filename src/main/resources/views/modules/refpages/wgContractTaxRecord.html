@@ -1,0 +1,35 @@
+<% layout('/layouts/default.html', {title: '税率变更记录', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-body">
+			<#form:form id="searchForm" action="${ctx}/wght/wgContract/taxRecordData?pkContract=${pkContract}" method="post" class="form-inline hide">
+			</#form:form>
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'主键', name:'id', hidden:true},
+		{header:'${text("主键")}', name:'pkContractTax', index:'a.pk_contract_tax',hidden:true, width:150, align:"left"},
+		{header:'${text("变更开始日期")}', name:'dstartdate', index:'a.dstartdate', width:80, align:"left"},
+		{header:'${text("税率(%)")}', name:'ntaxrate', index:'a.ntaxrate', width:80, align:"left"},
+		{header:'${text("合同号")}', name:'htcode', index:'a.htcode', width:150, align:"left"},
+		{header:'${text("开票金额")}', name:'nkpmny', index:'a.nkpmny', width:80, align:"left"},
+		{header:'${text("操作者")}', name:'changer.userName', index:'a.changer', width:100, align:"left"},
+		{header:'${text("操作日期")}', name:'dchangedate', index:'a.dchangedate', width:140, align:"left"},
+	],
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}, 
+	onSelectRow: function(id, isSelect, event){//单击方法
+		
+	},
+});
+</script>

@@ -1,0 +1,141 @@
+﻿<% layout('/layouts/default.html', {title: '收入确认管理', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/css/c_search.css">
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('收入确认管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<a href="javascript:" onclick="refPageYqrsr()" class="btn btn-sm"  title="${text('参照应确认收入单')}"><i class="fa fa-external-link"></i> ${text('参照应确认收入')}</a>
+				<% if(hasPermi('ct:ctChargeSrqr:edit')){ %>
+					<a href="${ctx}/ct/ctChargeSrqr/form?isEdit=true&isCz=true" class="btn btn-sm btnTool" title="${text('新增收入确认')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+				<a href="#" class="btn btn-sm" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default" id="c_btnRefresh" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+			       	<a href="#" class="btn btn-default" id="btnDelAll" title="${text('批量删除')}"><i class="fa fa-trash-o"></i> 批量删除</a>
+					<div class="btn-group">
+						<a href="javascript:" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+							<i class="fa fa-navicon"></i> 审批<span class="caret"></span>
+					</a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:" id="btnApproveAll"><i class="glyphicon glyphicon-export"></i>审批</a></li>
+							<li><a href="javascript:" id="btnUnApproveAll"><i class="glyphicon glyphicon-import"></i>取消审批</a></li>
+					</ul>
+				</div>
+			</div>
+			</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${ctChargeSrqr}" action="${ctx}/ct/ctChargeSrqr/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="c_form_group">
+				<div class="form-group">
+					<label class="control-label"><span class="required ">* </span>${text('所属组织')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label"><span class="required ">* </span>${text('项目信息')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkProject" title="${text('项目选择')}"
+							path="pkProject.pkProject" labelPath="pkProject.name" 
+							url="${ctx}/zl/zlProject/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('部门')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkDept" title="${text('部门选择')}"
+							path="pkDept.id" labelPath="pkDept.deptName" 
+							url="${ctx}/base/bdDept/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+						<button type="button" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+						<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</div>
+			<div class="c_search">
+				<div class="c_title_search pull-left">
+					<i class="fa fa-filter"></i> <span>查询</span>
+				</div>
+				<div class="pull-right">
+					<span class="c_close">x</span>
+				</div>
+			</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+	    {header:'${text("id")}', name:'id',hidden:true},
+		{header:'${text("组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			if(row.iszz!=1){
+				return '<a href="${ctx}/ct/ctChargeSrqr/form?pkChargeSrqr='+row.pkChargeSrqr+'&isEdit=true&isCz=true" class="btnList" data-title="${text("编辑收入确认")}">'+(val||row.id)+'</a>';
+			}else{
+				return (val||row.id);
+			}
+		}},
+		{header:'${text("部门")}', name:'pkDept.deptName', index:'a.pk_dept', width:120, align:"left"},
+		{header:'${text("单据状态")}', name:'vbillstatus', index:'a.vbillstatus', width:100, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_billstatus')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("项目信息")}', name:'pkProject.name', index:'a.pk_project', width:150, align:"left"},
+		{header:'${text("应确认收入金额")}', name:'nyqrsrmny', index:'a.nyqrsrmny', width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("本次收入确认金额")}', name:'nbcsrqrmny', index:'a.nbcsrqrmny', width:150, classes:"color-area-label", align:"right", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("来源单据类型")}', name:'lyvbilltype', index:'a.lyvbilltype', width:150, align:"left", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_billtype')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("操作")}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			 if(row.vbillstatus==0){
+				 if(row.iszz!=1){
+						var actions = [];
+						<% if(hasPermi('ct:ctChargeSrqr:edit')){ %>
+							actions.push('<a href="${ctx}/ct/ctChargeSrqr/form?pkChargeSrqr='+row.pkChargeSrqr+'&isEdit=true&isCz=true" class="btnList" title="${text("编辑收入确认")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+							actions.push('<a href="${ctx}/ct/ctChargeSrqr/delete?pkChargeSrqr='+row.pkChargeSrqr+'" class="btnList" title="${text("删除收入确认")}" data-confirm="${text("确认要删除该收入确认吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+						<% } %>
+						return actions.join(''); 
+				 }else{
+						var actions = [];
+						<% if(hasPermi('ct:ctChargeSrqr:edit')){ %>
+							actions.push('<a href="${ctx}/ct/ctChargeSrqr/delete?pkChargeSrqr='+row.pkChargeSrqr+'" class="btnList" title="${text("删除收入确认")}" data-confirm="${text("确认要删除该收入确认吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+						<% } %>
+						return actions.join('');
+				 }
+				
+			 }else{
+				 var actions = []; 
+				 return actions.join('');
+			 }
+		
+		}}
+	],
+	 showCheckbox: true, // 是否显示复选框
+	 multiselectWidth: 40,   // 复选框的宽度
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+    onSelectRow: function(id, isSelect, event){//单击方法
+		
+	},
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "查看收入确认单", "/js/a/ct/ctChargeSrqr/form?pkChargeSrqr="+id+'&isEdit=false&isCz=false', null, null);//弹出新的标签页
+	},
+});
+</script>
+<script src="${ctxStatic}/ct/ctChargeSrqr/ctChargeSrqrList.js"></script>

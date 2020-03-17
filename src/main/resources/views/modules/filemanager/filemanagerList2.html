@@ -1,0 +1,251 @@
+<% layout('/layouts/default.html', {title: '文件管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-tools pull-left ${imgType == 'add' ? '':'hide'}">
+				<!-- <a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a> -->
+				<!--	<a href="javascript:" id="imgident" class="btn btn-default" title="${text('图片识别')}"
+						data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-folder-o"></i> ${text('图片识别')}</a>
+					<a href="javascript:" id="viewimg" class="btn btn-default" title="${text('影像查询')}"
+						data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-folder-o"></i> ${text('影像查询')}</a>
+					<a href="javascript:" id="addimg" class="btn btn-default" title="${text('影像追加')}"
+						data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-folder-o"></i> ${text('影像追加')}</a> -->
+					<a href="${ctx}/filemanager/filemanagerFolder/form" id="btnNewFolder" class="btn btn-default addTabPage" title="${text('新建文件夹')}"
+						data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-folder-o"></i> ${text('新建文件夹')}</a>
+					<a href="${ctx}/filemanager/form" id="btnUploadFile" class="btn btn-default addTabPage" title="${text('上传文件')}"
+						data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-upload"></i> ${text('上传文件')}</a>
+					<a href="javascript:" id="btnDeleteFile" class="btn btn-default" title="${text('删除')}"><i class="fa fa-trash-o"></i> ${text('删除')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${filemanager}" action="${ctx}/filemanager/listData" method="post" class="form-inline "
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<#form:hidden path="groupType"/>
+				<#form:hidden path="folderId"/>
+				<#form:hidden path="sharedId"/>
+				<div class="form-group">
+					<label class="control-label">${text('名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="fileName" maxlength="500" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('上传者')}：</label>
+					<div class="control-inline width-120">
+						<#form:treeselect id="createBy" title="${text('上传者选择')}"
+							path="createBy" labelPath="createByName"
+							url="${ctx}/sys/office/treeData?isLoadUser=true"
+							class=" required" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('上传时间')}：</label>
+					<div class="control-inline">
+						<#form:input path="createDate_gte" readonly="true" maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false,onpicked:function(){createDate_lte.click()}});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="createDate_lte" readonly="true" maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm c_close">${text('查询')}</button>
+					<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/MD5.js"></script>
+<script>
+var imgType = ${toJson(imgType)};
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("名称")}', name:'fileName', index:'a.file_name', width:300, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			var html = [];
+			if (row.fileType == 'folder'){
+				html.push('<i class="fa fa-folder-o"></i> &nbsp;');
+				html.push('<a href="javascript:" onclick="enterFileFolder(\''+row.folderId+'\')">'+(val||row.id)+'</a>');
+			}else{
+				html.push('<i class="fa fa-file-text-o"></i> &nbsp;');
+				html.push('<a href="javascript:" onclick="js.windowOpen(\'${ctx}/file/download/'+row.fileUploadId+'?preview=weboffice\')" title="${text("预览文件")}">'+(val||row.id)+'</a>');
+			}
+			return html.join('');
+		}},
+		{header:'${text("文件类型")}', name:'fileType', sortable:false, width:80, align:"center", formatter: function(val, obj, row, act){
+			return val == 'image' ? '${text("图片")}' : val == 'media' ? '${text("媒体")}' : val == 'file' ? '${text("文档")}' : '';
+		}},
+		{header:'${text("文件大小")}', name:'fileSizeFormat', sortable:false, width:130, align:"center"},
+		{header:'${text("上传者")}', name:'createByName', index:'a.create_by', width:130, align:"center"},
+		{header:'${text("上传时间")}', name:'createDate', index:'a.create_date', width:130, align:"center"},
+// 		{header:'${text("备注")}', name:'remarks', index:'a.remarks', width:130, align:"left"},
+		{header:'${text("操作")}', name:'actions', width:90, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (row.fileType == 'folder'){
+				<% if(isBlank(filemanager.sharedId)&&imgType=='add'){ %>
+				actions.push('<a href="${ctx}/filemanager/filemanagerFolder/form?id='+row.folderId+'" class="addTabPage" title="${text("编辑文件夹")}" data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/filemanager/filemanagerFolder/delete?id='+row.folderId+'" class="btnList" title="${text("删除文件夹")}" data-confirm="${text("确认要删除该文件夹吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				<% } %>
+			}else{
+				actions.push('<a href="${ctx}/file/download/'+row.fileUploadId+'"><i class="fa fa-download"></i></a>&nbsp;');
+				<% if(isBlank(filemanager.sharedId)&&imgType=='add'){ %>
+				actions.push('<a href="${ctx}/filemanager/delete?ids='+row.id+'" class="btnList" title="${text("删除文件")}" data-confirm="${text("确认要删除该文件吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				<% } %>
+			}
+			return actions.join('');
+		}}
+	],
+	multiboxonly: true,	// 单击复选框时再多选
+	showCheckbox: true,	// 是否显示复选框
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		var parentCode = js.val(data, 'otherData.folder.parentCode');
+		if (parentCode && parentCode != ''&&parentCode !='0'<% if(isNotBlank(filemanager.sharedId)){ %> && parentCode == '${filemanager.folderId}'<% } %>){
+			$('#dataGrid .jqgfirstrow').after('<tr class="ui-widget-content jqgrow ui-row-ltr pointer"'
+					+' onclick="enterFileFolder(\''+parentCode+'\')" title="${text("上级文件夹")}">'
+					+'<td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;width: 30px;"'
+					+' aria-describedby="dataGrid_rn"><i class="icon-action-undo"></i></td>'
+					+'<td role="gridcell" style="text-align:center;width: 25px;" aria-describedby="dataGrid_cb">#</td>'
+					+'<td colspan="6"><i class="fa fa-folder-o"></i> &nbsp;<a href="javascript:">..</a></td></tr>');
+		}
+		var groupType = $('#groupType').val(), folderId = $('#folderId').val();
+		$('#btnNewFolder').data('href', $('#btnNewFolder').attr('href') + '?groupType='+groupType+'&parentCode='+folderId);
+		$('#btnUploadFile').data('href', $('#btnUploadFile').attr('href') + '?groupType='+groupType+'&folderId='+folderId);
+	}
+});
+function enterFileFolder(folderId){
+	$('#folderId').val(folderId);
+	$('#searchForm').submit();
+}
+$('#btnMoveFile').click(function(){
+	var ids = $('#dataGrid').dataGrid('getSelectRows');
+	if (ids.length <= 0){
+		js.showMessage('请选择要移动的文件');
+		return false;
+	}
+	var groupType = $('#groupType').val(), folderId = $('#folderId').val();
+	$('#btnMoveFile').data('href', $('#btnMoveFile').attr('href')
+			+'?groupType='+groupType+'&folderId='+folderId
+			+'&ids='+ids.join(','));
+});
+$('#btnShareFile').click(function(){
+	var ids = $('#dataGrid').dataGrid('getSelectRows');
+	if (ids.length <= 0){
+		js.showMessage('请选择要移动的文件');
+		return false;
+	}
+	$('#btnShareFile').data('href', $('#btnShareFile').attr('href')
+			+'?ids='+ids.join(','));
+});
+$('#btnDeleteFile').click(function(){
+	var ids = $('#dataGrid').dataGrid('getSelectRows');
+	if (ids.length <= 0){
+		js.showMessage('请选择要删除的文件');
+		return false;
+	}
+	js.confirm('确认要删除你选中的文件吗？', function(data){
+		js.ajaxSubmit("${ctx}/filemanager/delete", {
+			ids: ids.join(',')
+		}, function(data){
+			js.showMessage(data.message);
+			page();
+		});
+	});
+	return false;
+});
+
+$('#viewimg').click(function(){
+	
+	var date=new Date();
+	var year=date.getFullYear();
+	var month=date.getMonth()+1;
+	month=month<10?'0'+month:month;
+	var day=date.getDate();
+	day=day<10?'0'+day:day;
+	var date2=year+month+day;
+	var token = hex_md5("ncsystem" + "system" +date2);
+	
+	var urlnew2="http://tcl794892938.uicp.net/js/ssoLogin/login?username=system&token="+token+"&appkey=ncsystem";
+	$.ajax({
+		type : "get",
+		url : urlnew2,
+		//contentType : "application/json;charset=UTF-8",
+		dataType : 'jsonp',
+		success : function(data) {
+			if(data.code=="0"){
+				window.open("http://tcl794892938.uicp.net/js/a/filemanager/viewImg?appid=nc&vbillno=BXD201109071",'tclapp');
+			}else{
+				alert(data.msg);
+			}
+		},
+	    error : function (data) {
+	    	alert('请求失败！');
+	    }
+	});
+});
+
+$('#addimg').click(function(){
+	
+	var date=new Date();
+	var year=date.getFullYear();
+	var month=date.getMonth()+1;
+	month=month<10?'0'+month:month;
+	var day=date.getDate();
+	day=day<10?'0'+day:day;
+	var date2=year+month+day;
+	var token = hex_md5("ncsystem" + "system" +date2);
+	
+	var urlnew2="http://tcl794892938.uicp.net/js/ssoLogin/login?username=system&token="+token+"&appkey=ncsystem";
+	$.ajax({
+		type : "get",
+		url : urlnew2,
+		//contentType : "application/json;charset=UTF-8",
+		dataType : 'jsonp',
+		success : function(data) {
+			if(data.code=="0"){
+				window.open("http://tcl794892938.uicp.net/js/a/filemanager/addImg?appid=nc&vbillno=BXD201109071");
+			}else{
+				alert(data.msg);
+			}
+		},
+	    error : function (data) {
+	    	alert('请求失败！');
+	    }
+	});
+
+});
+
+
+$('#imgident').click(function(){
+	
+	var timestamp = Date.parse(new Date());
+	var stime=timestamp.toString().substring(0,timestamp.toString().length-3);
+	var appkey="5d5284bd";
+	var appscret="f8ab2c8fb7a903434836a0f7315c3bd8";
+	var token = hex_md5(appkey + "+" +stime+"+"+appscret);
+	var urlnew2="https://fapiao.glority.cn/v1/item/get_multiple_items_info?"+
+			"app_key="+appkey+"&timestamp="+stime+"&token="+token+
+			"&image_url=http://tcl794892938.uicp.net/js/userfiles/fileupload/201908/1163696243409801218.jpg";
+	$.ajax({
+		type : "get",
+		url : urlnew2,
+		contentType : "application/x-www-form-urlencoded;charset=UTF-8",
+		dataType : 'json',
+		success : function(data) {
+			if(data.result=="1"){//识别成功
+				var data2=data.response.data.identify_results[0];
+			}else{
+				alert(data.message);
+			}
+		},
+	    error : function (data) {
+	    	alert('请求失败！');
+	    }
+	});
+});
+</script>

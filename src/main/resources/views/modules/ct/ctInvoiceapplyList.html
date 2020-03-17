@@ -1,0 +1,154 @@
+﻿<% layout('/layouts/default.html', {title: '开票登记管理', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/css/c_search.css">
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('开票登记管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('ct:ctInvoiceapply:edit')){ %>
+					<a href="javascript:" onclick="refYSList()" class="btn btn-sm"  title="${text('参照应收单')}"><i class="fa fa-external-link"></i> ${text('参照应收单')}</a>
+					<a href="${ctx}/ct/ctInvoiceapply/form" class="btn btn-default btnTool" title="${text('新增开票登记')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+					<a href="#" class="btn btn-default" id="btnEdit" title="${text('修改')}"><i class="fa fa-pencil"></i> 修改</a>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default" id="c_btnRefresh" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+				<% if(hasPermi('ct:ctInvoiceapply:edit')){ %>
+					<a href="#" class="btn btn-default" id="btnDelAll" title="${text('批量删除')}"><i class="fa fa-trash-o"></i> 批量删除</a>
+					<div class="btn-group">
+						<a href="javascript:" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+							<i class="fa fa-navicon"></i> 审批<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:" id="btnApproveAll"><i class="glyphicon glyphicon-export"></i>审批</a></li>
+							<li><a href="javascript:" id="btnUnApproveAll"><i class="glyphicon glyphicon-import"></i>取消审批</a></li>
+						</ul>
+					</div>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${ctInvoiceapply}" action="${ctx}/ct/ctInvoiceapply/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+			<div class="c_form_group">
+				<div class="form-group">
+					<label class="control-label"><span class="required ">* </span>${text('所属组织')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('单据号')}：</label>
+					<div class="control-inline">
+						<#form:input path="vbillno" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('部门')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkDept" title="${text('部门选择')}"
+							path="pkDept.id" labelPath="pkDept.deptName" 
+							url="${ctx}/base/bdDept/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label"><span class="required ">* </span>${text('项目信息')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkProject" title="${text('项目选择')}"
+							path="pkProject.pkProject" labelPath="pkProject.name" 
+							url="${ctx}/zl/zlProject/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('开票登记人')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkSqr" title="${text('用户选择')}"
+							path="pkSqr.userCode" labelPath="pkSqr.userName" 
+							url="${ctx}/sys/office/treeData?isLoadUser=true" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('开票登记日期')}：</label>
+					<div class="control-inline">
+						<#form:input path="dsqdate_gte" readonly="true" maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(dsqdate_lte)}'});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="dsqdate_lte" readonly="true" maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,minDate:'#F{$dp.$D(dsqdate_gte)}'});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('单据状态')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="vbillstatus" dictType="wg_billstatus" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="button" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</div>
+			<div class="c_search">
+					<div class="c_title_search pull-left">
+						<i class="fa fa-filter"></i> <span>查询</span>
+					</div>
+					<div class="pull-right">
+						<span class="c_close">x</span>
+					</div>
+			</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("主键")}', name:'id',hidden:true},
+		{header:'${text("主键")}', name:'pkInvoiceapply', hidden:true,index:'a.pk_invoiceapply', width:150, align:"left", frozen:true},
+		{header:'${text("所属组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:250, align:"left"},
+		{header:'${text("单据号")}', name:'vbillno', index:'a.vbillno', width:150, align:"left"},
+		{header:'${text("部门")}', name:'pkDept.deptName', index:'a.pk_dept', width:100, align:"left"},
+		{header:'${text("单据状态")}', name:'vbillstatus', index:'a.vbillstatus', width:100, align:"left", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_billstatus')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("项目信息")}', name:'pkProject.name', index:'a.pk_project', width:200, align:"left"},
+		{header:'${text("开票金额")}', name:'nsqmny', index:'a.nsqmny', width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("开票登记人")}', name:'pkSqr.userName', index:'a.pk_sqr', width:100, align:"left"},
+		{header:'${text("开票登记日期")}', name:'dsqdate', index:'a.dsqdate', width:100, align:"left"},
+		{header:'${text("票据类型")}', name:'fptype', index:'a.fptype', width:100, align:"left", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_fptype')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("开票号码")}', name:'fpcode', index:'a.fpcode', width:150, align:"left"},
+		{header:'${text("开票要求")}', name:'kpyq', index:'a.kpyq', width:150, align:"left"},
+		{header:'${text("创建人")}', name:'creator.userName', index:'a.creator', width:150, align:"left"},
+		{header:'${text("创建时间")}', name:'creationtime', index:'a.creationtime', width:150, align:"left"}
+	],
+	sortableColumn : false,//根据列排序
+	lazyLoad: true,//懒加载，当调用 dataGrid.refresh()时再进行加载
+	multiboxonly: true,	// 单击复选框时再多选
+	showCheckbox: true,    // 是否显示复选框
+	multiselectWidth: 40,   // 复选框的宽度
+	shrinkToFit: false,
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+	onSelectRow: function(id, isSelect, event){//单击方法
+		
+	},
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "开票登记详情", "${ctx}/ct/ctInvoiceapply/form?pkInvoiceapply="+id+"&noEdit=true", null, null);//弹出新的标签页
+	},
+});
+</script>
+<script src="${ctxStatic}/ct/ctInvoiceapply/ctInvoiceapplyList.js"></script>

@@ -1,0 +1,510 @@
+<% layout('/layouts/default.html', {title: '退租管理管理', libs: ['validate','dataGrid']}){ %>
+<link href="${ctxStatic}/css/c_tab_nav.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa icon-note"></i> ${text(wgThrowalease.isNewRecord ? '新增退租管理' : '编辑退租管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('wght:wgContract:edit')){ %>
+					<button type="submit" class="btn btn-sm ${isEdit?'':'hide'}" id="ly_btnSubmit"><i class="fa fa-check"></i> ${text('保存')}</button>
+				<% } %>
+				<button type="button" class="btn btn-sm" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关闭')}</button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${wgThrowalease}" action="${ctx}/wght/wgThrowalease/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkThrowalease"/>
+				<#form:hidden path="isNewRecord"/>
+				<#form:hidden path="billtype"/>
+				<#form:hidden path="vsrcid"/>
+				<#form:hidden path="vsrctype"/>
+				<input type="hidden" id="isEdit" name="isEdit" value="${isEdit}">
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('单据编号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="vbillno" maxlength="200" class="form-control" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('所属组织')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="pkOrg" title="${text('组织选择')}" 
+										path="pkOrg.officeCode" labelPath="pkOrg.officeName" class="required" 
+										url="${ctx}/sys/office/treeData?officeTypes=1,2&isShowCode=true" allowClear="true" 
+										canSelectParent="true" canSelectRoot="true" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="pkProject" title="${text('项目选择')}" 
+										path="pkProject.pkProject" labelPath="pkProject.name" class="required" 
+										url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true" 
+										canSelectParent="true" canSelectRoot="true" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('合同编号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="htcode" maxlength="200" class="form-control required" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('合同起始日')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="dstartdate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('合同终止日')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="denddate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('退租日期')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<% if(isEdit) {%>
+									<#form:input path="dtzdate" maxlength="20" class="form-control Wdate required" 
+										dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,onpicked:pickDateAfter});"/>
+								<% } else { %>
+									<#form:input path="dtzdate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true" />
+								<% } %>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('退租类型')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="tztype" dictType="wg_tztype" class="form-control" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('部门')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="pkDept" title="${text('部门选择')}" 
+										path="pkDept.pkDept" labelPath="pkDept.deptName" class=" required" 
+										url="${ctx}/base/bdDept/treeData" allowClear="true" 
+										readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('单据状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:select path="vbillstatus" dictType="wg_billstatus" class="form-control" readonly="true" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="c_tab_nav">
+					<ul class="c_nav">
+						<li class="c_active">客户房产信息</li>
+						<li>保证金结算</li>
+						<li>费用结算</li>
+					</ul>
+					<div class="c_nav_content">
+						<div class="ml10 mr10">
+							<table id="wgThrowaleaseKhfcDataGrid"></table>
+							<a href="#" id="wgThrowaleaseKhfcDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+						</div>
+						<div class="ml10 mr10 hide" style="overflow:auto">
+							<table id="wgThrowaleaseBzjDataGrid"></table>
+								<a href="#" id="wgThrowaleaseBzjDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+						</div>
+						<div class="ml10 mr10 hide" style="overflow:auto">
+							<table id="wgThrowaleaseFyqsDataGrid"></table>
+								<a href="#" id="wgThrowaleaseFyqsDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+						</div>
+					</div>
+				</div>
+				<div class="c_footer_box">
+					<h4 class="form-unit">${text('表尾信息')}</h4>
+					<div class="row">
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('制单时间')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="createdtime" maxlength="20" class="form-control Wdate disabled" dataFormat="datetime2" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('最后修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('最后修改时间')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="modifiedtime" maxlength="20" class="form-control Wdate disabled" dataFormat="datetime2" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('审核人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="approver" title="${text('用户选择')}"
+										path="approver.userCode" labelPath="approver.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('审核时间')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="approvedtime" maxlength="20" class="form-control Wdate disabled" dataFormat="datetime2" readonly="true"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('wght:wgThrowalease:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+//初始化退租管理表体-客户房产信息DataGrid对象
+$("#wgThrowaleaseKhfcDataGrid").dataGrid({
+
+	data: ${toJson(wgThrowalease.wgThrowaleaseKhfcList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkThrowaleaseKhfc', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkThrowalease.pkThrowalease', editable:true, hidden:true},
+		{header:'${text("客户名称")}', name:'pkCustomer', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCustomer.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkCustomer') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('listselectTpl2', {
+						id: 'cCust_'+editOptions.id, title: '客户选择', 
+						path: 'pkCustomer.pkCustomer', value: val.split('|')[0], 
+						labelPath: 'pkCustomer.name', labelValue: val.split('|')[1],
+						itemCode:'pkCustomer', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/base/bdCustomer/bdCustomerSelect', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("房产名称")}', name:'pkHouse', width:250, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkHouse.estatename')==undefined?"":js.val(row, 'pkHouse.estatename');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkHousesource') + '|' + js.val(obj.colModel.data[obj.rowId], 'estatename');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('listselectTpl2', {
+						id: 'hHouse_'+editOptions.id, title: '房产选择', 
+						path: 'pkHouse.pkHousesource', value: val.split('|')[0], 
+						labelPath: 'pkHouse.estatename', labelValue: val.split('|')[1],
+						itemCode:'pkHousesource', itemName :'estatename',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/zl/zlHousesource/housesourceSelect', cssClass: ' required'
+					});
+				}
+			}
+		},
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgThrowaleaseKhfcDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {pkThrowaleaseKhfc: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgThrowaleaseKhfcList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkThrowaleaseKhfc,pkThrowalease.pkThrowalease,pkCustomer.pkCustomer,pkHouse.pkHousesource,vdef1,vdef2,vdef3,vdef4,vdef5,dr,ts,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化退租管理表体-保证金结算DataGrid对象
+$("#wgThrowaleaseBzjDataGrid").dataGrid({
+
+	data: ${toJson(wgThrowalease.wgThrowaleaseBzjList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkThrowaleaseBzj', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkThrowalease.pkThrowalease', editable:true, hidden:true},
+		{header:'${text("收支项目")}', name:'pkCostproject', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCostproject.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('treeselectTpl2', {
+						id: 'bzjcostp_'+editOptions.id, title: '收支项目选择', 
+						name: 'pkCostproject.pkProject', value: val.split('|')[0], 
+						labelName: 'pkCostproject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/bd/bdProject/treeData', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("已收保证金")}', name:'nskmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("应退保证金")}', name:'nygtmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number required','readonly':${isEdit?'false':'true'}}},
+		<% if(isEdit){ %>
+			{header:'${text("应退日期")}', name:'dytdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'}, 
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required', 
+					dataInit: function(element){ $(element).on('focus', function(){
+							WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});
+					});
+				}}
+			},
+		<% } else { %>
+			{header:'${text("应退日期")}', name:'dytdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("已退保证金")}', name:'nyjtmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgThrowaleaseBzjDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {pkThrowaleaseBzj: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgThrowaleaseBzjList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkThrowaleaseBzj,pkThrowalease.pkThrowalease,pkCostproject.pkProject,nskmny,nygtmny,dytdate,nyjtmny,vdef1,vdef2,vdef3,vdef4,vdef5,dr,ts,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化退租管理表体-费用结算DataGrid对象
+$("#wgThrowaleaseFyqsDataGrid").dataGrid({
+
+	data: ${toJson(wgThrowalease.wgThrowaleaseFyqsList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkThrowaleaseFyqs', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkThrowalease.pkThrowalease', editable:true, hidden:true},
+		{header:'${text("收支项目")}', name:'pkCostproject', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCostproject.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('treeselectTpl2', {
+						id: 'fycostp_'+editOptions.id, title: '收支项目选择', 
+						name: 'pkCostproject.pkProject', value: val.split('|')[0], 
+						labelName: 'pkCostproject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/bd/bdProject/treeData', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("应退金额")}', name:'nygtmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number required','readonly':${isEdit?'false':'true'}, 
+			dataInit: function(element){ $(element).on('change', function(){
+				var rowId = $('#wgThrowaleaseFyqsDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				var nygtmny=toNumber($("#"+rowId+"_nygtmny").val());
+				var tax=toNumber($("#"+rowId+"_ntaxrate").val());
+				var nnotaxmny=(nygtmny/(1+tax/100)).toFixed(2);
+				var ntaxmny=nygtmny-nnotaxmny;
+				$("#"+rowId+"_nnotaxmny").val(nnotaxmny);
+				$("#"+rowId+"_ntaxmny").val(ntaxmny);
+				form_jine();//增加千分位符
+			});
+		}}},
+		<% if(isEdit){ %>
+			{header:'${text("应退日期")}', name:'dytdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required', 
+					dataInit: function(element){ $(element).on('focus', function(){
+							WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});
+					});
+				}}
+			},
+		<% } else { %>
+			{header:'${text("应退日期")}', name:'dytdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+		<% } %>
+		<% if(isEdit){ %>
+			{header:'${text("税率")}', name:'ntaxrate', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_taxrate')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){
+							var rowId = $('#wgThrowaleaseFyqsDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+							var nygtmny=toNumber($("#"+rowId+"_nygtmny").val());
+							var tax=toNumber($("#"+rowId+"_ntaxrate").val());
+							var nnotaxmny=(nygtmny/(1+tax/100)).toFixed(2);
+							var ntaxmny=nygtmny-nnotaxmny;
+							$("#"+rowId+"_nnotaxmny").val(nnotaxmny);
+							$("#"+rowId+"_ntaxmny").val(ntaxmny);
+							form_jine();//增加千分位符
+							$(this).resetValid();
+						});
+					}
+				}
+			},
+		<% } else { %>
+			{header:'${text("税率")}', name:'ntaxrate', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("无税金额")}', name:'nnotaxmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("税额")}', name:'ntaxmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("已退金额")}', name:'nyjtmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("扣减应确认收入")}', name:'nygqrmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number required','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("扣减已确认收入")}', name:'nyjqrmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgThrowaleaseFyqsDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {pkThrowaleaseFyqs: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgThrowaleaseFyqsList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkThrowaleaseFyqs,pkThrowalease.pkThrowalease,pkCostproject.pkProject,nygtmny,dytdate,ntaxrate,nnotaxmny,ntaxmny,nyjtmny,nygqrmny,nyjqrmny,vdef1,vdef2,vdef3,vdef4,vdef5,dr,ts,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script id="treeselectTpl" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}" 
+	class="{{d.cssClass}}" btnClass="" allowClear="true" canSelectParent="true" canSelectRoot="true" />
+</div>//--></script>
+<script id="treeselectTpl2" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}" readonly="true" 
+	class="{{d.cssClass}}" btnClass="" allowClear="true" canSelectParent="true" canSelectRoot="true" />
+</div>//--></script>
+<script id="listselectTpl" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.path}}" value="{{d.value}}"
+	labelName="{{d.labelPath}}" labelValue="{{d.labelValue}}" url="{{d.url}}" checkbox="{{d.checkbox}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}" boxWidth="{{d.boxWidth}}" boxHeight="{{d.boxHeight}}"
+	class="{{d.cssClass}}" btnClass="" allowClear="true"/>
+</div>//--></script>
+<script id="listselectTpl2" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.path}}" value="{{d.value}}"
+	labelName="{{d.labelPath}}" labelValue="{{d.labelValue}}" url="{{d.url}}" checkbox="{{d.checkbox}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}" boxWidth="{{d.boxWidth}}" boxHeight="{{d.boxHeight}}"
+	class="{{d.cssClass}}" btnClass="" allowClear="true" readonly="true" />
+</div>//--></script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}
+		}, "json");
+    }
+});
+</script>
+<script src="${ctxStatic}/wght/wgThrowalease/wgThrowaleaseForm.js"></script>

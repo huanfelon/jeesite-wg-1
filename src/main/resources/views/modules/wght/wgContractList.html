@@ -1,0 +1,254 @@
+<% layout('/layouts/default.html', {title: '合同管理', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/css/c_search.css">
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('合同管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('wght:wgContract:edit')){ %>
+					<a href="${ctx}/wght/wgContract/form?isEdit=true" class="btn btn-default btnTool" title="${text('新增合同管理')}"><i class="fa fa-plus"></i> ${text('新增')} </a>
+					<a href="#" class="btn btn-default" id="btnEdit" title="${text('修改')}"><i class="fa fa-pencil"></i> 修改</a>
+					<a href="#" class="btn btn-default" id="btnDelAll" title="${text('批量删除')}"><i class="fa fa-trash-o"></i> 删除 </a>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')} </a>
+				<a href="#" class="btn btn-default" id="c_btnRefresh" title="${text('刷新')}"><i class="fa fa-refresh"></i> 刷新 </a>
+				<div class="btn-group">
+					<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+						<i class="fa fa-navicon"></i> 金额明细 <span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="#" onclick="btnPlanMny()" title="${text('合同计划金额')}"><i class="fa fa-cny"></i> ${text('合同计划金额')} </a></li>
+						<li><a href="#" onclick="btnSrMny()" title="${text('合同收入金额')}"><i class="fa fa-cny"></i> ${text('合同收入金额')} </a></li>
+					</ul>
+				</div>
+				<% if(hasPermi('wght:wgContract:edit')){ %>
+					<div class="btn-group">
+						<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+							<i class="fa fa-navicon"></i> 审批 <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="#" id="btnApproveAll2"><i class="fa fa-check"></i> 审批 </a></li>
+							<li><a href="#" id="btnUnApproveAll2"><i class="fa fa-remove"></i> 取消审批 </a></li>
+						</ul>
+					</div>
+					<a href="#" class="btn btn-default" onclick="btnResetHt()" title="${text('续约')}"><i class="fa fa-clone"></i> ${text('续约')}</a>
+					<div class="btn-group">
+						<a href="#" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+							<i class="fa fa-navicon"></i> 税率调整 <span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a href="#" onclick="btnTaxChange()" title="${text('租金税率变更')}"><i class="fa fa-exchange"></i> 租金税率变更 </a></li>
+							<li><a href="#" onclick="btnTaxRecord()" title="${text('租金税率记录查看')}"><i class="fa fa-file-text"></i> 租金税率记录查看 </a></li>
+						</ul>
+					</div>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnFileUpload" title="${text('附件管理')}"><i class="fa fa-folder"></i> ${text('附件管理')}</a>
+				<a href="#" class="btn btn-default" id="btnPrint2" title="${text('合同条款打印')}"><i class="fa fa-file"></i> ${text('打印')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${wgContract}" action="${ctx}/wght/wgContract/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="c_form_group">
+				<div class="form-group">
+					<label class="control-label">${text('所属组织')}：</label>
+					<div class="control-inline">
+						<#form:treeselect id="pkOrg" title="${text('组织选择')}" 
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData?officeTypes=1,2&isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('单据号')}：</label>
+					<div class="control-inline">
+						<#form:input path="vbillno" maxlength="200" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('客户名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="vdef5" maxlength="200" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('项目信息')}：</label>
+					<div class="control-inline">
+						<#form:treeselect id="pkProject" title="${text('项目选择')}" 
+							path="pkProject.pkProject" labelPath="pkProject.name" 
+							url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('合同编号')}：</label>
+					<div class="control-inline">
+						<#form:input path="htcode" maxlength="200" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('合同类型')}：</label>
+					<div class="control-inline">
+						<#form:treeselect id="httype" title="${text('项目选择')}" 
+							path="httype.pkHttype" labelPath="httype.name" 
+							url="${ctx}/bd/bdHttype/treeData?isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('签租日期')}：</label>
+					<div class="control-inline">
+						<#form:input path="dqzdate_gte" readonly="true" maxlength="20" class="form-control Wdate-date" placeholder="开始日期" 
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(dqzdate_lte)}'});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="dqzdate_lte" readonly="true" maxlength="20" class="form-control Wdate-date" placeholder="结束日期" 
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,minDate:'#F{$dp.$D(dqzdate_gte)}'});"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('合同状态')}：</label>
+					<div class="control-inline">
+						<#form:select path="htstatus" dictType="wg_htstatus" class="form-control width-120" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('单据状态')}：</label>
+					<div class="control-inline">
+						<#form:select path="vbillstatus" dictType="wg_billstatus" class="form-control width-120" />
+					</div>
+				</div>
+				<div class="form-group">
+					<button type="button" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+				</div>
+				<div class="c_search">
+					<div class="c_title_search pull-left">
+						<i class="fa fa-filter"></i> <span>查询</span>
+					</div>
+					<div class="pull-right">
+						<span class="c_close">x</span>
+					</div>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("主键")}', name:'id', hidden:true},
+		{header:'${text("所属组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"left"},
+		{header:'${text("单据号")}', name:'vbillno', index:'a.vbillno', width:150, align:"left"},
+		{header:'${text("合同编号")}', name:'htcode', index:'a.htcode', width:150, align:"left"},
+		{header:'${text("客户名称")}', name:'custname', index:'a.custname', width:150, align:"left"},
+		{header:'${text("项目信息")}', name:'pkProject.name', index:'a.pk_project', width:150, align:"left"},
+		/* {header:'${text("部门")}', name:'pkDept.deptName', index:'a.pk_dept', width:150, align:"left"}, */
+		{header:'${text("合同类型")}', name:'httype.name', index:'a.httype', width:150, align:"left"},
+		{header:'${text("签租日期")}', name:'dqzdate', index:'a.dqzdate', width:90, align:"left"},
+		{header:'${text("合同起始日")}', name:'dstartdate', index:'a.dstartdate', width:90, align:"left"},
+		{header:'${text("合同终止日")}', name:'denddate', index:'a.denddate', width:90, align:"left"},
+		{header:'${text("租赁方式")}', name:'renttype', index:'a.renttype', width:90, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_renttype')}, val, '${text("")}', true);
+		}},
+		{header:'${text("合同税率")}', name:'ntaxrate', index:'a.ntaxrate', width:90, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+		}},
+		{header:'${text("租金单价")}', name:'nprice', index:'a.nprice', width:90, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("附加条款")}', name:'exremarks', index:'a.exremarks', width:150, align:"left"},
+		{header:'${text("日租金")}', name:'ndayprice', index:'a.ndayprice', width:100, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("月租金")}', name:'nmonthprice', index:'a.nmonthprice', width:100, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("年租金")}', name:'nyearprice', index:'a.nyearprice', width:100, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("合同状态")}', name:'htstatus', index:'a.htstatus', width:90, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_htstatus')}, val, '${text("")}', true);
+		}},
+		{header:'${text("退租日期")}', name:'dtzdate', index:'a.dtzdate', width:90, align:"left"},
+		{header:'${text("单据状态")}', name:'vbillstatus', index:'a.vbillstatus', width:90, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_billstatus')}, val, '${text("")}', true);
+		}},
+		{header:'${text("单据类型")}', name:'billtype', index:'a.billtype', width:90, align:"left", formatter: function(val, obj, row, act){
+            return js.getDictLabel(${@DictUtils.getDictListJson('wg_billtype')}, val, '${text("")}', true);
+		}},
+		{header:'${text("制单人")}', name:'creator.userName', index:'a.creator', width:90, align:"left"},
+		{header:'${text("制单时间")}', name:'createdtime', index:'a.createdtime', width:90, align:"left"},
+		{header:'${text("最后修改人")}', name:'modifier.userName', index:'a.modifier', width:100, align:"left"},
+		{header:'${text("最后修改时间")}', name:'modifiedtime', index:'a.modifiedtime', width:100, align:"left"},
+		{header:'${text("审核人")}', name:'approver.userName', index:'a.approver', width:90, align:"left"},
+		{header:'${text("审核时间")}', name:'approvedtime', index:'a.approvedtime', width:90, align:"left"},
+	],
+	lazyLoad: true, 	    // 是否懒加载Grid数据，默认初始列表后不及时加载数据，（仅对url远程请求数据有效），当调用 dataGrid.refresh()时再进行加载。
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	sortableColumn: true,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	showCheckbox:true,
+	multiselectWidth: 40,   // 复选框的宽度
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+	onSelectRow: function(id, isSelect, event){//单击方法
+		
+	},
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法 
+		js.addTabPage($(this), "查看合同管理", "${ctx}/wght/wgContract/form?pkContract="+id+"&isEdit=false", null, null);//弹出新的标签页
+	},
+});
+</script>
+<script id="printTempletSelectTpl" type="text/template">//<!--
+<#form:form id="templetForm">
+<div class="row" style="margin:20px 25px 20px 0px">
+	<div class="col-xs-12">
+		<div class="form-group">
+			<label class="control-label col-sm-4" title="">
+			<span class="required ">*</span> ${text('合同模板类型')}：<i class="fa icon-question hide"></i></label>
+			<div class="col-sm-6">
+				<#form:select path="httemplet" dictType="wghtprint_templet" class="form-control " blankOption="true" blankOptionLabel="请选择类型" />
+			</div>
+		</div>
+	</div>
+</div>
+</#form:form>
+//--></script>
+<script id="htTaxChangeTpl" type="text/template">//<!--
+<#form:form id="taxChangeForm">
+<div class="row" style="margin:20px 10px 20px 25px">
+	<div class="col-xs-6">
+		<div class="form-group">
+			<label class="control-label col-sm-4" title="">
+			<span class="required ">*</span> ${text('变更时间节点')}：<i class="fa icon-question hide"></i></label>
+			<div class="col-sm-6">
+				<#form:hidden path="dmin"/>
+				<#form:hidden path="dmax"/>
+				<#form:input path="dstart" maxlength="20" class="form-control Wdate required" 
+					dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM',minDate:'#F{$dp.$D(dmin,{M:1})}',maxDate:'#F{$dp.$D(dmax,{M:-1})}',isShowClear:true});"/>
+			</div>
+		</div>
+	</div>
+	<div class="col-xs-6">
+		<div class="form-group">
+			<label class="control-label col-sm-4" title="">
+			<span class="required ">*</span> ${text('税率')}：<i class="fa icon-question hide"></i></label>
+			<div class="col-sm-6">
+				<#form:hidden path="tax"/>
+				<#form:select path="taxrate" dictType="wg_taxrate" class="form-control " blankOption="true" blankOptionLabel="请选择" />
+			</div>
+		</div>
+	</div>
+</div>
+</#form:form>
+//--></script>
+<script src="${ctxStatic}/wght/wgContract/wgContractList.js"></script>

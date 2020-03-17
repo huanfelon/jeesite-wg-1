@@ -1,0 +1,211 @@
+﻿<% layout('/layouts/default.html', {title: '户型信息管理', libs: ['validate']}){ %>
+<script src="${ctxStatic}/zl/zlFamilyfile/zlFamilyfileForm.js"></script>
+<link href="${ctxStatic}/css/zlFormShow.css" rel="stylesheet" type="text/css"/>
+<!-- <script src="${ctxStatic}/js/refPBFF.js"></script> -->
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(zlFamilyfile.isNewRecord ? '新增户型信息' :  isEdit=='true'?'编辑户型信息':'户型信息详情')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('zl:zlFamilyfile:edit')&& isEdit=='true'){ %>
+				 	<a herf="javascript:void(0);"  class="btn btn-sm" id="btnSubmit0"><i class="fa fa-check"></i> ${text('保存')}</a>
+				<% } %>
+				<button type="button" class="btn btn-sm" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关闭')}</button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${zlFamilyfile}" action="${ctx}/zl/zlFamilyfile/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkFamilyfile"/>
+				<span id="isEdit" class="hide">${isEdit}</span>
+				<#form:hidden path="isNewRecord"/>
+				<div class="row">	
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('组织名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="pkOrg" title="${text('组织选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData?isShowCode=true&officeTypes=1,2"
+									class="" allowClear="true"
+									canSelectRoot="true" canSelectParent="true" readonly="${!zlFamilyfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								 <#form:treeselect id="pkProjectid" title="${text('项目选择')}"
+									path="pkProjectid.pkProject" labelPath="pkProjectid.name"
+									url="${ctx}/zl/zlProject/treeData?isShowCode=true"
+									class=""  allowClear="true" class="form-control required" readonly="${!zlFamilyfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="name" maxlength="50" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('业态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								 <#form:treeselect id="pkFormattypeid" title="${text('业态选择')}"
+									path="pkFormattypeid.pkFormattype" labelPath="pkFormattypeid.name"
+									url="${ctx}/bd/bdFormattype/treeData?isShowCode=true"
+									class=""  allowClear="true" class="form-control " readonly="${!zlFamilyfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('车位')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:checkbox path="isCw" dictType="zl_iscw" label="是否车位" class="form-control" readonly="${!zlFamilyfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('面积')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="builtuparea" class="form-control number required color-area-input" readonly="${!zlFamilyfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="code" maxlength="50" class="form-control " readOnly="true" />
+							</div>
+						</div>
+					</div>
+				</div>
+
+			   	<div class="form-unit cw_btn_taggle">${text('人员信息')}
+					<button type="button" class="btn btn-box-tool pull-left btn_taggle" data-show='true' ><i class="fa fa-minus"></i></button>
+				</div>
+				<div class=''>
+					<div class="row">
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7 cedit">
+										<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('制单日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7 ">
+									<#form:input path="dbilldate" readonly="true" disabled="disabled" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7 cedit">
+										<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('修改日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="modifiedtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('zl:zlFamilyfile:edit')&& isEdit=='true'){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+		<!-- <div id="showRefData">
+			<ul>
+				动态存放参照模糊查询数据
+			</ul>
+		</div> -->
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/htmlview.js"></script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					var code=data.data;
+					contentWindow.document.getElementById("code").value=code;
+					contentWindow.page();
+					contentWindow.document.getElementById("code").value=null;
+				});
+			}
+		}, "json");
+    }
+});
+</script>
+<script>
+$(function(){
+	 var is =$("#isEdit").text();
+	 if(is=="false"){
+		 $('#builtuparea').val(js.formatNumber($('#builtuparea').val(), 2, true, '0.00'));
+			$('#innerarea').val(js.formatNumber($('#innerarea').val(), 2, true, '0.00'));
+	 }
+})
+setTimeout(function(){
+	 if(${!zlFamilyfile.isNewRecord}==true){
+			$('#isCw1').attr('disabled','disabled');
+			//$('input.sr').attr('style', 'background:#F6F6F6!important');
+			//$('select').attr('disabled','disabled');//select不可选择(disabled)
+		  }
+},10); 
+/* function treeselectCallback(id, act, index, layero, nodes){
+	if(id=="pkProjectid"){
+		   $("#pkProjectidName").val(nodes[0].name);
+	}else if(id=="pkFormattypeid"){
+		$("#pkFormattypeidName").val(nodes[0].name);
+	}
+} */
+</script>

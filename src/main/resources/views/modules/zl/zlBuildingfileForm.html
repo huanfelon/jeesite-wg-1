@@ -1,0 +1,204 @@
+<% layout('/layouts/default.html', {title: '楼栋档案管理', libs: ['validate']}){ %>
+<script src="${ctxStatic}/zl/zlBuildingfile/zlBuildingfileForm.js"></script>
+<link href="${ctxStatic}/css/zlFormShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(zlBuildingfile.isNewRecord ? '新增楼栋档案' : isEdit=='true'?'编辑楼栋档案':'楼栋档案详情')}
+			</div> -->
+			<div class="box-tools pull-left">
+			    <% if (hasPermi('zl:zlBuildingfile:edit')&& isEdit=='true'){ %>
+					<a herf="javascript:void(0);"  class="btn btn-sm" id="btnSubmit0"><i class="fa fa-check"></i> ${text('保存')}</a>
+				<% } %>
+			    <button type="button" class="btn btn-sm" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关闭')}</button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${zlBuildingfile}" action="${ctx}/zl/zlBuildingfile/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkBuildingfile"/>
+				<span id="isEdit" class="hide">${isEdit}</span>
+				<div class="row">
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('组织名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:treeselect id="pkOrg" title="${text('组织选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData?isShowCode=true&officeTypes=1,2"
+									class="" allowClear="true"
+									canSelectRoot="true" canSelectParent="true" readonly="${!zlBuildingfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								 <#form:treeselect id="pkProjectid" title="${text('项目选择')}"
+									path="pkProjectid.pkProject" labelPath="pkProjectid.name"
+									url="${ctx}/zl/zlProject/treeData?isShowCode=true"
+									class="" allowClear="true" class="form-control required" readonly="${!zlBuildingfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('楼栋名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="name" maxlength="50" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('房产数量')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="nproperty" maxlength="18" readOnly="true" class="form-control  digits color-number-input"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide">*</span> ${text('面积')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="builtuparea"  class="form-control number color-area-input" readOnly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required hide ">*</span> ${text('楼栋编码')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="code" maxlength="50" class="form-control " readOnly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('单元数量')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="nunit"  class="form-control required" readonly="${!zlBuildingfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-4">
+						<div class="form-group">
+							<label class="control-label col-sm-4" title="">
+								<span class="required ">*</span> ${text('楼栋层数')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-8">
+								<#form:input path="nbuilding" maxlength="50" class="form-control required" readonly="${!zlBuildingfile.isNewRecord}"/>
+							</div>
+						</div>
+					</div>
+				</div>
+	
+				<div class="form-unit cw_btn_taggle">${text('人员信息')}
+					<button type="button" class="btn btn-box-tool pull-left btn_taggle" data-show='true' ><i class="fa fa-minus"></i></button>
+				</div>
+				<div class=''>
+					<div class="row">
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required ">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8 cedit">
+										<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('制单日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:input path="dbilldate" readonly="true" disabled="disabled" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required ">*</span> ${text('修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8 cedit">
+										<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-4">
+							<div class="form-group">
+								<label class="control-label col-sm-4" title="">
+									<span class="required hide">*</span> ${text('修改日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-8">
+									<#form:input path="modifiedtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('zl:zlBuildingfile:edit')&& isEdit=='true'){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+		
+		<div id="showRefData">
+			<ul>
+				<!-- 动态存放参照模糊查询数据 -->
+			</ul>
+		</div>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/js/htmlview.js"></script>
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					var code=data.data;
+					contentWindow.document.getElementById("code").value=code;
+					contentWindow.page();
+					contentWindow.document.getElementById("code").value=null;
+				});
+			}
+		}, "json");
+    }
+});
+</script>
+<script>
+$(function(){
+	$('#builtuparea').val(js.formatNumber($('#builtuparea').val(), 2, false, '0.00'));
+	$('#innerarea').val(js.formatNumber($('#innerarea').val(), 2, false, '0.00'));
+})
+/* function treeselectCallback(id, act, index, layero, nodes){
+	if(id=="pkProjectid"){
+		   $("#pkProjectidName").val(nodes[0].name);
+	} */
+}
+</script>

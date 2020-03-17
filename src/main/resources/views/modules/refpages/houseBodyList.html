@@ -1,0 +1,71 @@
+﻿<% layout('/layouts/default.html', {title: '房源信息管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-body">
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<script src="${ctxStatic}/zl/zlHousesource/zlHousesourceList.js"></script>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	data: ${toJson(list)},
+	datatype: "local", // 设置本地数据
+	columnModel: [
+	     {header:'${text("组织名称")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"left"},
+		{header:'${text("项目名称")}', name:'projectname.name', index:'a.projectname', width:150, align:"left"},
+		{header:'${text("楼栋")}', name:'buildname.name',hidden:true, index:'a.buildname', width:150, align:"left"},
+		{header:'${text("单元")}', name:'unit', index:'a.unit', width:60, align:"left"},
+		{header:'${text("楼层")}', name:'floorn', index:'a.floorn', width:60, align:"left"},
+		{header:'${text("房号")}', name:'roomnumber', index:'a.roomnumber', width:60, align:"left"},
+		{header:'${text("房产编号")}', name:'estatecode', index:'a.estatecode', width:170, align:"left"},
+		{header:'${text("房产名称")}', name:'estatename',editable:true, index:'a.estatename', width:170, align:"left"},
+		{header:'${text("面积")}', name:'buildarea', index:'a.buildarea', width:60, align:"right",classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("产证面积")}', name:'innerarea',hidden:true,  index:'a.innerarea', width:150, align:"right", classes:"color-area-label",formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("户型信息")}', name:'pkFamilyfile.name', index:'a.pk_familyfile', width:150, align:"left"},
+		{header:'${text("业态")}', name:'pkFormattype.name', index:'a.pk_formattype', width:150, align:"left"},
+		{header:'${text("房源状态")}', name:'housestate',index:'a.housestate', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('zl_housestatus')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("上级房号")}', name:'parentroom', index:'a.parentroom', width:150, align:"left"},
+		{header:'${text("合并拆分状态")}', name:'hbcfstatus', index:'a.hbcfstatus', width:150, align:"left"},
+		{header:'${text("主实体房号")}', name:'zstroom', index:'a.zstroom', width:150, align:"left"}, 
+		/*{header:'${text("制单人")}', name:'creator.userName', index:'a.creator', width:100, align:"left"},
+		{header:'${text("制单日期")}', name:'dbilldate', index:'a.dbilldate', width:120, align:"center"},
+		{header:'${text("修改人")}', name:'modifier.userName', index:'a.modifier', width:100, align:"left"}, 
+		{header:'${text("修改日期")}', name:'modifiedtime', index:'a.modifiedtime', width:120, align:"center"},*/
+		{header:'${text("组织名称编码")}', name:'pkOrg.officeCode', hidden:true,index:'a.pk_org', width:150, align:"left"},
+		{header:'${text("项目名称编码")}', name:'projectname.pkProject', hidden:true,index:'a.projectname', width:150, align:"left"},
+		{header:'${text("业态编码")}', name:'pkFormattype.pkFormattype', hidden:true,index:'a.pk_formattype', width:150, align:"left"},
+		{header:'${text("楼栋编码")}', name:'buildname.pkBuildingfile', hidden:true, index:'a.buildname', width:150, align:"left"},
+		{header:'${text("操作")}', name:'actions', hidden:true, width:100, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('zl:zlHousesource:edit')){ %>
+				//actions.push('<a href="${ctx}/zl/zlHousesource/form?pkHousesource='+row.pkHousesource+'&isEdit=true" class="btnList" title="${text("编辑房源信息")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="javascript:void(0);" data-url="${ctx}/zl/zlHousesource/bianji?pkHousesource='+row.pkHousesource+'&isEdit=true" onclick="bianji33(this, false)" title="${text("编辑房源信息")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/zl/zlHousesource/delete?pkHousesource='+row.pkHousesource+'" class="btnList" title="${text("删除房源信息")}" data-confirm="${text("确认要删除该房源信息吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+
+	lazyLoad: true,//懒加载，当调用 dataGrid.refresh()时再进行加载
+	showCheckbox :true ,
+	shrinkToFit : false,//自动分配单元格宽度
+
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "查看房源信息", "/js/a/zl/zlHousesource/form?pkHousesource="+id+"&isEdit=false", null, null);//弹出新的标签页
+	},
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+
+});
+</script>

@@ -1,0 +1,183 @@
+<% layout('/layouts/default.html', {title: '房源信息管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+				<span id="isHb" class="hide">${isHb}</span>
+			<div class="ml10 mr10">
+					<table id="page"></table>
+						<a href="#" id="splitHouseChildDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+				
+				</div>
+		<div class="box-body">
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<!-- <script src="${ctxStatic}/js/zl.js"></script> -->
+<!-- <script src="${ctxStatic}/zl/zlHousesource/zlHousesourceList.js"></script> -->
+<script>
+var Grid=${toJson(isHb)};
+if(Grid==true){
+	Grid=false;
+}else{
+	Grid=true;
+}
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	
+	data: ${toJson(page)},
+	datatype: "local", // 设置本地数据
+	columnModel: [
+	    {header:'${text("组织名称")}', name:'pkOrg.officeName',width:150,align:"left"},
+		{header:'${text("项目名称")}', name:'projectname.name', index:'a.projectname', width:150},
+		{header:'${text("楼栋")}', name:'buildname.name', index:'a.buildname', width:150, align:"left"},
+		{header:'${text("单元")}', name:'unit', index:'a.unit', width:150, align:"left",editable:true, edittype:'text', editoptions:{'class':'form-control '}},
+		{header:'${text("楼层")}', name:'floorn', index:'a.floorn', width:150, align:"left",editable:true, edittype:'text', editoptions:{'class':'form-control '}},
+		{header:'${text("房号")}', name:'roomnumber', index:'a.roomnumber', width:150, align:"left", editable:true, edittype:'text', editoptions:{'class':'form-control '}},
+		{header:'${text("房产编号")}', name:'estatecode', index:'a.estatecode', width:150, align:"left"},
+		{header:'${text("房产名称")}', name:'estatename',index:'a.estatename', width:150, align:"left"},
+		{header:'${text("租赁面积")}', name:'buildarea', index:'a.buildarea', width:150,  editable:true, edittype:'text', editoptions:{'class':'form-control '}, formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("产证面积")}', name:'innerarea', index:'a.innerarea', width:150, align:"right", editable:true, edittype:'text', editoptions:{'class':'form-control '},formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, false, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+	/* 	{header:'${text("户型信息")}', name:'pkFamilyfile', width:150, 
+			formatter: function(val, obj, row, act){
+			return js.val(row, 'pkFamilyfile.pkFamilyfile')+'|'+js.val(row, 'pkFamilyfile.name');
+		},editable: true, edittype: "custom", editoptions: {
+			custom_element: function(val, editOptions) {
+				return js.template('listselectTpl', {
+					id: 'pkFamilyfile_'+editOptions.id, title: '户型信息选择', 
+					path: 'pkFamilyfile.pkFamilyfile', value: val.split('|')[0], 
+					labelPath: 'pkFamilyfile.name', labelValue: val.split('|')[1],
+					itemCode:'pkFamilyfile', itemName :'name',
+					boxWidth:$(top.window).width()*8/10,boxHeight:$(top.window).height()*4/5,
+					url: '${ctx}/zl/zlFamilyfile/familySelect?family='+val.split('|')[0], cssClass: ''
+				});
+			  }
+		  }
+		}, */
+		{header:'${text("户型信息")}', name:'pkFamilyfile.name', index:'a.pk_familyfile', width:150, align:"center"},
+		{header:'${text("房源状态")}', name:'housestate', index:'a.housestate', width:80, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('zl_housestatus')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("业态")}', name:'pkFormattype.name', index:'a.pk_formattype', width:150, align:"center"},
+		{header:'${text("上级房号")}', name:'parentroom', index:'a.parentroom', width:100, align:"center"},
+/* 		{header:'${text("合并拆分状态")}', name:'hbcfstatus', index:'a.hbcfstatus', width:100, align:"center"},
+		{header:'${text("主实体房号")}', name:'zstroom', index:'a.zstroom', width:100, align:"center"},
+		{header:'${text("制单日期")}', name:'dbilldate', index:'a.dbilldate', width:150, align:"center"},
+		{header:'${text("创建人")}', name:'creator.userName', index:'a.create', width:150, align:"left"},
+		{header:'${text("创建时间")}', name:'creationtime', index:'a.creationtime', width:150, align:"left"},
+		{header:'${text("修改人")}', name:'modifier.userName', index:'a.modifier', width:150, align:"left"},
+		{header:'${text("修改时间")}', name:'modifiedtime', index:'a.modifiedtime', width:150, align:"left"}, */
+		{header:'${text("操作")}', name:'actions', width:40, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#dataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				//actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#dataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				actions.push('<a href="#" onclick="g_delete(this)" data-id="'+obj.rowId+'" data-global="'+Global.STATUS_DELETE+'"> <i class="fa fa-trash-o"></i></a>&nbsp;');
+				
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+
+	shrinkToFit : true,//自动分配单元格宽度
+	editGrid: true,				// 是否是编辑表格
+	editGridAddRowBtn: $('#splitHouseChildDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: Grid,	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {id: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'page', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,id,testSort,testData.id,testInput,testTextarea,testSelect,testSelectMultiple,testRadio,testCheckbox,testDate,testDatetime,testUser.userCode,testOffice.officeCode,testAreaCode,testAreaName,', // 提交数据列表的属性字段
+	// 加载成功后执行事件
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		console.log(data);
+	}
+});
+
+var jishu = 0;
+function g_delete(aaa){
+	console.log(aaa)
+	var dataId = $(aaa).attr("data-id");
+	console.log(dataId)
+	var global = $(aaa).attr("data-global");
+	console.log(global)
+	
+	// 最少留2行
+	var select_list = $('#dataGrid').dataGrid('getRowData');
+	console.log(select_list);
+	var shiyu = select_list.length - jishu;
+	if(shiyu == 2){
+		js.showMessage("最少留2行","","error");
+		return
+	}
+	
+	js.confirm('你确认要删除这条数据吗？', function(){
+		jishu++;
+		$('#dataGrid').dataGrid('setRowData',dataId,null,{display:'none'});
+		$('#'+dataId+'_status').val(global);
+	});
+	return false;
+}
+
+ var page1=${toJson(page)}[1];
+ var name=$('#projectname').val();
+    $("#splitHouseChildDataGridAddRowBtn").click(splitHouseRowClick);
+    function splitHouseRowClick(){
+    	var page2=[];
+    	var datas=$('#dataGrid').dataGrid('getParam', "data");
+    //	var datas1=$('#dataGrid').dataGrid('getRowData');
+    	for(var i=0;i<datas.length-1;i++){
+    		datas[i].unit=$("#"+(i+1)+"_unit").val()
+    		datas[i].floorn=$("#"+(i+1)+"_floorn").val()
+    		datas[i].roomnumber=$("#"+(i+1)+"_roomnumber").val()
+    		datas[i].buildarea=$("#"+(i+1)+"_innerarea").val()
+    		page2.push(datas[i]);
+    	}
+    	for(var i=datas.length-1;i<datas.length;i++){
+    		datas[i].pkOrg=page1.pkOrg;
+    		datas[i].projectname=page1.projectname;
+    		datas[i].buildname=page1.buildname;
+    		datas[i].estatecode=page1.estatecode;
+    		datas[i].estatename=page1.estatename;
+    		datas[i].pkFamilyfile=page1.pkFamilyfile;
+    		datas[i].pkFormattype=page1.pkFormattype;
+    		datas[i].housestate=page1.housestate;
+    		datas[i].parentroom=page1.parentroom;
+    		datas[i].dbilldate=page1.dbilldate;
+    		datas[i].creator=page1.creator;
+    		datas[i].creationtime=page1.creationtime;
+    		page2.push(datas[i]);
+    	}
+    	
+	 $('#dataGrid').dataGrid('setParam', {data:page2}, true);
+	 $('#dataGrid').dataGrid('refresh'); 
+    	/*     	var page2=[];
+    	//var datas=$('#dataGrid').dataGrid('getParam', "data");
+    	var datas=$('#dataGrid').dataGrid('getRowData');
+    	for(var i=0;i<datas.length-1;i++){
+    		datas[i].unit=page1.unit;
+    		datas[i].floorn=page1.floorn;
+    		datas[i].roomnumber=page1.roomnumber;
+    		datas[i].buildarea=page1.buildarea;
+    		datas[i].innerarea=page1.innerarea;
+    		datas[i].pkFamilyfile=page1.pkFamilyfile;
+    		page2.push(datas[i]);
+    	}
+		page2.push(page1);
+	 $('#dataGrid').dataGrid('setParam', {data:page2}, true);
+	 $('#dataGrid').dataGrid('refresh'); */
+	}
+
+</script>
+<script id="listselectTpl" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.path}}" value="{{d.value}}"
+	labelName="{{d.labelPath}}" labelValue="{{d.labelValue}}" url="{{d.url}}" checkbox="{{d.checkbox}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}" boxWidth="{{d.boxWidth}}" boxHeight="{{d.boxHeight}}"
+	class="{{d.cssClass}}" btnClass="btn-sm" allowClear="true"/>
+</div>//--></script>

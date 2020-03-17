@@ -1,0 +1,76 @@
+<li class="dropdown user-menu mr5">
+	<a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
+		<img src="${@user.getAvatarUrl().replaceFirst('/ctxPath', ctxPath)}" class="user-image">
+		<span id="userName" class="hidden-xs">${user.userName}</span>
+		<span id="userCode" class="hidden-xs hide">${user.userCode}</span>
+		<span id="psndocName" class="hidden-xs hide"></span>
+		<span id="psndocCode" class="hidden-xs hide"></span>
+		<span id="deptName" class="hidden-xs hide"></span>
+		<span id="deptCode" class="hidden-xs hide"></span>
+	</a>
+	<ul class="dropdown-menu">
+		<li class="mt5">
+			<a id="userInfo" href="javascript:" data-href="${ctx}/sys/user/info" class="addTabPage">
+			<i class="fa fa-user"></i> ${text('个人中心')}</a>
+		</li>
+		<li>
+			<a id="modifyPassword" href="javascript:" data-href="${ctx}/sys/user/info?op=pwd" class="addTabPage">
+			<i class="fa fa-key"></i> ${text('修改密码')}</a>
+		</li>
+		<li class="divider"></li>
+		<li>
+			<a href="${ctx}/logout">
+			<i class="fa fa-sign-out"></i> ${text('退出登录')}</a>
+		</li>
+		<% if(user.superAdmin){ %>
+			<li class="divider"></li>
+			<li class="dropdown-header mb5">${text('系统切换')}：</li>
+			<% var menuSysCode = @UserUtils.getLoginInfo().getParam('sysCode', 'default'); %>
+			<% for(var dict in @DictUtils.getDictList('sys_menu_sys_code')){ %>
+				<li>
+					<a href="${ctx}/switch/${dict.dictValue}">
+						<i class="fa fa-${menuSysCode == dict.dictValue 
+							? 'check-' : ''}circle-o"></i> ${dict.dictLabel}
+					</a>
+				</li>
+			<% } %>
+			<li class="mt10"></li>
+		<% }else{ %>
+		<li class="mt10"></li>
+		<% } %>
+	</ul>
+</li>
+<script>
+	var jsonData={};
+	jsonData["userCode"]=$("#userCode").html();
+	$.ajax({
+		url: "${ctx}/base/bdPsndoc/getUserPsndoc",
+	    dataType: "json",
+	    data: jsonData,
+	    contentType: "application/json;charset=UTF-8",
+		success:function(data){
+			$("#psndocCode").html(data.PK_PSNDOC);
+			$("#psndocName").html(data.NAME);
+			if(data.PK_PSNDOC!=null&&data.PK_PSNDOC!=""){
+				var JSONDATA2={};
+				JSONDATA2['psndocCode']=data.PK_PSNDOC;
+				$.ajax({
+					url: '/js/a/base/bdPsndoc/listData',
+					datatype: 'json',
+					data: JSONDATA2,
+					contentType: 'application/json;charset=utf-8',
+					success: function (data) {
+						$("#deptCode").html(data.list[0].pkDept.pkDept);
+						$("#deptName").html(data.list[0].pkDept.deptName);
+					},
+					error: function(e){
+						console.log(e);
+					}
+				});
+			}
+		},
+		error: function(e){
+			console.log(e);
+		}
+	});
+</script>

@@ -1,0 +1,313 @@
+﻿<% layout('/layouts/default.html', {title: '楼栋档案管理', libs: ['dataGrid']}){ %>
+<link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/>
+<link href="${ctxStatic}/css/zuling.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main zuling">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('楼栋档案管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('zl:zlBuildingfile:edit')){ %>
+					<a href="${ctx}/zl/zlBuildingfile/form?isEdit=true" class="btn btn-default btnTool" title="${text('新增楼栋档案')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default" id="c_btnRefresh" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+				<a href="javascript:" id="edit" onclick="c_editBtn('/js/a/zl/zlBuildingfile/bianji?pkBuildingfile')" class="btn btn-default" title="${text('修改户型信息')}"><i class="fa fa-pencil"></i> ${text('修改')}</a>
+				<a href="#" class="btn btn-default" onclick="c_delete('pkBuildingfile')" title="${text('删除')}"><i class="fa fa-trash-o"></i> 删除 </a>
+				<a href="#" class="btn btn-default " id="zuling" title="${text('建房')}" data-zt="0"><i class="fa fa-filter"></i> ${text('建房')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${zlBuildingfile}" action="${ctx}/zl/zlBuildingfile/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('组织')}：</label>
+					<div class="control-inline">
+	                  <#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData"
+									class="" allowClear="true"/>					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('编码')}：</label>
+					<div class="control-inline">
+						<#form:input path="code" maxlength="50" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="50" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('项目信息')}：</label>
+					<div class="control-inline">
+								 <#form:treeselect id="pkProjectid" title="${text('项目选择')}"
+									path="pkProjectid.pkProject" labelPath="pkProjectid.name"
+									url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true"
+									class="" checkbox="true" canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<!-- <div class="form-group">
+					<label class="control-label">${text('制单日期')}：</label>
+					<div class="control-inline">
+						  查询单个日期
+						<#form:input path="dbilldate" readonly="true" maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:false});"/>
+							
+							日期范围查询 
+						<#form:input path="dbilldate_gte" readonly="true"  maxlength="20" class="form-control Wdate-date"
+						     dataFormat="date" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(dbilldate_lte)}',isShowClear:true});"/>
+						&nbsp;--&nbsp;
+						<#form:input path="dbilldate_lte" readonly="true"  maxlength="20" class="form-control Wdate-date"
+							dataFormat="date" onclick="WdatePicker({skin:'whyGreen',dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(dbilldate_gte)}',isShowClear:true});"/> 
+					</div>
+				</div> -->
+				<div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+		<div id="childGuide" class="hide">
+	        <div class="child1">
+	            <div class="searchNav">
+	                <div class="row">
+	                    <div class="col-xs-1">
+	                        <span>第一步：</span>
+	                    </div>
+	                    <div class="col-xs-8">
+                       		确认单元数、每层的户数和单元号
+	                    </div>
+	                </div>
+	                <div class="row">
+	                    <div class="col-xs-1">
+	                        <span>项目信息：</span>
+	                    </div>
+	                    <div class="col-xs-3">
+	                        <input type="text" class="pro1" readonly="true">
+	                    </div>
+	                    <div class="col-xs-1">
+	                        <span>楼栋信息：</span>
+	                    </div>
+	                    <div class="col-xs-3">
+	                        <input type="text" class="build1"  readonly="true">
+	                    </div>
+	                    <!-- <div class="col-xs-1">
+	                        <span>起始层：</span>
+	                    </div>
+	                    <div class="col-xs-3">
+	                        <input type="text" value="1">
+	                    </div> -->
+	                </div>
+	            </div>
+	            <div class="contentBody">
+	                <div class="tips">
+	                    <a class="tips_btn hove" href="#" data-lei="danyuanMsg">单元信息</a>
+	                    <a class="tips_btn" href="#" data-lei="loucengMsg">楼层信息</a>
+	                </div>
+	                <div class="listShow">
+	                    <table class="danyuanMsg onePageTable">
+	                        <thead>
+	                            <tr>
+	                                <th>单元</th>
+	                                <th>户数</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody id="dy_xinxi">
+	                            <tr>
+	                                <td><input type="text" value="1"></td>
+	                                <td><input type="text" value="3"></td>
+	                            </tr>
+	                            <tr>
+	                                <td><input type="text" value="2"></td>
+	                                <td><input type="text" value="1"></td>
+	                            </tr>
+	                            <tr>
+	                                <td><input type="text" value="3"></td>
+	                                <td><input type="text" value="2"></td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+	                    <table class="loucengMsg onePageTable">
+	                        <thead>
+	                            <tr>
+	                                <th>单元</th>
+	                                <th>面积</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody id="lou_xinxi">
+	                            <tr>
+	                                <td><input type="text" value="1"></td>
+	                                <td><input type="text" value="60"></td>
+	                            </tr>
+	                            <tr>
+	                                <td><input type="text" value="2"></td>
+	                                <td><input type="text" value="150"></td>
+	                            </tr>
+	                            <tr>
+	                                <td><input type="text" value="3"></td>
+	                                <td><input type="text" value="80"></td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+	
+	                </div>
+	            </div>
+	            <div class="buttonGroup">
+	                <p>
+	                    <span id="toSecond"><i class="fa fa-arrow-down"></i>下一步</span>
+	                    <!-- <span class="toMian"><i class="fa fa-mail-reply"></i>返回修改表头信息</span>
+	                <span id="toFirst"><i class="fa fa-arrow-up"></i>上一步</span>
+	                <span class="toNewChild"><i class="fa fa-plus"></i>新增报销</span>
+	                <span id="commitChild"><i class="fa fa-download"></i>保存并结束向导</span> -->
+	                </p>
+	            </div>
+	        </div>
+	        <div class="child2 hide">
+	            <div class="searchNav">
+	                <div class="row">
+	                    <div class="col-xs-1">
+	                        <span>第二步：</span>
+	                    </div>
+	                    <div class="col-xs-8">
+	                        设置房号
+	                    </div>
+	                </div>
+	                <div class="row">
+	                    <div class="col-xs-1">
+	                        <span>项目信息：</span>
+	                    </div>
+	                    <div class="col-xs-3">
+	                        <input type="text" class="pro2" readonly="true">
+	                    </div>
+	                    <div class="col-xs-1">
+	                        <span>楼栋信息：</span>
+	                    </div>
+	                    <div class="col-xs-3">
+	                        <input type="text" class="build2" readonly="true">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="contentBody2 table_content">
+	                <table>
+	                    <thead id="t_thead">
+	                        <tr>
+	                            <th rowspan="2">楼层</th>
+	                        </tr>
+	                    </thead>
+	                    <tbody id="t_tbody">
+	                    
+	                    </tbody>
+	                </table>
+	            </div>
+	            <div class="buttonGroup">
+	                <p>
+	                    <span id="toFirst"><i class="fa fa-arrow-up"></i>上一步</span>
+	                    <!-- <span id="toSql"> 确定 </span> -->
+	                    <span id="toThree"><i class="fa fa-arrow-down"></i>下一步</span>
+	                </p>
+	            </div>
+	        </div>
+	        <div class="child3 hide">
+	            <div class="searchNav">
+	                <div class="row">
+	                    <div class="col-xs-1">
+	                        <span>第三步：</span>
+	                    </div>
+	                    <div class="col-xs-8">
+	                        	设置户型
+	                    </div>
+	                </div>
+	                <div class="row">
+	                    <div class="col-xs-1">
+	                        <span>项目信息：</span>
+	                    </div>
+	                    <div class="col-xs-3">
+	                        <input type="text" class="pro2" readonly="true">
+	                    </div>
+	                    <div class="col-xs-1">
+	                        <span>楼栋信息：</span>
+	                    </div>
+	                    <div class="col-xs-3">
+	                        <input type="text" class="build2" readonly="true">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="contentBody3 table_content">
+	                <table>
+	                    <thead id="t_thead3">
+	                    </thead>
+	                    <tbody id="t_tbody3">
+	                    </tbody>
+	                </table>
+	            </div>
+	            <div class="buttonGroup">
+	                <p>
+	                    <span id="backSecond"><i class="fa fa-arrow-up"></i>上一步</span>
+	                    <span id="toSql"> 确定 </span>
+	                </p>
+	            </div>
+	        </div>
+	        
+	    </div>
+		<div id="showRefData">
+			<ul>
+				<!-- 动态存放参照模糊查询数据 -->
+			</ul>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("项目主键")}', name:'pkProjectid.pkProject', index:'a.pkProjectid', width:150, align:"left",hidden:true},
+		{header:'${text("主键")}', name:'pkBuildingfile',hidden:true},
+    	{header:'${text("组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"center"},
+  		{header:'${text("项目信息")}', name:'pkProjectid.name', index:'a.pk_projectid', width:150, align:"left"},
+		{header:'${text("名称")}', name:'name', index:'a.name', width:150, align:"left"},
+		{header:'${text("楼栋层数")}', name:'nbuilding', index:'a.nbuilding', width:150, align:"left"},
+		{header:'${text("单元数量")}', name:'nunit', index:'a.nunit', width:150, align:"left"},
+		{header:'${text("是否建房")}', name:'isbuild', index:'a.isbuild', width:150, align:"left", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_yes_no')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("房产数量")}', name:'nproperty', index:'a.nproperty', width:150, align:"right"},
+		{header:'${text("面积")}', name:'builtuparea', index:'a.builtuparea', width:150, align:"right",classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("产证面积")}', name:'innerarea', hidden:true,index:'a.innerarea', width:150, align:"right",classes:"color-area-label", formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("编码")}', name:'code', index:'a.code', width:150, align:"left"},
+		{header:'${text("制单人")}', name:'creator.userName', index:'a.creator', width:150, align:"center"},
+		{header:'${text("制单日期")}', name:'dbilldate', index:'a.dbilldate', width:150, align:"center"},
+		{header:'${text("修改人")}', name:'modifier.userName', index:'a.modifier', width:150, align:"center"},
+		{header:'${text("修改日期")}', name:'modifiedtime', index:'a.modifiedtime', width:150, align:"center"},
+		{header:'${text("操作")}', name:'actions',hidden:true, width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('zl:zlBuildingfile:edit')){ %>
+				actions.push('<a href="javascript:void(0);" data-url="${ctx}/zl/zlBuildingfile/bianji?pkBuildingfile='+row.pkBuildingfile+'&isEdit=true" onclick="bianji33(this, false)" title="${text("编辑楼栋档案")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/zl/zlBuildingfile/delete?pkBuildingfile='+row.pkBuildingfile+'" class="btnList" title="${text("删除楼栋档案")}" data-confirm="${text("确认要删除该楼栋档案吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],	
+	lazyLoad: true,//懒加载，当调用 dataGrid.refresh()时再进行加载
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "查看楼栋档案", "/js/a/zl/zlBuildingfile/form?pkBuildingfile="+id+"&isEdit=false", null, null);//弹出新的标签页
+	},
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+	}
+});
+</script>
+
+<script src="${ctxStatic}/zl/zlBuildingfile/zlBuildingfileList.js"></script>
+<script src="${ctxStatic}/js/refPBFF.js"></script>

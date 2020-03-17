@@ -1,0 +1,109 @@
+<% layout('/layouts/default.html', {title: '部门管理', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/css/c_search.css">
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('部门管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('base:bdDept:edit')){ %>
+					<a href="${ctx}/base/bdDept/form" id="officeid" class="btn btn-default btnTool" title="${text('新增部门')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+				<% } %>
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default" id="btnRefreshTree" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+				<a href="#" class="btn btn-default" id="btnExpandTreeNode" title="${text('展开一级')}"><i class="fa fa-angle-double-down"></i> ${text('展开')}</a>
+				<a href="#" class="btn btn-default" id="btnCollapseTreeNode" title="${text('折叠全部')}"><i class="fa fa-angle-double-up"></i> ${text('折叠')}</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${bdDept}" action="${ctx}/base/bdDept/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+					<#form:hidden path="pkDept" />
+				 <div class="c_form_group">
+					 <div class="form-group">
+						<label class="control-label">${text('组织')}：</label>
+						<div class="control-inline width-120" >
+							<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+								path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+								url="${ctx}/sys/office/treeData" allowClear="true"/>
+						</div>
+					</div> 
+					<div class="form-group">
+						<label class="control-label">${text('部门编码')}：</label>
+						<div class="control-inline">
+							<#form:input path="deptCode" maxlength="50" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('部门名称')}：</label>
+						<div class="control-inline">
+							<#form:input path="deptName" maxlength="50" class="form-control width-120"/>
+						</div>
+					</div>
+				
+				
+					<div class="form-group">
+						<button type="submit" class="btn btn-primary btn-sm c_close">${text('查询')}</button>
+						<button type="reset" class="btn btn-default btn-sm">${text('重置')}</button>
+					</div>
+				</div>
+				<div class="c_search">
+					<div class="c_title_search pull-left">
+						<i class="fa fa-filter"></i> <span>查询</span>
+					</div>
+					<div class="pull-right">
+						<span class="c_close">x</span>
+					</div>
+				</div>
+			</#form:form>
+			<table id="dataGrid"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text('部门名称')}', name:'deptName', index:'a.dept_name', width:250, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			return '( '+row.deptCode+' ) '+'<a href="${ctx}/base/bdDept/form?pkDept='+row.pkDept+'" class="btnList" data-title="${text('编辑部门')}">'+(val||row.id)+'</a>';
+		}},
+		{header:'${text('组织')}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"center"},
+		
+	
+		{header:'${text('部门名称')}', name:'deptName', index:'a.dept_name', width:150, align:"center"},
+		{header:'${text('本级排序号')}', name:'treeSort', index:'a.tree_sort', width:150, align:"center"},
+	
+		{header:'${text('部门管理员')}', name:'deptAdmin.userName', index:'a.deptAdmin', width:150, align:"center"},
+		
+		{header:'${text('状态')}', name:'status', index:'a.status', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('sys_search_status')}, val, '${text('未知')}', true);
+		}},
+		{header:'${text('创建时间')}', name:'createDate', index:'a.create_date', width:150, align:"center"},
+		{header:'${text("备注信息")}', name:'remarks', index:'a.remarks', width:150, align:"left"},
+		{header:'${text('操作')}', name:'actions', width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('base:bdDept:edit')){ %>
+				actions.push('<a href="${ctx}/base/bdDept/form?guide=v&pkDept='+row.pkDept+'" class="btnList" title="${text('编辑部门')}"><i class="fa fa-pencil"></i></a>&nbsp;');
+				if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/base/bdDept/disable?pkDept='+row.pkDept+'" class="btnList" title="${text('停用部门')}" data-confirm="${text('确认要停用该部门吗？')}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/base/bdDept/enable?pkDept='+row.pkDept+'" class="btnList" title="${text('启用部门')}" data-confirm="${text('确认要启用该部门吗？')}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				}
+				actions.push('<a href="${ctx}/base/bdDept/delete?pkDept='+row.pkDept+'" class="btnList" title="${text('删除部门')}" data-confirm="${text('确认要删除该部门及所有子部门吗？')}" data-deltreenode="'+row.id+'"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/base/bdDept/form?guide=t&parentCode='+row.id+'" class="btnList" title="${text('新增下级部门')}"><i class="fa fa-plus-square"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	treeGrid: true,			// 启用树结构表格
+	defaultExpandLevel: 0,	// 默认展开的层次
+	expandNodeClearPostData: 'deptCode,deptName,', // 展开节点清理请求参数数据（一般设置查询条件的字段属性，否则在查询后，不能展开子节点数据）	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>

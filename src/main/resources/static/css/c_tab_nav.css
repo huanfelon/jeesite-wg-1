@@ -1,0 +1,26 @@
+.c_tab_nav {
+  padding-top: 20px;
+}
+.c_tab_nav ul {
+  height: 34px;
+  line-height: 30px;
+  background: linear-gradient(#F7F7F7, #ECECEC);
+  padding: 2px 0;
+  font-size: 12px;
+  margin: 0 12px 0 10px;
+  overflow: hidden;
+}
+.c_tab_nav ul li {
+  list-style: none;
+  float: left;
+  min-width: 100px;
+  text-align: center;
+  border-right: 1px solid #eae4e4;
+  cursor: pointer;
+}
+.c_tab_nav ul li:hover {
+  box-shadow: 0px -4px 0px 0px #7cb2e7 inset;
+}
+.c_tab_nav ul li.c_active {
+  box-shadow: 0px -4px 0px 0px #0453a2 inset;
+}

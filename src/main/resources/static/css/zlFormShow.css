@@ -1,0 +1,49 @@
+/* .main-style{
+	background-color: #d4d4d4;
+} */
+.box-head {
+    
+}
+.noheight{
+	height:0px;
+	overflow:hidden;
+	transition: height 1s
+}
+.showLine{
+	display:inline-block;
+}
+.mb30{
+	margin-bottom: 30px;
+}
+.mb40{
+	margin-bottom: 40px;
+}
+.input-text-left{
+	text-align: left;
+}
+.input-text-center{
+	text-align: center;
+}
+.input-text-right{
+	text-align: right;
+}
+.color-money-input{
+	text-align: right;
+	color: lightseagreen;
+}
+.color-area-input{
+	text-align: right;
+	color: #8080ff;
+}
+.color-number-input{
+	text-align: right;
+}
+.color-keyword-title{
+	color: lightcoral;
+}
+.color-keyword-input{
+	color: lightcoral;
+}
+.resize-none {
+	resize: none;
+}

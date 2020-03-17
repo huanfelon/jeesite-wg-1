@@ -1,0 +1,97 @@
+<% layout('/layouts/default.html', {title: '收费标准管理', libs: ['dataGrid']}){ %>
+<link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<!-- <div class="box-title">
+				<i class="fa icon-notebook"></i> ${text('收费标准管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if(hasPermi('bd:bdFeescale:edit')){ %>
+					<a href="${ctx}/bd/bdFeescale/form?isEdit=true" class="btn btn-default btnTool" title="${text('新增收费标准')}"><i class="fa fa-plus"></i> ${text('新增')}</a>
+					<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+					<a href="#" class="btn btn-default" id="c_btnRefresh" title="${text('刷新')}"><i class="fa fa-refresh"></i> ${text('刷新')}</a>
+					<a href="javascript:" id="edit" onclick="c_editBtn('/js/a/bd/bdFeescale/bianji?pkFeescale')" class="btn btn-default" title="${text('修改合同类型')}"><i class="fa fa-pencil"></i> ${text('修改')}</a>
+					<a href="#" class="btn btn-default" onclick="c_delete('pkFeescale')" title="${text('批量删除')}"><i class="fa fa-trash-o"></i> 删除 </a>
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${bdFeescale}" action="${ctx}/bd/bdFeescale/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="form-group">
+					<label class="control-label">${text('组织')}：</label>
+					<div class="control-inline" >
+						<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('编码')}：</label>
+					<div class="control-inline">
+						<#form:input path="code" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+                <div class="form-group">
+					<button type="submit" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>			
+				</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+	    {header:'${text("组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"center"},
+	    {header:'${text("编码")}', name:'code', index:'a.code', width:150, align:"left"},
+		{header:'${text("名称")}', name:'name', index:'a.name', width:150, align:"center"},
+		{header:'${text("收费项目")}', name:'pkProject.name', index:'a.pk_project', width:150, align:"center"},
+		{header:'${text("计算方式")}', name:'caMethod', index:'a.ca_method', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_ca_method')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("计算数额")}', name:'caAmount', index:'a.ca_amount', width:150, align:"right",classes:"color-money-label", formatter: function(val, obj, row, act){
+			return "¥"+js.formatNumber(val, 2, false, '0.00'); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("舍入方式")}', name:'round', index:'a.round', width:150, align:"center", formatter: function(val, obj, row, act){
+			return js.getDictLabel(${@DictUtils.getDictListJson('wg_round')}, val, '${text("未知")}', true);
+		}},
+		{header:'${text("操作")}', name:'actions',hidden:true, width:120, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			<% if(hasPermi('bd:bdFeescale:edit')){ %>
+			//actions.push('<a href="${ctx}/bd/bdFeescale/form?pkFeescale='+row.pkFeescale+'&isEdit=true" class="btnList" title="${text("编辑收费标准")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+		    actions.push('<a href="javascript:void(0);" data-url="${ctx}/bd/bdFeescale/bianji?pkFeescale='+row.pkFeescale+'&isEdit=true" onclick="bianji33(this, false)"   title="${text("编辑收费标准")}"><i class="fa fa-pencil"></i></a>&nbsp;');
+			/*if (row.status == Global.STATUS_NORMAL){
+					actions.push('<a href="${ctx}/bd/bdFeescale/disable?pkFeescale='+row.pkFeescale+'" class="btnList" title="${text("停用收费标准")}" data-confirm="${text("确认要停用该收费标准吗？")}"><i class="glyphicon glyphicon-ban-circle"></i></a>&nbsp;');
+				}
+				if (row.status == Global.STATUS_DISABLE){
+					actions.push('<a href="${ctx}/bd/bdFeescale/enable?pkFeescale='+row.pkFeescale+'" class="btnList" title="${text("启用收费标准")}" data-confirm="${text("确认要启用该收费标准吗？")}"><i class="glyphicon glyphicon-ok-circle"></i></a>&nbsp;');
+				} */
+				actions.push('<a href="${ctx}/bd/bdFeescale/delete?pkFeescale='+row.pkFeescale+'" class="btnList" title="${text("删除收费标准")}" data-confirm="${text("确认要删除该收费标准吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			<% } %>
+			return actions.join('');
+		}}
+	],
+	lazyLoad: true, //打开懒加载，不加载数据
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	},
+	ondblClickRow: function(id, rownum, colnum, event){//双击方法
+		js.addTabPage($("#dataGrid"), "查看收费项目", "/js/a/bd/bdFeescale/form?pkFeescale="+id+'&isEdit=false', null, null);//弹出新的标签页
+	},
+});
+</script>
+<script src="${ctxStatic}/bd/bdFeescale/bdFeescaleList.js"></script>

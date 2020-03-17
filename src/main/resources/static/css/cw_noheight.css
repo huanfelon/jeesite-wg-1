@@ -1,0 +1,22 @@
+/* .show_hide {
+	height: 200px;
+	padding: 10px 20px;
+	overflow:scroll;
+	transition: height 1s;
+	-webkit-transition: all 1s;	Safari 和 Chrome
+    -moz-transition: all 1s; Firefox 4
+	-o-transition: all 1s; Opera
+} */
+.noheight{
+	height:0px;
+	padding: 0px 20px;
+    overflow:hidden;
+    transition: all 1s;
+    -webkit-transition: all 1s;	/* Safari 和 Chrome */
+    -moz-transition: all 1s; /* Firefox 4 */
+	-o-transition: all 1s; /* Opera */
+};
+.showLine{
+	display:inline-block;
+}
+//此css未起到作用

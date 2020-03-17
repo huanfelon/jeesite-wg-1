@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>房屋租赁合同</title>
+    <link rel="stylesheet" href="${ctxStatic}/css/moban.css">
+</head>
+
+<body>
+    <div class="backg c_hide">
+        <img src="${ctxStatic}/img/221.png" alt="">
+    </div>
+    <div class="shouye">
+        <div class="bianhao1">
+            <div>合同编号：<span>${htPrint.HTCODE}</span></div>
+        </div>
+
+        <div class="ht_title">
+            <span>房屋租赁合同</span>
+        </div>
+
+        <div class="suoshu">
+            <div>（所属园区<span class="under_line">${htPrint.PRONAME}·${htPrint.BUILDNAME}</span>）</div>
+        </div>
+        <div class="qianzi">
+            <div>承租方：<span class="width400 under_line">${htPrint.YFNAME}</span></div>
+            <div>签约地点：<span class="width400 under_line"></span></div>
+            <div>签约时间：<span class="under_line">${htPrint.QYYEAR}</span>年<span class="under_line">${htPrint.QYMONTH}</span>月<span class="under_line">${htPrint.QYDAY}</span>日</div>
+        </div>
+    </div>
+    <div class="moban">
+        <h2>房屋租赁合同</h2>
+        <div class="htxx_jiacu_left">
+           	<div>甲方（出租方）：<span class="width400 under_line">${htPrint.JFNAME}</span></div>
+            <div>乙方（承租方）：<span class="width400 under_line">${htPrint.YFNAME}</span></div>
+        </div>
+        <div class="zhuti2">
+            <div class="wd">
+                <div class="wdtitle">第一条、总  则</div>
+                <div class="wdn">1、根据《中华人民共和国合同法》及相关的法律规定，甲、乙双方在平等、自愿、公平和诚实信用的基础上，经协商一致，就乙方承租甲方有权出租的租赁物相关事宜，订立本合同，并共同签订和遵守执行。</div>
+                <div class="wdn">2、该房屋的现有装修、附属设施、设备状况或甲方同意乙方自行装修和增设附属设施的内容、标准及需约定的有关事宜，由双方分别在本合同附件二中加以列明。甲乙双方同意该附件作为甲方向乙方交付该房屋和本合同终止时乙方向甲方返还该房屋的验收依据。对此，乙方已充分了解租赁物的现状，确认租赁房屋满足乙方经营需要，在无异议的情况下签订本合同。</div>
+               
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第二条、用途说明</div>
+                <div class="wdn">乙方租赁该房屋期间，必须遵守合同中约定的租赁用途。同时必须遵守国家和南京市有关房屋使用和物业管理的规定。</div>
+                <div class="wdn">本合同的租赁期间、租金标准、递增、保证金等详见附件一，附件一为本合同不可分割的组成部分。</div>
+                
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第三条、合同续签</div>
+                <div class="wdn">
+                    租赁期满，甲方有权收回该房屋，乙方应如期返还。乙方需继续承租该房屋的，应于租赁期满前3个月，向甲方提出续租书面申请，经甲方同意后，双方重新签订租赁合同，在同等条件下，乙方享有优先续租权。如双方在本合同租赁期结束前两个月未重新签订租赁合同，视乙方自动放弃续租权。甲方有权在租赁期结束之前的三个月内陪同潜在客户进入该房屋参观；乙方应予以配合，届时甲方将尽最大努力减少对乙方工作的影响。且乙方应于租赁期满时结清与甲方及物业管理公司间各项应结款项并搬出该房屋。
+                   
+                </div>
+                
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第四条、费用支付</div>
+                <div class="wdn">1、租金  甲乙双方约定：实行“先付后用”的租赁原则，乙方以转账或现金方式向甲方支付。遇乙方付款时逢法定节假日，乙方须提前至节假日前的1～3日内支付。</div>
+                <div class="wandful">
+                    <div>甲方全称：<span class="width400 under_line">${htPrint.JFNAME}</span></div>
+                    <div>甲方账号：<span class="width400 under_line">${htPrint.BANKNO}</span></div>
+                    <div>开户银行：<span class="width400 under_line">${htPrint.BANKNAME}</span></div>
+                </div>
+                
+                <div class="wdn">2、乙方租赁期间，因使用房屋及从事经营活动而发生的相关费用，包括但不限于电费、水费、电话费、网络安装使用费、物业管理费、装修保证金、停车费等，均由乙方每月按时向相关部门、甲方或物业管理公司交纳，并承担因滞纳所产生的一切费用（包括装修优惠期）。若乙方逾期本项所述的相关费用时，甲方和物业均有权向乙方追讨。</div>
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第五条、履约保证金</div>
+                <div class="wdn">1、甲乙双方在签订合同后，乙方为保证正常履行合同，向甲方缴纳履约保证金。.15%标准比例支付滞纳金。</div>
+                <div class="wdn">2、租赁关系终止时，乙方在未损害房屋主体结构、附属设施及结清应付给甲方及物业管理公司各项费用并将以该房屋注册的公司信息（如有）办理注销或变更的情况下，7个工作日内甲方无息归还房屋履约保证金。如乙方未结清各项费用或给甲方造成损失的，甲方可以直接以同等金额的履约保证金冲抵。履约保证金不足以弥补损失的，乙方应另行补足及赔偿。</div>
+                <div class="wdn">3、合同履行期间，乙方违约或造成甲方损失的，甲方有权从履约保证金中直接扣除，不足部分乙方应及时补足；若在甲方要求乙方补足履约保证金的通知发出后7日内，乙方仍未补足的，则视为乙方违约，甲方有权终止本租赁合同。</div>
+                <div class="wdn">4、乙方应向甲方或物业管理公司支付全额物业管理费，并在入驻前签订《物业服务协议》，同时乙方应遵守园区的物业规章管理制度。乙方承租的房屋的水电费的收取标准和方式在《物业服务协议》中另行确定，乙方因经营需要安装电话、电视、网络等，可直接向物业管理部提出申请，该房屋的物业管理费根据该房屋的计租面积计算。</div>
+                <div class="wdn">5、本合同中的租赁条件经双方一致确定，在合同期内此条件不受市场环境等外部因素的影响而改变。</div>
+                
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第六条、房屋使用要求和维修责任</div>
+                <div class="wdn">1、租赁期间，乙方应合理使用并爱护该房屋及其附属设施。 因乙方使用不当或不合理使用，致使该房屋及其附属设施损坏或发生故障的，乙方应负责维修。乙方不维修的，甲方可代为维修，费用由乙方承担,乙方如需要在屋面、墙面及其他部位安装广告牌、标贴、设备时需要征得甲方书面同意、需要征得行政管理部门同意的必须先征得行政管理部门的书面同意，安装时如果造成楼体损伤、漏水及其它功能和装饰破坏的，乙方应负责维修。乙方不维修的，甲方可代为维修，费用由乙方承担。</div>
+                <div class="wdn">2、租赁期间，如乙方需对租赁房屋进行装修，必须事先向甲方及有关部门递交书面申请和方案，经甲方书面同意并报相关部门审批后方可实施。装修不得损害房屋主体结构，如有损坏，乙方应负责修复以至赔偿，并承担由此造成的一切人身或财物损害责任。</div>
+                <div class="wdn">3、若政府任何主管部门对乙方的装修（包括但不限于消防设施）提出任何整改要求，乙方均须按照政府主管部门的要求修改其装修。乙方应承担该等修改带来的一切责任及费用，并赔偿甲方因此而遭受的任何损害。</div>
+                <div class="wdn">4、乙方应承担由于乙方、其雇用的人员、承包商或代理人的过错、过失或疏忽行为对该房屋、第三方或园区的任何部位及甲方造成的损失。</div>
+                <div class="wdn">5、当发生下述情况时，甲方有权处置租赁物，其中包括但不限于收回该房屋另行出租、将该房屋腾空和清理房屋内的物品、设施设备等。对因此而引起的乙方之损害或损失，甲方概不负责：
+                    <div class="xiayiji">
+                        <div>（1）、本合同终止或提前解除后，乙方未在5日内腾空房屋，且未得到甲方书面同意临时使用房屋的；</div>
+                        <div>（2）、若乙方交还房屋后遗留下任何物件，视为乙方放弃其所有权，且承担甲方合理的清理费用；</div>
+                        <div>（3）、乙方按照合同约定的时间逾期支付租金超过15日的；</div>
+                        <div>（4）、乙方在期满前3个月，未能向甲方提出续租书面要求或在期满前2个月未重新签订租赁合同的情况下，甲方将上述房屋出租给第三方后，乙方再次要求续租的，甲方不予接受，由此给甲方造成的损失由乙方负责。</div>
+                    </div>
+                </div>
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第七条、该房屋返还时的状态</div>
+                <div class="wdn">
+                    1、除甲方同意乙方续租外，乙方应在本合同的租期届满5日内返还该房屋，未经甲方同意逾期返还房屋的，逾期期间的占用使用费，应按日租金及物业管理费用的两倍向甲方支付从归还期限届满次日起至乙方实际归还房屋及场地之日止的房屋使用费，并承担第五条第2款规定的各项相关费用。
+                </div>
+                <div class="wdn">2、租赁合同终止或解除时，乙方返还给甲方的房屋标准应为签订合同交付使用时的状态。</div>
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第八条、甲方的权利和义务</div>
+                <div class="wdn">1、甲方有按本合同约定向乙方收取租金的权利，如乙方未按时支付租金的，甲方有权按乙方应付租金总额的日0.15%标准比例，向乙方收取逾期利息。</div>
+                <div class="wdn">2、在乙方支付当期租金后，甲方须向乙方提供正式发票。</div>
+                <div class="wdn">3、甲方确认：拥有该房屋的合法使用权，以及房屋产权人允诺的房屋转租权。如因此产生纠纷，甲方承担全部责任。</div>
+                <div class="wdn">4、甲方应按本合同规定的条件向乙方提供适合正常使用的房屋，对租赁过程中影响乙方使用的情况予以维修。</div>
+                <div class="wdn">5、租赁期内，甲方如拟改建、增建或装修该房屋，须事先征求乙方同意。甲方的改建、增建或装修行为给乙方的办公造成影响时,甲方应给乙方提供其他房屋供乙方过渡期使用。乙方确认：甲方在不影响乙方使用承租房屋的前提下享有因园区发展需要重新装修、处分大楼任何部分（含设施、该房屋除外）的权利。</div>
+                <div class="wdn">6、甲方有权在不影响乙方使用承租房屋和乙方正常办公、经营的前提下对乙方在租赁期内办公、经营活动的履约情况和所租赁房屋使用现状及安全进行例行检查和监督。</div>
+                <div class="wdn">7、在下述情况下，甲方不承担任何责任，且本合同项下之租金或使用费（以适用者为准）及其它费用不得减免或终止支付：
+                    <div class="xiayiji">
+                        <div>（1）、在任何时间内该房屋的水、电、电话、空调、传真及其它服务非因甲方原因停止供应，或公共设施非因甲方原因停止运作的情形；如因第三方原因导致乙方不能正常使用房屋或不能正常办公、经营，甲方积极协助乙方向第三方索赔；</div>
+                        <div>（2）、由于乙方或第三方(包括但不限于乙方之雇员、承包商、代理人)的原因对乙方或第三方造成的任何损失或伤害；</div>
+                        <div>（3）、任何时间非甲方原因造成的该房屋内人身或财产损失。 </div>
+                    </div>
+                </div>
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第九条、乙方的权利和义务</div>
+                <div class="wdn">1、乙方应按照本合同约定，如期、足额向甲方交纳该房屋的应付租金和履约保证金；按规定标准及时交纳物业管理费、因使用该房屋而产生的相关费用；应接受本园区物业管理公司对房屋的统一物业管理，并在入驻前签订园区《物业服务协议》。</div>
+                <div class="wdn">2、在租赁期间，该房屋的使用权归乙方所有，其合法权益受国家有关法律、法规保护，乙方在租赁期间、经营中发生的一切经济纠纷，与甲方无涉；在承租房屋内乙方不得从事任何违反国家法律法规及物业管理规定的行为，如违反，则甲方有权终止本合同，并要求乙方赔偿甲方的损失，乙方不得有异议。</div>
+                <div class="wdn">3、乙方应保证房屋原有之结构和设施的完整和完好，如乙方需改造房屋之结构或设施，或进行分割和装修，必须征得甲方书面同意，并备齐有关管理部门之审批文件；乙方所租赁该房屋的水电配置及容量以现状为准，若乙方因办公、经营需要扩容和增容的，经甲方同意后，由乙方自行解决，甲方可予以协助，扩容和增容的费用由乙方自行承担；本合同解除或终止后，甲方对此不予任何补偿，乙方不得将增加的设备拆除（若乙方要求拆除，则甲方有权要求乙方在拆除的同时恢复原状）。</div>
+                <div class="wdn">4、未经甲方书面同意，乙方不得在该房屋的外部（包括公共通道、窗户、外墙或顶部）展示、树立、黏贴或悬挂任何标志、文字、标记、海报、旗帜、广告牌或告示等；未经甲方或物业管理公司书面同意，乙方不得在该房屋外及其他公共空间放置任何物品。</div>
+                <div class="wdn">5、在租赁期内，未获得甲方准许，乙方不得将所租的房屋分租、转租、转借或改变用途，若发生此种情形，甲方有权终止合同、收回房屋，并没收履约保证金。</div>
+                <div class="wdn">6、双方确认，如在租赁期限内，乙方认为存在甲方违约并应赔偿损失的行为，则乙方应当向甲方提出索赔或根据本合同相应的争议解决条款处理。但此等处理并不免除乙方继续履行本合同项下的租金、管理费、公共事业费用及其他任何应当由乙方承担的费用的按时缴付义务，否则仍构成乙方违约，乙方应当承担的违约责任等不应为上述乙方的索赔是否得到甲方的同意或法院支持而发生任何减轻或免除。</div>
+                <div class="wdn">7、乙方的负责人（或法人）是租用该房屋的安全防火责任人。乙方应按消防部门有关规定全面负责租赁房屋内的防火安全，甲方有权于双方同意的合理时间内检查租赁房屋的防火安全。</div>
+                <div class="wdn">8、乙方在取得营业许可等文件后，应提供营业执照、法人代表身份证明文件，经甲方验证之后复印留存。</div>
+                <div class="wdn">9、乙方入园后，如需享有甲方对接的当地政府落地政策的（其中包括但不限于税收、人才、项目申报、资金扶持等），乙方需在合同签订后6个月内实现在园区内办理新公司注册和税收落地手续。</div>
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第十条、解除或终止本合同的条件及违约责任</div>
+                <div class="wdn">1、甲乙双方同意在租赁期内，有下列情形之一的，本合同终止，双方互不承担责任：
+                    <div class="xiayiji">
+                        <div>（1）、合同期满后，乙方没有继续租赁该房屋的意向，或即使有续租意向，但甲方未同意继续续租的；</div>
+                        <div>（2）、该房屋因不可抗力销毁、灭失或者被鉴定为危险房屋的，但若该房屋的毁损或者危险性在该毁损发生或鉴定做出后14天内得以恢复原状，则本合同将不因此而终止；</div>
+                        <div>（3）、其他法律法规规定的情形。</div>
+                    </div>
+                </div>
+                <div class="wdn">2、甲乙双方一致约定：若该房屋因城市建设需要而被依法列入房屋拆迁许可范围的、该房屋因社会公共利益被依法征用的、该房屋所占土地范围的土地使用权被政府依法提前收回的，则甲方在获取政府关于本园区（含该房屋）的正式拆迁通知文件及补偿后，甲方与乙方之间采取如下方式处理解决：
+                    <div class="xiayiji">
+                        <div>（1）、甲方给予乙方1个月该房屋租金标准的搬迁费用贴补；</div>
+                        <div>（2）、甲方按照当地权威评估机构对乙方所租赁的该房屋的装修投入费用的评估金额（扣减掉乙方已使用期间所对应的装修折旧评估金额）给予乙方装修补偿金；</div>
+                        <div>（3）、乙方须将与甲方及物业管理公司之间的应结清费用全部结清（此费用可在甲方给予乙方的搬迁贴补款和装修补偿金中冲抵）；</div>
+                        <div>（4）、甲方退还乙方自拆迁开始之日起乙方已付的该房屋的（未使用期间）租金；</div>
+                        <div>（5）、甲乙双方签订的该房屋租赁合同自动解除；乙方就所租赁的该房屋与甲方及与所涉及到该房屋的任何关联单位、机构等就该房屋拆迁涉及的事项再无任何的经济纠纷及责任；</div>
+                        <div>（6）、乙方不得以任何方式阻挠拆迁，不得再向甲方、房屋产权人及拆迁单位要求补偿，否则视为严重违约。</div>
+                    </div>
+                </div>
+                <div class="wdn">3、有下列情形之一的，即视为单方违约，违约方应向另一方按月租金的两倍支付违约金,且违约方须即时纠正违约行为，如违约行为不能纠正，被违约方有权终止合同，造成的损失由违约方承担，违约金不足抵付损失的，还应赔偿损失与违约金的差额部分：
+                    <div class="xiayiji">
+                        <div>（1）、甲方交付的该房屋不符合本合同的约定，致使乙方不能正常使用的或甲方交付的房屋危及乙方安全的；</div>
+                        <div>（2）、乙方未征得甲方书面同意改变房屋结构或用途的；</div>
+                        <div>（3）、乙方不执行房屋装修规定，影响市容及园区形象和环境的；</div>
+                        <div>（4）、乙方逾期不支付租金或其他费用累计超过7日的；</div>
+                        <div>（5）、乙方其他违反本合同约定的情形的。</div>
+                    </div>
+                </div>
+                <div class="wdn">4、乙方有下列情形之一的，即视为乙方严重违约，乙方应按半年租金的金额向甲方支付违约金，且本合同即行终止；若乙方支付的违约金不足抵付甲方损失的，还应赔偿损失与违约金的差额部分：
+                    <div class="xiayiji">
+                        <div>（1）、乙方违法经营或在房屋内进行违法、犯罪活动的；</div>
+                        <div>（2）、因乙方使用房屋不当的原因导致房屋灭失、甲方或第三方人员伤亡，以及其他给甲方造成重大损失的情形；</div>
+                        <div>（3）、乙方擅自转租该房屋，转让、转借该房屋承租权或与他人交换各自承租的房屋的；</div>
+                        <div>（4）、合同中相关费用（租金、物业管理费）逾期天数达到30天的；</div>
+                        <div>（5）、乙方其他严重违约行为和违反园区管理规定而拒不改正的；</div>
+                        <div>（6）、其他归因于乙方，法律法规允许甲方收回该房屋的情形。</div>
+                    </div>
+                </div>
+                <div class="wdn">5、一方擅自解除合同的违约责任
+                    <div class="xiayiji">
+                        <div>（1）、租赁期间，非本合同规定的情况，甲方擅自解除本合同、提前收回该房屋的，甲方按三个月的租金标准向乙方支付违约金，并退还乙方缴纳的履约保证金。</div>
+                        <div>（2）、租赁期间，非本合同规定的情况，乙方中途擅自退租的，乙方按三个月的租金标准向甲方支付违金。同时，甲方有权扣除履约保证金。若违约金不足抵付甲方损失的，乙方还应负责赔偿。</div>
+                        
+                    </div>
+                </div>
+                <div class="wdn">6、若乙方逾期未交纳本租赁合同内条款项下乙方应交纳的费用（包括但不限于租金、使用费、租赁押金、物业管理费及其他费用或违约金、损害赔偿金），乙方应按该应付款项金额的日0.15%标准比例向甲方或物业管理公司支付逾期利息；若乙方在甲方或物业管理公司通知（统一通过甲方或园区物业管理公司的信息告知平台发送或通过其他有效方式寄送）后7日内仍未支付，甲方有权停止乙方使用该房屋（包括但不限于停水、停电），因此造成的一切后果由乙方自行承担。</div>
+                <div class="wdn">7、甲方因向乙方催付租金或其他费用而引起的所有费用和开支（包括但不限于律师费、公证费、诉讼费），及甲方因乙方违约行为而主张本合同项下其他任何权利而引起的所有费用、开支（包括但不限于律师费、公证费、诉讼费），均由乙方承担，甲方有权向乙方追讨该等费用、开支。</div>
+                <div class="wdn">8、如乙方发生下述行为导致甲方损失的，甲方有权要求乙方赔偿其损失：
+                    <div class="xiayiji">
+                        <div>（1）、乙方及其雇员和承包商在为乙方工作时在该房屋或园区的任何部位的故意或过失的行为；</div>
+                        <div>（2）、乙方违反或不遵守任何适用的本合同之规定；乙方及其雇员发出的超出正常使用所必需的噪音，干扰到其他租户对其承租之房屋的安静使用；乙方及其雇员和承包商在为乙方工作时的不当行为影响甲方及管理公司对园区的正常管理；</div>
+                        <div>（3）、乙方未征得甲方书面同意或者超出甲方书面同意的范围和要求装修房屋或者增设附属设施的，甲方可以要求乙方恢复原状并赔偿损失。</div>
+                    </div>
+                </div>
+                <div class="wdn">9、双方确认本合同约定的甲方给予乙方的装修免租期，系以本合同全部租赁期限得以履行为前提而给予乙方的优惠。如果由于乙方单方面提出终止合同违约导致合同提前终止，则甲方除有权按本合同之约定追究乙方违约责任外，还有权要求乙方向甲方补缴装修免租期所免除的租金（按照本合同第一年的标准）。</div>
+            </div>
+            <div class="wd">
+                <div class="wdtitle">第十一条、其他</div>
+                <div class="wdn">1、本合同未尽事宜，经甲乙双方协商一致，可另订立补充条款（协议），补充条款（协议）与本合同具有同等法律效力。</div>
+                <div class="wdn">2、甲乙双方在履行本合同过程中发生争议，应通过协商解决；协商解决不成的，双方同意提交房屋所在地人民法院裁判。</div>
+                <div class="wdn">3、合同双方在本合同项下的通知或其他通信往来，甲方将统一通过本园区物业管理公司的信息告知平台发送或通过其他有效方式寄送至本合同乙方登记的通讯地址；双方也可以派员直接送达，在送达过程中，如因附件一中的通讯地址不准确或变更后没有告知另一方而导致的无法有效送达，由此而引发的全部责任和损失均由责任方自行承担，并视为相关通知按通信地址寄出后第二日已合法送达。</div>
+                <div class="wdn">4、《房屋租赁合同商务主要条款》、《租赁房屋内交付时（现有）装修、附属设施及设备状况》、《房屋租赁及租金计算表》、《承租人身份证复印件、营业执照复印件》、《租赁房屋平面图》作为本合同的附件，与本合同具有同等法律效力。</div>
+                <div class="wdn">5、本合同连同附件一式肆份，甲乙双方各执两份；自双方签字盖章后生效。</div>
+            </div>
+
+        </div>
+        <div class="moban_footer">
+            <div class="footer_left">
+                <span>甲 方： </span>
+                <span style="padding: 20px 0;">（盖   章）</span>
+                <span>签约代表人：</span>
+                <span>签订日期：</span>
+            </div>
+            <div class="footer_left">
+                <span>乙 方： </span>
+                <span style="padding: 20px 0;">（盖   章）</span>
+                <span>签约代表人：</span>
+                <span>签订日期：</span>
+            </div>
+        </div>
+
+        <div class="fuze_biao">
+            <div class="fubiao_list vh100">
+                <div>附件一：《房屋租赁合同商务主要条款》</div>
+                <div>附件二：《租赁房屋内交付时（现有）装修、附属设施及设备状况》</div>
+                <div>附件三：《房屋租赁及租金计算表》</div>
+                <div>附件四：《承租人身份证复印件、营业执照复印件》</div>
+                <div>附件五：《租赁房屋平面图》</div>
+                <div>附件六：《租赁房屋产权证》</div>
+            </div>
+
+            <div class="fubiao vh100">
+                <div class="fubiao_title">
+                    <span>附件一</span>
+                </div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td colspan="10" class="bold">房屋租赁合同商务主要条款</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="bold">甲方全称</td>
+                            <td colspan="3">${htPrint.JFNAME}</td>
+                            <td class="bold">乙方全称</td>
+                            <td colspan="4">${htPrint.YFNAME}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="bold">联系电话</td>
+                            <td colspan="3">${htPrint.JFPHONE}</td>
+                            <td class="bold">联系电话</td>
+                            <td colspan="4">${htPrint.YFPHONE}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="bold">企业代表</td>
+                            <td colspan="3"></td>
+                            <td class="bold">企业法人</td>
+                            <td></td>
+                            <td colspan="3" class="text_left">身份证号码：${htPrint.YFIDNO}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="bold">通讯地址</td>
+                            <td colspan="3">${htPrint.JFADDR}</td>
+                            <td class="bold">通讯地址</td>
+                            <td colspan="4">${htPrint.YFADDR}</td>
+                        </tr>
+
+                        <tr>
+                            <td class="bold">1</td>
+                            <td class="bold">位置</td>
+                            <td colspan="3">${htPrint.JFADDR}${htPrint.ROOM}室</td>
+                            <td class="bold">租赁用途</td>
+                            <td>科研办公</td>
+                            <td colspan="3"><span class="under_line2">具体租赁区域详见：合同附件五</span></td>
+                        </tr>
+                        <tr>
+                            <td class="bold">2</td>
+                            <td class="bold">出租面积</td>
+                            <td colspan="2">${htPrint.NALLAREA}</td>
+                            <td>平方米</td>
+                            <td colspan="5" class="text_left" style="font-size: 10px;">该面积为计算租金、使用费、物业管理费及政府规定的房屋使用中产生的应由乙方承担的费用的依据（该面积为双方认定的计算租金面积，含园区各公摊面积，实际使用面积以实际空间为准）。</td>
+                        </tr>
+                        <tr>
+                            <td class="bold">3</td>
+                            <td class="bold">租赁期限</td>
+                            <td colspan="8" class="text_left">自<span class="under_line2">${htPrint.KSYEAR}</span>年<span class="under_line2">${htPrint.KSMONTH}</span>月<span class="under_line2">${htPrint.KSDAY}</span>日
+                            起至<span class="under_line2">${htPrint.JZYEAR}</span>年<span class="under_line2">${htPrint.JZMONTH}</span>月<span class="under_line2">${htPrint.JZDAY}</span>日止，合计<span class="under_line2">${htPrint.NHTYEAR}</span>年。</td>
+                        </tr>
+                        <tr>
+                            <td class="bold">4</td>
+                            <td class="bold">交付时间</td>
+                            <td colspan="8" class="text_left">甲乙双方约定，甲方于<span class="under_line2">${htPrint.JFYEAR}</span>年<span class="under_line2">${htPrint.JFMONTH}</span>月<span class="under_line2">${htPrint.JFDAY}</span>日前向乙方交付该房屋；</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="4" width="8%" class="bold">5</td>
+                            <td rowspan="4" width="8%" class="bold">租金计算表</td>
+                            <td rowspan="2" width="10%">房号</td>
+                            <td colspan="2" width="12%">计租面积</td>
+                            <td colspan="2">租金单价</td>
+                            <td>月租金</td>
+                            <td colspan="2">年租金</td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">（㎡）</td>
+                            <td colspan="2">（元/ ㎡/天）</td>
+                            <td>（元）</td>
+                            <td colspan="2">（元）</td>
+                        </tr>
+                        <tr>
+                            <td>${htPrint.ROOM}</td>
+                            <td colspan="2">${htPrint.NALLAREA}</td>
+                            <td colspan="2">${htPrint.NPRICE}</td>
+                            <td>${htPrint.NMONTHPRICE}</td>
+                            <td colspan="2">${htPrint.NYEARPRICE}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" class="text_left" style="font-size: 10px;">备注：以上租金价格为甲方给予乙方的优惠价格，若乙方需要改变租金的支付方式，须经甲方同意且价格按以上标准上浮15%。</td>
+                        </tr>
+                        <tr>
+                            <td class="bold">6</td>
+                            <td class="bold">支付方式</td>
+                            <td colspan="4">${htPrint.PAYSTYLE}</td>
+                            <td class="bold">付款清单</td>
+                            <td colspan="3" class="bold text_left"><span class="under_line2">详见合同附件三</span></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td class="bold">履约保证金</td>
+                            <td colspan="3"><span class="under_line2">${htPrint.NYJMON}</span>个月房租</td>
+                            <td colspan="3">金额（小写）</td>
+                            <td colspan="2">${htPrint.HTYJ}</td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td class="bold">设备押金</td>
+                            <td colspan="3"> 30元/㎡</td>
+                            <td colspan="3">金额（小写）</td>
+                            <td colspan="2">${htPrint.SBYJ}</td>
+                        </tr>
+                        <tr>
+                            <td rowspan="5">9</td>
+                            <td rowspan="5" class="bold">首期款及付款时间</td>
+                            <td colspan="8" class="text_left">首期款：<span class="under_line2">（大写）<span id="sqk_big"></span>（小写：${htPrint.NSQKMNY}元）</span></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" class="text_left">首期款付款日期：<span class="under_line2">${htPrint.JFYEAR}</span>年<span class="under_line2">${htPrint.JFMONTH}</span>月<span class="under_line2">${htPrint.JFDAY}</span>日</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" class="text_left" style="border-bottom:1px dotted #4d4b4b;">备注：a、首期款含履约保证金、设备押金、首期房租；</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" class="text_left" style="border-bottom:1px dotted #4d4b4b;">&nbsp;&nbsp;&nbsp;&nbsp;b、正常付款日，乙方须在到期付款时提前15日向甲方支付下期租金；</td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" class="text_left" style="border-bottom:1px dotted #4d4b4b;">&nbsp;&nbsp;&nbsp;&nbsp;C、首期款按双方约定时间到账，如未到账，本合同自动作废。同时按照新合同标准，扣除老合同押金，不足部分补齐。</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="fubiao vh100">
+                <div class="fubiao_title">
+                    <span>附件二</span>
+                </div>
+                <h2>租赁房屋内交付时（现有）装修、附属设施及设备状况</h2>
+                <table class="fujian2_table">
+                    <thead>
+                        <tr>
+                            <th>设备设施项</th>
+                            <th>数量</th>
+                            <th>备注</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>顶</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td>地</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td>墙</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td>门</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td>窗</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td>电</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td>网络、电话</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td>空调</td>
+                            <td>全部租赁区域</td>
+                            <td>现状交付</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>附加说明</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="fubiao vh100">
+                <div class="fubiao_title">
+                    <span>附件三</span>
+                </div>
+                <h2>房屋租赁及付款金额、付款时间表</h2>
+                <table class="fujian3_table">
+                    <thead>
+                        <tr>
+                            <th>付款时间</th>
+                            <th>租金付款金额（元）</th>
+                            <th>对应租赁使用时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div class="fubiao vh100">
+                <div class="fubiao_title">
+                    <span>附件四</span>
+                </div>
+                <h2>承租人身份证复印件、营业执照复印件</h2>
+                <div class="fubiao_img">
+                    
+                </div>
+            </div>
+            <div class="fubiao vh100">
+                <div class="fubiao_title">
+                    <span>附件五</span>
+                </div>
+                <h2>租赁房屋平面图（仅供识别使用）</h2>
+                <div class="fubiao_img">
+                    
+                </div>
+            </div>
+            <div class="fubiao vh90">
+                <div class="fubiao_title">
+                    <span>附件六</span>
+                </div>
+                <h2>产权证</h2>
+                <div class="fubiao_img">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript" src="${ctxStatic}/js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript">
+    window.onload = function () {
+        var data = ${ toJson(htPrint) };
+        var nsqkmny=data.NSQKMNY;
+        $("#sqk_big").html(digitUppercase(nsqkmny));
+        var fkData = ${ toJson(fkDetail) };
+        var tbody="";
+        var allmny=0;
+        for(var i=0; i<fkData.length; i++){
+        	var yj="";
+        	if(i==0){//首行增加保证金
+        		yj="<p>履约保证金："+fkData[i].htyj+"元</p><p>设备押金："+fkData[i].sbyj+"元</p>";
+        		allmny=parseFloat(allmny)+parseFloat(fkData[i].htyj)+parseFloat(fkData[i].sbyj);
+        	}
+        	tbody=tbody+"<tr><td>"+fkData[i].fkdate+"</td><td style=\"text-align:left;\"><p>"+fkData[i].fzfkqj+"房租："+fkData[i].nmny+"元</p>"+yj+"</td><td style=\"text-align:left;\">"+fkData[i].zlqj+"</td></tr>";
+        	allmny=parseFloat(allmny)+parseFloat(fkData[i].nmny);
+        }
+        tbody=tbody+"<tr><td>合计</td><td style=\"text-align:left;\">房屋租金："+allmny+"元</td><td></td></tr>";
+        $(".fujian3_table tbody").html(tbody);
+	   	window.print();
+	    var index = parent.layer.getFrameIndex(window.name);
+	    parent.layer.close(index);
+    };
+    
+  	//数字金额大小写转换
+    var digitUppercase=function(n) {
+        var fraction = ['角', '分'];
+        var digit = [
+            '零', '壹', '贰', '叁', '肆',
+            '伍', '陆', '柒', '捌', '玖'
+        ];
+        var unit = [
+            ['元', '万', '亿'],
+            ['', '拾', '佰', '仟']
+        ];
+        var head = n < 0 ? '欠' : '';
+        n = Math.abs(n);
+        var s = '';
+        for (var i = 0; i < fraction.length; i++) {
+            s += (digit[Math.floor(n * 10 * Math.pow(10, i)) % 10] + fraction[i]).replace(/零./, '');
+        }
+        s = s || '整';
+        n = Math.floor(n);
+        for (var i = 0; i < unit[0].length && n > 0; i++) {
+            var p = '';
+            for (var j = 0; j < unit[1].length && n > 0; j++) {
+                p = digit[n % 10] + unit[1][j] + p;
+                n = Math.floor(n / 10);
+            }
+            s = p.replace(/(零.)*零$/, '').replace(/^$/, '零') + unit[0][i] + s;
+        }
+        return head + s.replace(/(零.)*零元/, '元')
+            .replace(/(零.)+/g, '零')
+            .replace(/^整$/, '零元整');
+    }
+</script>
+</html>

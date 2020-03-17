@@ -1,0 +1,144 @@
+<% layout('/layouts/default.html', {title: '收费标准管理', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" href="${ctxStatic}/css/c_search.css">
+<link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-body">
+			<#form:form id="searchForm" model="${bdFeescale}" action="${ctx}/bd/bdFeescale/listData" method="post" class="form-inline hide"
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<div class="c_form_group">
+				<#form:hidden path="pkProject" />
+				<div class="form-group">
+					<label class="control-label">${text('组织')}：</label>
+					<div class="control-inline width-120" >
+						<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('编码')}：</label>
+					<div class="control-inline">
+						<#form:input path="code" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label">${text('名称')}：</label>
+					<div class="control-inline">
+						<#form:input path="name" maxlength="255" class="form-control width-120"/>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label class="control-label">${text('状态')}：</label>
+					<div class="control-inline width-120">
+						<#form:select path="status" dictType="sys_search_status" blankOption="true" class="form-control"/>
+					</div>
+				</div>
+					<div class="form-group">
+						<button type="button" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+						<button type="button" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+					</div>
+				</div>
+				<div class="c_search">
+					<div class="c_title_search pull-left">
+						<i class="fa fa-filter"></i> <span>查询</span>
+					</div>
+					<div class="pull-right">
+						<span class="c_close">x</span>
+					</div>
+				</div>
+			</#form:form>
+		<div class="row">
+				<div class="col-xs-10 pr10">
+					<table id="dataGrid"></table>
+					<div id="dataGridPage"></div>
+				</div>
+				<div class="col-xs-2 pl0">
+					<div id="selectData" class="tags-input"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+var selectData = ${isNotBlank(selectData!) ? selectData! : "{\}"},
+selectNum = 0, dataGrid = $('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+	    {header:'${text("组织")}', name:'pkOrg.officeName', index:'a.pk_org', width:150, align:"center"},
+	    {header:'${text("编码")}', name:'code', index:'a.code', width:150, align:"left"},
+		{header:'${text("名称")}', name:'name', index:'a.name', width:150, align:"center"},
+		{header:'行数据', name:'rowData', hidden:true, formatter: function(val, obj, row, act){
+			return JSON.stringify(row);
+		}}
+	],
+	autoGridHeight: function(){
+		var height = $(window).height() - $('#searchForm').height() - $('#dataGridPage').height() - 75;
+		$('.tags-input').height($('.ui-jqgrid').height() - 10);
+		return height;
+	},
+	showCheckbox: '${parameter.checkbox}' == 'true',
+	multiboxonly: false, // 单击复选框时再多选
+	ajaxSuccess: function(data){
+		$.each(selectData, function(key, value){
+			dataGrid.dataGrid('setSelectRow', key);
+		});
+		initSelectTag();
+	},
+	onSelectRow: function(id, isSelect, event){
+		if ('${parameter.checkbox}' == 'true'){
+			if(isSelect){
+				selectData[id] = JSON.parse(dataGrid.dataGrid('getRowData', id).rowData);
+			}else{
+				delete selectData[id];
+			}
+		}else{
+			selectData = {};
+			selectData[id] = JSON.parse(dataGrid.dataGrid('getRowData', id).rowData);
+		}
+		initSelectTag();
+	},
+	onSelectAll: function(ids, isSelect){
+		if ('${parameter.checkbox}' == 'true'){
+			for (var i=0; i<ids.length; i++){
+				if(isSelect){
+					selectData[ids[i]] = JSON.parse(dataGrid.dataGrid('getRowData', ids[i]).rowData);
+				}else{
+					delete selectData[ids[i]];
+				}
+			}
+		}
+		initSelectTag();
+	},
+	ondblClickRow: function(id, rownum, colnum, event){
+		if ('${parameter.checkbox}' != 'true'){
+			js.layer.$('#' + window.name).closest('.layui-layer')
+				.find(".layui-layer-btn0").trigger("click");
+		}
+		initSelectTag();
+	}
+});
+function initSelectTag(){
+	selectNum = 0;
+	var html = [];
+	$.each(selectData, function(key, value){
+		selectNum ++;
+		html.push('<span class="tag" id="'+key+'_tags-input"><span>'+value.name+'<br>'+value.code+' </span>'
+			+ '<a href="#" onclick="removeSelectTag(\''+key+'\');" title="取消选择">x</a></span>');
+	});
+	html.unshift('<div class="title">当前已选择<span id="selectNum">'+selectNum+'</span>项：</div>');
+	$('#selectData').empty().append(html.join(''));
+}
+function removeSelectTag(key){
+	delete selectData[key];
+	dataGrid.dataGrid('resetSelection', key);
+	$('#selectNum').html(--selectNum);
+	$('#'+key+'_tags-input').remove();
+}
+function getSelectData(){
+	return selectData;
+}
+</script>

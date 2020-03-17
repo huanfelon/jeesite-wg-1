@@ -1,0 +1,538 @@
+﻿<% layout('/layouts/default.html', {title: '房源信息管理', libs: ['validate']}){ %>
+<script src="${ctxStatic}/zl/zlHousesource/zlHousesourceForm.js"></script>
+<link href="${ctxStatic}/css/zlFormShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(zlHousesource.isNewRecord ? '新增房源信息' : isEdit=='true'?'编辑房源信息':'房源信息详情')}
+			</div> -->
+			<div class="box-tools pull-left">
+			<% if (isEdit=='true'){ %>
+				<a herf="javascript:void(0);"  class="btn btn-sm" id="btnSubmit1"><i class="fa fa-check"></i> ${text('保存')}</a>
+			<% } %>
+				<button type="button" class="btn btn-sm" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关闭')}</button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${zlHousesource}" action="${ctx}/zl/zlHousesource/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body">
+				<div class="form-unit">${text('基本信息')}</div>
+				<#form:hidden path="pkHousesource"/>
+				<span id="isEdit" class="hide">${isEdit}</span>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required  hide">*</span> ${text('房产编号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="estatecode" maxlength="50" class="form-control" readOnly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide ">*</span> ${text('房产名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="estatename" maxlength="50" class="form-control " readOnly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('组织名称')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+									path="pkOrg.officeCode" labelPath="pkOrg.officeName"
+									url="${ctx}/sys/office/treeData?isShowCode=true"
+									class="" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								 <#form:treeselect id="projectname" title="${text('项目选择')}"
+									path="projectname.pkProject" labelPath="projectname.name"
+									url="${ctx}/zl/zlProject/treeData?isShowCode=true"
+									class=""  class="form-control required" allowClear="true"/>
+							</div>
+						</div>
+					</div>
+				
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('户型信息')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+                           <#form:listselect id="pkFamilyfile" title="户型选择" 
+                                	path="pkFamilyfile.pkFamilyfile" labelPath="pkFamilyfile.name"
+								    url="${ctx}/zl/zlFamilyfile/familySelect" allowClear="false" 
+								     boxWidth="900" boxHeight="$(top.window).height()*3/4"
+								    checkbox="false" itemCode="pkFamilyfile" itemName="name" class="form-control required"/> 
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('业态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7 family cedit">
+								 <#form:treeselect id="pkFormattype" title="${text('业态选择')}"
+									path="pkFormattype.pkFormattype" labelPath="pkFormattype.name"
+									url="${ctx}/bd/bdFormattype/treeData?isShowCode=true&officeTypes=1,2"
+									class=""  />
+							
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('楼栋')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+                           <#form:listselect id="buildname" title="楼栋选择" 
+                                	path="buildname.pkBuildingfile" labelPath="buildname.name"
+								    url="${ctx}/zl/zlBuildingfile/buildingSelect" allowClear="false"
+								     boxWidth="900" boxHeight="$(top.window).height()*3/4" 
+								    checkbox="false" itemCode="pkBuildingfile" itemName="name" class="form-control required"/>  
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('单元')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="unit" maxlength="50" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('楼层')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7"> 
+								<#form:input path="floorn" maxlength="50" class="form-control required" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('房间号')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="roomnumber" maxlength="50" class="form-control required"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('面积')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="buildarea" class="form-control number required color-area-input"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3 ">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('产证面积')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="innerarea" class="form-control number required color-area-input"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3 ">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required ">*</span> ${text('房源状态')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<% if(isEdit=="true"){ %>
+									<#form:select path="housestate" dictType="zl_housestatus2"  class="form-control digits required" />
+								<% }else{ %>
+									<#form:select path="housestate" dictType="zl_housestatus"  class="form-control digits" readonly="true" />
+								<% } %>
+							</div>
+						</div>
+					</div>
+				</div>
+			   	<div class="form-unit cw_btn_taggle">${text('人员信息')}
+					<button type="button" class="btn btn-box-tool pull-left btn_taggle" data-show='true' ><i class="fa fa-minus"></i></button>
+				</div>
+				<div class=''>
+					<div class="row">
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7 cedit">
+										<#form:treeselect id="creator" title="${text('用户选择')}"
+										path="creator.userCode" labelPath="creator.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('制单日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="dbilldate" readonly="true" disabled="disabled" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('修改人')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7 cedit">
+										<#form:treeselect id="modifier" title="${text('用户选择')}"
+										path="modifier.userCode" labelPath="modifier.userName"
+										url="${ctx}/sys/office/treeData?isLoadUser=true"
+										class="" allowClear="true" readOnly="true"/>
+								</div>
+							</div>
+						</div>
+							<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('修改日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="modifiedtime" readonly="true" maxlength="20" class="form-control Wdate disabled"
+										dataFormat="datetime"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row ">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('zl:zlHousesource:edit')&& isEdit=='true'){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+		<div id="showRefData">
+			<ul>
+				<!-- 动态存放参照模糊查询数据 -->
+			</ul>
+		</div>
+	</div>
+</div>
+<% } %>
+<!-- <script src="${ctxStatic}/zl/zlHousesource/zlHousesourceList.js"></script> -->
+<!-- <script src="${ctxStatic}/js/htmlview.js"></script> -->
+<script>
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			js.showMessage(data.message);
+			if(data.result == Global.TRUE){
+				js.closeCurrentTabPage(function(contentWindow){
+					var code=data.data;
+					contentWindow.document.getElementById("estatecode").value=code;
+					contentWindow.page();
+					contentWindow.document.getElementById("estatecode").value=null;
+				});
+			}
+		}, "json");
+    }
+});
+
+//根据项目过滤户型
+$("#projectnameDiv").change(function(){
+	 var proj = $("#projectnameCode").val();
+	 $("#pkFamilyfileName").val("");
+	 $("#pkFamilyfileCode").val("");
+	 $("#pkFormattypeName").val("");
+	 $("#pkFormattypeCode").val("");
+	 $("#buildarea").val("");
+	 $("#innerarea").val("");
+	 $("#pkFamilyfileDiv").attr('data-url',"${ctx}/zl/zlFamilyfile/familySelect?pkProjectid="+proj);
+}); 
+//根据项目过滤楼栋
+$("#projectnameDiv").change(function(){
+	 var proj = $("#projectnameCode").val();
+	 $("#buildnameName").val("");
+	 $("#buildnameCode").val("");
+	 $("#buildnameDiv").attr('data-url',"${ctx}/zl/zlBuildingfile/buildingSelect?pkProjectid="+proj);
+}); 
+//选择户型带出业态、租赁、产证
+$("#pkFamilyfileDiv").change(function(){
+	 var proj = $("#pkFamilyfileCode").val();
+	 if(proj!=""){
+			var JSONDATA={'pkFamilyfileCode':proj};
+			$.ajax({
+				url: '/js/a/zl/zlFamilyfile/out',
+				datatype: 'json',
+				data: JSONDATA,
+				async:false,
+				contentType: 'application/json;charset=utf-8',
+				success: function (msg) {
+					if(msg!=""){
+						 $("#pkFormattypeName").val(msg.pkFormattypeid.name);
+					     $("#pkFormattypeCode").val(msg.pkFormattypeid.id); 
+					     $("#buildarea").val(msg.builtuparea);
+					     $("#innerarea").val(msg.innerarea);
+					}
+				    
+				}
+			});
+	 }else{
+		  $("#pkFormattypeName").val("");
+	     $("#pkFormattypeCode").val(""); 
+	     $("#buildarea").val("");
+	     $("#innerarea").val("");
+	 }
+	
+}); 
+
+	//修改时不点击项目的情况下过滤户型和楼栋
+    var proj = $("#projectnameCode").val();
+	 $("#buildnameDiv").attr('data-url',"${ctx}/zl/zlBuildingfile/buildingSelect?pkProjectid="+proj);
+	 $("#pkFamilyfileDiv").attr('data-url',"${ctx}/zl/zlFamilyfile/familySelect?pkProjectid="+proj);
+</script>
+<!-- <script>
+$(document).ready(function() {
+	$(".input-group input").unbind("click");//移除参照选择
+	$(".input-group input").attr("readonly",false);
+	$(".input-group input").attr("autocomplete","off");
+
+	 var is =$("#isEdit").text();
+	 if(is=="false"){
+	  $('#buildarea').val(js.formatNumber($('#buildarea').val(), 2, true, '0.00'));
+	  $('#innerarea').val(js.formatNumber($('#innerarea').val(), 2, true, '0.00'));
+	 }
+
+	var refName,
+	refCode,
+	refList=new Array();
+	/****参照查询input框 start*****/
+	$(".input-group input").bind("focus propertychange",function (){//鼠标点击input触发事件
+		//查询区域初始化
+		$("#showRefData").css("display","none");
+		$("#showRefData").children().html("");
+		refList=new Array();
+		var refUrl=$(this).parent().attr("data-url");//参照路径
+		if(refUrl.indexOf("familySelect")!=-1){
+			var project=$("#projectnameCode").val();
+			if(project==""){
+				refUrl="/js/a/zl/zlFamilyfile/listFamily1"
+			}else{
+				refUrl="/js/a/zl/zlFamilyfile/listFamily?pkProjectid="+project;
+			}
+			
+		}else if(refUrl.indexOf("buildingSelect")!=-1){
+			var project=$("#projectnameCode").val();
+			if(project==""){
+				refUrl="/js/a/zl/zlBuildingfile/listBuild1"
+			}else{
+				refUrl="/js/a/zl/zlBuildingfile/listBuild?pkProjectid="+project;
+			}
+			
+		}
+		if(refUrl.startsWith("11")){//路径是列表的转换查数据路径，可重写模糊查询方法
+			
+		}
+		refName=$(this)[0].id;//用于存放参照名称
+		refCode=$(this)[0].nextElementSibling.id;//用于存放参照主键
+		var JSONDATA={};
+		$.ajax({
+			url: refUrl,
+			datatype: 'json',
+			data: JSONDATA,
+			contentType: 'application/json;charset=utf-8',
+			success: function (data) {
+				if(data!=null&&data.length>0){
+					for(var j=0;j<data.length;j++){
+						if(refName.startsWith("pkOrg")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].id,
+									"name":data[j].name
+								};
+						}else if(refName.startsWith("chargeitem")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+								};
+						}else if(refName.startsWith("projectname")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+								};
+						}else if(refName.startsWith("pkProjectid")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+								};
+						}else if(refName.startsWith("pkFormattypeid")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+								};
+						}else if(refName.startsWith("pkFormattype")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+								};
+						}else if(refName.startsWith("pkFamilyfile")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+								};
+						}else if(refName.startsWith("buildname")){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+								};
+						}
+					}
+					var html_li="";
+					var family=$("#projectnameName").val();
+						for(var i=0;i<refList.length;i++){
+							html_li+="<li>";
+							html_li+="<span style='display:none'>"+refList[i].id+"</span>";//存放主键
+							html_li+="<span style='display:none'>"+refList[i].code+"</span>";//存放编码
+							html_li+="<span>"+refList[i].name+"</span>";//存放名称
+							html_li+="</li>";
+						}
+						$("#showRefData").children().html(html_li);
+				
+				
+				}
+			}
+		});
+	});
+	$(".input-group input").on("dblclick",function (){//inpu值双击事件
+		var id=$("#"+refCode).val();
+		for(var i=0;i<refList.length;i++){
+			if(refList[i].id==id){
+				$("#"+refName).val(refList[i].code);
+				break;
+			}
+		}
+	});
+	$(".input-group input").bind("blur propertychange",function (){//input框光标移出事件
+		var s_value = $(this).val();//input框值
+		var count=0;
+		for(var i=0;i<refList.length;i++){
+			if(refList[i].code==s_value||refList[i].name==s_value){
+				$("#"+refName).val(refList[i].name);
+				$("#"+refCode).val(refList[i].id);
+				count++;
+			}
+		}
+		if(count!=1){
+			$("#"+refName).val(null);
+			$("#"+refCode).val(null);
+		}
+	});
+	$(".input-group input").bind("input propertychange",function (){//input框改变值事件
+		var s_value = $(this).val();//input框值
+		if(s_value==null||s_value==""){
+			$("#showRefData").css("display","none");
+			return;
+		}
+	    //匹配值
+	    var count=0;
+	    $("#showRefData").children().children("li").each(function(){
+	    	var code=$(this).children()[1].innerText;
+	    	var name=$(this).children()[2].innerText;
+	    	if(code.indexOf(s_value)!=-1||name.indexOf(s_value)!=-1){
+	    		$(this).css("display","block");
+	    		count++;
+	    	}else{
+	    		$(this).css("display","none");
+	    	}
+	    });
+	    var obj=$(this);//用于定位
+		var pageh= $(".wrapper").height();
+		var scollh=document.documentElement.scrollTop;  //网页被卷起来的高
+		var viewh=document.documentElement.offsetHeight; //网页可见区域高
+		var thistop=parseInt(obj.offset().top+obj.outerHeight())-9;
+		var refh=$("#showRefData").height();
+		var canh=(pageh-thistop+scollh)<(viewh-thistop+scollh)?(pageh-thistop+scollh):(viewh-thistop+scollh);
+		if(refh>canh){
+			thistop=parseInt(obj.offset().top)-refh-11;
+		}
+		//显示模糊查询区域
+		$("#showRefData").css("left",parseInt(obj.offset().left)+1);
+	   	$("#showRefData").css("top",thistop+10);
+	    $("#showRefData").css("min-width",parseInt(obj[0].parentNode.clientWidth));
+	    $("#showRefData").css('display', 'block');
+	    if(count==0){
+	    	$("#showRefData").css("display","none");
+	    }
+	});
+	$(".box-body,.box-head").bind("click propertychange",function (){//页面点击事件
+		$("#showRefData").css("display","none");
+	});
+	$("#showRefData").on("click","li",function(){//模糊查询值区域点击事件
+		$("#"+refCode).val($(this).children()[0].innerText);
+		$("#"+refName).val($(this).children()[2].innerText);
+		$("#showRefData").css("display","none");
+		if(refCode=="chargeitemCode"){
+			var proj = $(this).children()[0].innerText
+			var JSONDATA={'pkChargeitemCode':proj};
+			$.ajax({
+				url: '/js/a/zl/zlCostproject/out',
+				datatype: 'json',
+				data: JSONDATA,
+				async:false,
+				contentType: 'application/json;charset=utf-8',
+				success: function (msg) {
+				     var selectData=msg.roundtype;
+				     $("#roundform").val(selectData).trigger("change");
+				}
+			});
+		}else if(refCode=="pkFamilyfileCode"){
+			 var proj = $(this).children()[0].innerText;
+				var JSONDATA={'pkFamilyfileCode':proj};
+				$.ajax({
+					url: '/js/a/zl/zlFamilyfile/out',
+					datatype: 'json',
+					data: JSONDATA,
+					async:false,
+					contentType: 'application/json;charset=utf-8',
+					success: function (msg) {
+					     $("#pkFormattypeName").val(msg.pkFormattypeid.name);
+					     $("#pkFormattypeCode").val(msg.pkFormattypeid.id); 
+					     $("#buildarea").val(msg.builtuparea);
+					     $("#innerarea").val(msg.innerarea);
+					}
+				});
+		}
+		 
+	});
+	/****参照查询input框 end*****/
+});
+
+</script> -->
+<script>
+ function treeselectCallback(id, act, index, layero, nodes){
+ 	if(id=="projectname"){
+ 		var node1=nodes[0].name.split(" ");
+ 		   $("#projectnameName").val(node1[1]);
+ 	}
+ } 
+</script> 

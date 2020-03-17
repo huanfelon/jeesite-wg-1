@@ -1,0 +1,225 @@
+﻿.homePage {
+  	border: 1px solid #eee;
+  	padding: 6px;
+  	margin: 10px;
+  	background: #fff;
+}
+.homePage .chars_title {
+  	height: 30px;
+  	line-height: 30px;
+  	font-size: 12px;
+  	background-color: #66cad4;
+  	overflow: hidden;
+  	color: #ffffff;
+  	font-family: 'Sans-serif';
+}
+.homePage .chars_title div {
+  	display: inline-block;
+}
+.homePage .chars_title .chars_title_left {
+  	float: left;
+  	margin-left: 4px;
+  	cursor: default;
+}
+.homePage .chars_title .chars_title_right {
+  	float: right;
+  	margin-right: 4px;
+  	cursor: pointer;
+}
+.homePage .content {
+  	overflow: hidden;
+  	min-height: 700px;
+  	padding: 15px;
+  	margin-right: auto;
+  	margin-left: auto;
+  	padding-left: 15px;
+  	padding-right: 15px;
+}
+#searchForm {
+	padding-top: 20px;
+	padding-right: 50px;
+}
+.box-tools .btn {
+    color: #fff;
+    background-color: #5d80ff;
+}
+.xk_page {
+	min-height: 600px;
+	width: 100%;
+	overflow: hidden;
+  	margin-top: 10px;
+}
+.xk_page .page_left {
+  float: left;
+  width: 100%;
+  margin-right: 10px;
+  padding: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.xk_page .lenged {
+  overflow: hidden;
+  padding-left: 15px;
+}
+.xk_page .lenged div {
+  float: left;
+  font-size: 16px;
+  font-weight: bolder;
+  margin-right: 10px;
+}
+.xk_page .lenged .keshou span,
+.xk_page .lenged .yishou span {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+}
+.xk_page .lenged .keshou span {
+  background: #84e69e;
+  border: 1px solid #84e69e;
+}
+.xk_page .lenged .yishou span {
+    border: 1px solid #e4e1e1;
+    background-color: #e4e1e1;
+}
+.xk_page .lenged .zongTao {
+  font-weight: bolder;
+}
+.xk_page .lenged .qianjiao {
+  color: #ff4040;
+  font-weight: bolder;
+}
+.xk_page .page_left .guDing {
+  width: 100%;
+  height: 100%;
+  font-family: '微软雅黑';
+  margin-top: 10px;
+}
+.xk_page .page_left .guDing .gudingTab {
+  position: absolute;
+  left: 4px;
+  background: #fff;
+  z-index: 222;
+}
+.xk_page .page_left .guDing .gudingTab .fh_thead th {
+  font-size: 16px;
+  text-align: center;
+  border: 1px solid #caccce;
+  white-space: nowrap;
+  background-color: #00bace;
+  color: #fff;
+}
+.xk_page .page_left .guDing .gudingTab .fh_thead th:nth-child(1) {
+  font-size: 14px;
+}
+.xk_page .page_left table {
+  border-collapse: collapse;
+  border: 1px solid #caccce;
+}
+.xk_page .page_left table tr {
+  border: 1px solid #caccce;
+}
+.xk_page .page_left table tr td {
+  border: 1px solid #caccce;
+}
+.xk_page .page_left table tr th {
+  border: 1px solid #caccce;
+}
+.xk_page .page_left table thead tr {
+  height: 36px;
+  white-space: nowrap;
+}
+.xk_page .page_left table thead tr th {
+  line-height: 36px;
+  text-align: center;
+}
+.xk_page .page_left table thead tr th:nth-child(1) {
+  width: 70px;
+  text-align: center;
+}
+.xk_page .page_left table thead tr th.qufen {
+  border-left: 3px solid #caccce !important;
+}
+.xk_page .page_left table tbody tr td {
+  min-width: 130px;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 80px;
+}
+.xk_page .page_left table tbody tr td div {
+  border-right: 1px solid #caccce;
+  flex-basis: 100%;
+  text-align: center;
+  height: 80px;
+}
+.xk_page .page_left table tbody tr td div:last-child {
+  border-right: none;
+}
+.xk_page .page_left table tbody tr td p {
+  text-align: center;
+}
+.xk_page .page_left table tbody tr td p:first-child {
+  font-weight: bold;
+}
+.xk_page .page_left table tbody tr td p:nth-child(2) {
+  color: #ccc;
+  font-size: 12px;
+}
+.xk_page .page_left table tbody tr td:nth-child(1) {
+  text-align: center;
+  width: 36px;
+  min-width: 36px !important;
+  background-color: #00bace;
+  color: #fff;
+}
+.xk_page .page_left table tbody tr td:nth-child(1) span {
+  display: inline-block;
+  width: 35px;
+}
+.xk_page .page_left table tbody tr div.success {
+  background: #cdf5c0;
+}
+.xk_page .page_left table tbody tr div.success p:first-child {
+  color: #555db5;
+}
+.xk_page .page_left table tbody tr div.success p:nth-child(2) {
+  color: black;
+}
+.xk_page .page_left table tbody tr div.danger {
+  background: #ED1615;
+}
+.xk_page .page_left table tbody tr div.danger p:first-child {
+  color: #fff;
+}
+.xk_page .page_left table tbody tr div.danger p:nth-child(2) {
+  color: black;
+}
+.xk_page .page_left table tbody tr div.duoxuan {
+  box-shadow: inset 0 0 2px blue;
+}
+.xk_page .page_left table tbody tr td.qufen {
+  border-left: 3px solid #caccce !important;
+}
+.xk_page .FH_content {
+  font-family: '微软雅黑';
+  font-size: 14px;
+}
+.xk_page .FH_content .fh_thead th {
+  font-size: 16px;
+  text-align: center;
+  border: 1px solid #caccce;
+}
+.xk_page .FH_content .fh_thead th:nth-child(1) {
+  font-size: 14px;
+}
+.yjfy {
+	background-color: #84e69e;
+	color: #fff;
+}
+.qjfy {
+	background-color: #e4e1e1;
+	color: #000;
+}
+.selectedRoom {
+	background-color: #ff8db2;
+	color: #fff;
+}

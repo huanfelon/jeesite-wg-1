@@ -1,0 +1,131 @@
+
+<% layout('/layouts/default.html', {title: '附件管理', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-title">
+				<i class="fa icon-docs"></i> ${text('附件管理')}
+			</div>
+			<div class="box-tools pull-right ${isEdit == 'true' ? '':'hide'}">
+				<% if(hasPermi('filemanager') && isBlank(filemanager.sharedId)){ %>
+					<a href="${ctx}/filemanager/filemanagerFolder/form" id="btnNewFolder" class="btn btn-default addTabPage" title="${text('新建文件夹')}"
+						data-layer="true" data-layer-width="950" data-layer-height="390"><i class="fa fa-folder-o"></i> ${text('新建文件夹')}</a>
+					<a href="${ctx}/filemanager/appForm2" id="btnUploadFile" class="btn btn-default addTabPage" title="${text('上传文件')}"
+						data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-upload"></i> ${text('上传文件')}</a>
+					<a href="javascript:" id="btnDeleteFile" class="btn btn-default" title="${text('删除')}"><i class="fa fa-trash-o"></i> ${text('删除')}</a>
+					<!-- <a href="javascript:" id="ceshi" class="btn btn-default" title="${text('测试')}"><i class="fa fa-trash-o"></i> ${text('测试')}</a> -->
+				<% } %>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${filemanager}" action="${ctx}/filemanager/listAppData" method="post" class="form-inline "
+					data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+				<#form:hidden path="groupType"/>
+				<#form:hidden path="folderId"/>
+				<#form:hidden path="sharedId"/>
+			</#form:form>
+			<table id="dataGrid"></table>
+			<div id="dataGridPage"></div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+
+var isEdit = ${toJson(isEdit)};
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'${text("名称")}', name:'fileName', index:'a.file_name', width:150, align:"left", frozen:true, formatter: function(val, obj, row, act){
+			var html = [];
+			if (row.fileType == 'folder'){
+				html.push('<i class="fa fa-folder-o"></i> &nbsp;');
+				html.push('<a href="javascript:" onclick="enterFileFolder(\''+row.folderId+'\')">'+(val||row.id)+'</a>');
+			}else{
+				html.push('<i class="fa fa-file-text-o"></i> &nbsp;');
+				html.push('<a href="javascript:" onclick="js.windowOpen(\'${ctx}/file/download/'+row.fileUploadId+'?preview=weboffice\')" title="${text("预览文件")}">'+(val||row.id)+'</a>');
+			}
+			return html.join('');
+		}},
+		
+		{header:'${text("文件大小")}', name:'fileSizeFormat', sortable:false, width:100, align:"center"},
+		{header:'${text("操作")}', name:'actions', width:70, sortable:false, title:false, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (row.fileType == 'folder'){
+				<% if(isBlank(filemanager.sharedId)&&isEdit=='true'){ %>
+				actions.push('<a href="${ctx}/filemanager/filemanagerFolder/form?id='+row.folderId+'" class="addTabPage" title="${text("编辑文件夹")}" data-layer="true" data-layer-width="950" data-layer-height="430"><i class="fa fa-pencil"></i></a>&nbsp;');
+				actions.push('<a href="${ctx}/filemanager/filemanagerFolder/delete?id='+row.folderId+'" class="btnList" title="${text("删除文件夹")}" data-confirm="${text("确认要删除该文件夹吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				<% } %>
+			}else{
+				actions.push('<a href="${ctx}/file/download/'+row.fileUploadId+'"><i class="fa fa-download"></i></a>&nbsp;');
+				<% if(isBlank(filemanager.sharedId)&&isEdit=='true'){ %>
+				actions.push('<a href="${ctx}/filemanager/delete?ids='+row.id+'" class="btnList" title="${text("删除文件")}" data-confirm="${text("确认要删除该文件吗？")}"><i class="fa fa-trash-o"></i></a>&nbsp;');
+				<% } %>
+			}
+			return actions.join('');
+		}}
+	],
+	lazyLoad: false,     //懒加载
+	multiboxonly: true,	// 单击复选框时再多选
+	showCheckbox: true,	// 是否显示复选框
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		var parentCode = js.val(data, 'otherData.folder.parentCode');
+		if (parentCode && parentCode != ''&&parentCode !='0'<% if(isNotBlank(filemanager.sharedId)){ %> && parentCode == '${filemanager.folderId}'<% } %>){
+			$('#dataGrid .jqgfirstrow').after('<tr class="ui-widget-content jqgrow ui-row-ltr pointer"'
+					+' onclick="enterFileFolder(\''+parentCode+'\')" title="${text("上级文件夹")}">'
+					+'<td role="gridcell" class="ui-state-default jqgrid-rownum" style="text-align:center;width: 30px;"'
+					+' aria-describedby="dataGrid_rn"><i class="icon-action-undo"></i></td>'
+					+'<td role="gridcell" style="text-align:center;width: 25px;" aria-describedby="dataGrid_cb">#</td>'
+					+'<td colspan="6"><i class="fa fa-folder-o"></i> &nbsp;<a href="javascript:">..</a></td></tr>');
+		}
+		var groupType = $('#groupType').val(), folderId = $('#folderId').val();
+		$('#btnNewFolder').attr('href', '${ctx}/filemanager/filemanagerFolder/form' + '?groupType='+groupType+'&parentCode='+folderId);
+		$('#btnUploadFile').attr('href', '${ctx}/filemanager/appForm2' + '?groupType='+groupType+'&folderId='+folderId);
+		//var url = window.location.search;
+		//var pk = url.split("=")[1];
+		//enterFileFolder(pk)
+	}
+});
+function enterFileFolder(folderId){
+	$('#folderId').val(folderId);
+	$('#searchForm').submit();
+}
+
+$('#btnDeleteFile').click(function(){
+	var ids = $('#dataGrid').dataGrid('getSelectRows');
+	if (ids.length <= 0){
+		js.showMessage('请选择要删除的文件');
+		return false;
+	}
+	js.confirm('确认要删除你选中的文件吗？', function(data){
+		js.ajaxSubmit("${ctx}/filemanager/delete", {
+			ids: ids.join(',')
+		}, function(data){
+			js.showMessage(data.message);
+			page();
+		});
+	});
+	return false;
+});
+
+/* $('#ceshi').click(function(){
+	var groupType = $('#groupType').val();
+	var folderId = "1173840408148103168";
+	var href = $('#btnUploadFile').attr('href');
+	var new_href = href+'?groupType='+groupType+'&folderId='+folderId;
+	js.layer.open({
+		type: 2,
+		  title: false,
+		  closeBtn: 0, //不显示关闭按钮
+		  area: ['340px', '215px'],
+		  content: [new_href, 'no'], //iframe的url，no代表不显示滚动条
+		  end: function(){ //此处用于演示
+		    
+		  }
+	})
+	
+}); */
+
+</script>

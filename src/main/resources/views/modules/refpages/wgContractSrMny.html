@@ -1,0 +1,175 @@
+<% layout('/layouts/default.html', {title: '合同收入金额明细', libs: ['validate','dataGrid']}){ %>
+<style>
+.cw_box .ui-jqgrid .ui-jqgrid-bdiv {
+	height: 370px !important;
+    background: #F1F3F7 !important;
+}
+.ui-jqgrid tr.footrow td {
+    border-top: 1px solid rgb(225, 225, 225) !important;
+    border-bottom: 1px solid rgb(225, 225, 225) !important;
+}
+.text_right {
+	text-align: right;
+}
+</style>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text('收入金额')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('wght:wgContract:edit')){ %>
+					<button type="submit" class="btn btn-sm ${isEdit?'':'hide'}" id="ly_btnSubmit"><i class="fa fa-check"></i> ${text('保存')}</button>
+				<% } %>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${wgContract}" action="${ctx}/wght/wgContract/saveSrMny" method="post" class="form-inline cw_box c_background">
+			<div class="box-body">
+				<table id="wgContractSrcfGrid"></table>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('wght:wgContract:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#wgContractSrcfGrid').dataGrid({
+	
+	data: ${toJson(wgContract.wgContractSrcfList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	columnModel: [
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("主键")}', name:'pkContractSrcf', editable:true, hidden:true},
+		{header:'${text("收费项目")}', name:'pkCostproject.name', index:'a.pk_costproject', width:150, align:"left",classes:"bgcolor_noedit"},
+		{header:'${text("开始日期")}', name:'dstartdate', index:'a.dstartdate', width:100, align:"left",classes:"bgcolor_noedit"},
+		{header:'${text("截止日期")}', name:'denddate', index:'a.denddate', width:100, align:"left",classes:"bgcolor_noedit"},
+		<% if(isEdit){ %>
+			{header:'${text("无税金额")}', name:'nnotaxmny', index:'a.nnotaxmny', width:100, editable:true, edittype:'text', align:"right", classes:"color-area-label2",
+				editoptions:{'class':'form-control number required',
+				dataInit: function(element){ $(element).on('change', function(){
+					//计算本行
+					var rowId = $('#wgContractYwcfGrid').dataGrid('getSelectRow'); // 获取选择行Id
+					var ntaxmny=toNumber($("#"+rowId+"_ntaxmny").val());
+					var nnotaxmny=toNumber($("#"+rowId+"_nnotaxmny").val());
+					var nrec=ntaxmny+nnotaxmny;
+					$("#"+rowId+"_nrecmny").val(nrec);
+					recalHj();
+					form_jine();
+				});
+			}}},
+		<% }else{ %>
+			{header:'${text("无税金额")}', name:'nnotaxmny', index:'a.nnotaxmny', width:100, align:"right", classes:"color-area-label2 bgcolor_noedit",editoptions:{'class':'form-control number','readonly':'true'},
+				formatter: function(val, obj, row, act){
+					return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+			}},
+		<% } %>
+		{header:'${text("税额")}', name:'ntaxmny', index:'a.ntaxmny', width:100, editable:true, align:"right", classes:"color-area-label2 bgcolor_noedit",editoptions:{'class':'form-control number','readonly':'true'},
+			formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("税率(%)")}', name:'ntaxrate', index:'a.ntaxrate', width:80, editable:true, align:"right", classes:"color-area-label2 bgcolor_noedit",
+			editoptions:{'class':'form-control text_right','readonly':'true'}
+		},
+		{header:'${text("已确认收入金额")}', name:'nrealmny', index:'a.nrealmny', width:100, align:"right", classes:"color-area-label2 bgcolor_noedit",editoptions:{'class':'form-control number','readonly':'true'}, 
+			formatter: function(val, obj, row, act){
+			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+		}},
+		{header:'${text("应收金额")}', name:'nrecmny', index:'a.nrecmny', width:150, editable:true, hidden:true},
+		{header:'${text("客户名称")}', name:'pkCustomer.name', index:'a.pk_customer', width:200, align:"left",classes:"bgcolor_noedit"},
+		{header:'${text("楼栋")}', name:'pkBuild.name', index:'a.pk_build', width:150, align:"left",classes:"bgcolor_noedit"},
+		{header:'${text("房产名称")}', name:'pkHouse.estatename', index:'a.pk_house', width:200, align:"left",classes:"bgcolor_noedit"},
+	],
+	editGrid: ${isEdit},				// 是否是编辑表格
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	showFooter: true,
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractSrcfList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContract.pkContract,pkContractSrcf,nrecmny,ntaxmny,nnotaxmny,vdef1,vdef5', // 提交数据列表的属性字段
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+		var nrecmny=0;
+		var nrealmny=0;
+		var ntaxmny=0;
+		var nnotaxmny=0;
+		if(data!=null){
+			var num=data.records;
+			for(var i=0;i<num;i++){
+				var jso=data.rows[i];
+				var no1=jso['nrecmny']==null?0.00:jso['nrecmny'];
+				var no2=jso['nrealmny']==null?0.00:jso['nrealmny'];
+				var no3=jso['ntaxmny']==null?0.00:jso['ntaxmny'];
+				var no4=jso['nnotaxmny']==null?0.00:jso['nnotaxmny'];
+				nrecmny+=no1;
+				nrealmny+=no2;
+				ntaxmny+=no3;
+				nnotaxmny+=no4;
+			}
+		}
+		
+		setTimeout(function (){$('#wgContractSrcfGrid').dataGrid("footerData", "set", {
+			"pkCostproject.name" : "<b><center>合计：</center><b>",
+			"nrecmny" :  js.formatNumber(nrecmny, 2, true, '0.00'),
+			"nrealmny" :  js.formatNumber(nrealmny, 2, true, '0.00'),
+			"ntaxmny": js.formatNumber(ntaxmny, 2, true, '0.00'),
+			"nnotaxmny": js.formatNumber(nnotaxmny, 2, true, '0.00'),
+		}, false);},10);
+	},
+});
+</script>
+<script>
+setTimeout(function(){form_jine()},10);
+$("#inputForm").validate({
+	submitHandler: function(form){
+		js.ajaxSubmitForm($(form), function(data){
+			if(data.result == Global.TRUE){
+				js.showMessage(data.message);
+			}else{
+				js.showMessage(data.message,'','info',3000);
+			}
+			form_jine();
+		}, "json");
+    }
+});
+</script>
+<script>
+function recalHj(){
+	var rowIds = $('#wgContractSrcfGrid').dataGrid('getDataIDs'); // 获取所有数据Id
+	var nrecmny=0;
+	var ntaxmny=0;
+	var nnotaxmny=0;
+	for(var i=0;i<rowIds.length;i++){
+		var jso=rowIds[i];
+		var no1=toNumber($("#"+jso+"_nrecmny").val());
+		var no3=toNumber($("#"+jso+"_ntaxmny").val());
+		var no4=toNumber($("#"+jso+"_nnotaxmny").val());
+		nrecmny+=no1;
+		ntaxmny+=no3;
+		nnotaxmny+=no4;
+	}
+	$('#wgContractSrcfGrid').dataGrid("footerData", "set", {
+		"pkCostproject.name" : "<b><center>合计：</center><b>",
+		"nrecmny" :  js.formatNumber(nrecmny, 2, true, '0.00'),
+		"ntaxmny": js.formatNumber(ntaxmny, 2, true, '0.00'),
+		"nnotaxmny": js.formatNumber(nnotaxmny, 2, true, '0.00'),
+	}, false);
+}
+$("#ly_btnSubmit").click(function (){
+	form_cleanup_jine();//去掉千分位
+	$("#btnSubmit").click();
+});
+</script>

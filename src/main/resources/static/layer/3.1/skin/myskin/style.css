@@ -1,0 +1,31 @@
+body .demo-class .layui-layer-title{
+	background:#006cdc; 
+	color:#fff; 
+	border: none;
+}
+body .demo-class .layui-layer-btn{
+	border-top:1px solid #E9E7E7
+}
+body .demo-class .layui-layer-btn a{
+	background:#006cdc;
+	border:none;
+	color:#fff;
+}
+body .demo-class .layui-layer-btn .layui-layer-btn1{
+	background:#999;
+}
+.layui-layer-title{
+	height: 34px;
+	line-height: 34px;
+}
+.layui-layer-btn{
+	padding-bottom:4px;
+	padding-left:0;
+}
+.layui-layer-btn{
+	background-color: #fff;
+	/* margin-top: -2px; */
+}
+.layui-layer-setwin a{
+	top:-4px;
+}

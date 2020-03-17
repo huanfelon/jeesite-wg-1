@@ -1,0 +1,157 @@
+<% layout('/layouts/default.html', {title: '客户选择', libs: ['dataGrid']}){ %>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-body">
+			<#form:form id="searchForm" model="${bdCustomer}" action="${ctx}/base/bdCustomer/listData?pk_project=${pkProject}" method="post" class="form-inline " 
+			data-page-no="${parameter.pageNo}" data-page-size="${parameter.pageSize}" data-order-by="${parameter.orderBy}">
+					<div class="form-group hide">
+						<label class="control-label"><span class="required ">*</span>${text('所属组织')}：</label>
+						<div class="control-inline width-120" >
+							<#form:treeselect id="pkOrg" title="${text('机构选择')}"
+								path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+								url="${ctx}/sys/office/treeData" allowClear="true"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('客户编码')}：</label>
+						<div class="control-inline">
+							<#form:input path="code" maxlength="255" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('客户名称')}：</label>
+						<div class="control-inline">
+							<#form:input path="name" maxlength="255" class="form-control width-120"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('客户类型')}：</label>
+						<div class="control-inline width-120" >
+							<#form:treeselect id="pkCusttype" title="${text('客户类型')}"
+									path="pkCusttype.id" labelPath="pkCusttype.name"
+									url="${ctx}/bd/bdCusttype/treeData"
+									class="required" allowClear="true"/>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="control-label">${text('业务员')}：</label>
+						<div class="control-inline width-120" >
+							<#form:listselect id="pkPsndoc" title="${text('人员选择')}"
+									path="pkPsndoc.id" labelPath="pkPsndoc.name"
+									itemCode="id" itemName="name"
+									boxWidth="900" boxHeight="600"
+									url="${ctx}/base/bdPsndoc/bdPsndocSelect"
+									class="required" allowClear="true"/>
+						</div>
+					</div>
+					<!-- <div class="form-group">
+						<label class="control-label">${text('客户状态')}：</label>
+						<div class="control-inline width-120">
+							<#form:select path="custstatus" dictType="wg_custstatus" blankOption="true" class="form-control"/>
+						</div>
+					</div> -->
+				<div class="form-group pull-right">
+					<button type="submit" class="btn btn-primary btn-sm">查询</button>
+					<button type="reset" class="btn btn-default btn-sm">重置</button>
+				</div>
+			</#form:form>	
+			<div class="row">
+				<div class="col-xs-10 pr10">
+					<table id="dataGrid"></table>
+					<div id="dataGridPage"></div>
+				</div>
+				<div class="col-xs-2 pl0">
+					<div id="selectData" class="tags-input"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+var selectData = ${isNotBlank(selectData!) ? selectData! : "{\}"},
+selectNum = 0, dataGrid = $('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		{header:'主键', name:'id', hidden:true},
+		{header:'${text("主键")}', name:'pkCustomer', index:'a.pk_customer',hidden:true, width:150, align:"left"},
+		{header:'${text("客户编码")}', name:'code', index:'a.code', width:100, align:"left"},
+		{header:'${text("客户名称")}', name:'name', index:'a.name', width:250, align:"left"},
+		{header:'${text("客户类型")}', name:'pkCusttype.name', index:'a.pk_custtype', width:80, align:"left"},
+		{header:'${text("业务员")}', name:'pkPsndoc.name', index:'a.pk_psndoc', width:80, align:"left"},
+		//{header:'${text("身份证号")}', name:'idno', index:'a.idno', width:150, align:"left"},
+		//{header:'${text("社会统一信用代码")}', name:'creditcode', index:'a.creditcode', width:200, align:"left"},
+		{header:'行数据', name:'rowData', hidden:true, formatter: function(val, obj, row, act){
+			return JSON.stringify(row);
+		}}
+	],
+	sortableColumn : false,//根据列排序
+	shrinkToFit : true,//自动分配单元格宽度
+	autoGridHeight: function(){
+		var height = $(window).height() - $('#searchForm').height() - $('#dataGridPage').height() - 75;
+		$('.tags-input').height($('.ui-jqgrid').height() - 10);
+		return height;
+	},
+	showCheckbox: '${parameter.checkbox}' == 'true',
+	multiselectWidth: 40,   // 复选框的宽度
+	multiboxonly: false, // 单击复选框时再多选
+	ajaxSuccess: function(data){
+		$.each(selectData, function(key, value){
+			dataGrid.dataGrid('setSelectRow', key);
+		});
+		initSelectTag();
+	},
+	onSelectRow: function(id, isSelect, event){
+		if ('${parameter.checkbox}' == 'true'){
+			if(isSelect){
+				selectData[id] = JSON.parse(dataGrid.dataGrid('getRowData', id).rowData);
+			}else{
+				delete selectData[id];
+			}
+		}else{
+			selectData = {};
+			selectData[id] = JSON.parse(dataGrid.dataGrid('getRowData', id).rowData);
+		}
+		initSelectTag();
+	},
+	onSelectAll: function(ids, isSelect){
+		if ('${parameter.checkbox}' == 'true'){
+			for (var i=0; i<ids.length; i++){
+				if(isSelect){
+					selectData[ids[i]] = JSON.parse(dataGrid.dataGrid('getRowData', ids[i]).rowData);
+				}else{
+					delete selectData[ids[i]];
+				}
+			}
+		}
+		initSelectTag();
+	},
+	ondblClickRow: function(id, rownum, colnum, event){
+		if ('${parameter.checkbox}' != 'true'){
+			js.layer.$('#' + window.name).closest('.layui-layer')
+				.find(".layui-layer-btn0").trigger("click");
+		}
+		initSelectTag();
+	}
+});
+function initSelectTag(){
+	selectNum = 0;
+	var html = [];
+	$.each(selectData, function(key, value){
+		selectNum ++;
+		html.push('<span class="tag" id="'+key+'_tags-input"><span>'+value.name+' </span>'
+			+ '<a href="#" onclick="removeSelectTag(\''+key+'\');" title="取消选择">x</a></span>');
+	});
+	html.unshift('<div class="title">当前已选择<span id="selectNum">'+selectNum+'</span>项：</div>');
+	$('#selectData').empty().append(html.join(''));
+}
+function removeSelectTag(key){
+	delete selectData[key];
+	dataGrid.dataGrid('resetSelection', key);
+	$('#selectNum').html(--selectNum);
+	$('#'+key+'_tags-input').remove();
+}
+function getSelectData(){
+	return selectData;
+}
+</script>

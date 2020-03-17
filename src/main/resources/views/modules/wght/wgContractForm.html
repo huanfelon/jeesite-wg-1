@@ -1,0 +1,1449 @@
+﻿<% layout('/layouts/default.html', {title: '合同管理', libs: ['validate','dataGrid']}){ %>
+<link href="${ctxStatic}/css/c_tab_nav.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header with-border">
+			<!-- <div class="box-title">
+				<i class="fa fa-list-alt"></i> ${text(wgContract.isNewRecord ? '新增合同管理' : '编辑合同管理')}
+			</div> -->
+			<div class="box-tools pull-left">
+				<% if (hasPermi('wght:wgContract:edit')){ %>
+					<button type="submit" class="btn btn-sm ${isEdit?'':'hide'}" id="ly_btnSubmit"><i class="fa fa-check"></i> ${text('保存')}</button>
+				<% } %>
+				<button type="button" class="btn btn-sm" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关闭')}</button>
+			</div>
+		</div>
+		<#form:form id="inputForm" model="${wgContract}" action="${ctx}/wght/wgContract/save" method="post" class="form-horizontal cw_box c_background">
+			<div class="box-body" style="padding-bottom:110px">
+				<div class="form-unit">${text('基本信息')}</div>
+					<#form:hidden path="pkContract"/>
+					<#form:hidden path="isNewRecord"/>
+					<#form:hidden path="version"/>
+					<input type="hidden" id="isEdit" name="isEdit" value="${isEdit}">
+					<input type="hidden" id="days" name="days" value="${@Global.getConfig('wght_prehtfirstfkdays')}">
+					<div class="row">
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('单据编号')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="vbillno" maxlength="200" class="form-control" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('所属组织')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="pkOrg" title="${text('组织选择')}" 
+										path="pkOrg.officeCode" labelPath="pkOrg.officeName" class="required" 
+										url="${ctx}/sys/office/treeData?officeTypes=1,2&isShowCode=true" allowClear="true" 
+										canSelectParent="true" canSelectRoot="true" readonly="${!wgContract.isNewRecord}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('项目信息')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="pkProject" title="${text('项目选择')}" 
+										path="pkProject.pkProject" labelPath="pkProject.name" class="required" 
+										url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true" 
+										canSelectParent="true" canSelectRoot="true" readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('合同编号')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="htcode" maxlength="200" class="form-control required" readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('合同类型')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="httype" title="${text('合同类型选择')}" 
+										path="httype.pkHttype" labelPath="httype.name" class="required" 
+										url="${ctx}/bd/bdHttype/treeData?isShowCode=true" allowClear="true" 
+										canSelectParent="true" canSelectRoot="true" readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('签租日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+								<% if(isEdit) {%>
+									<#form:input path="dqzdate" maxlength="20" class="form-control Wdate required" readonly="true" 
+										dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+								<% } else { %>
+									<#form:input path="dqzdate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true" />
+								<% } %>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('合同起始日')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<% if(isEdit) {%>
+										<#form:input path="dstartdate" maxlength="20" class="form-control Wdate required" 
+											dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(denddate,{d:-1})}',isShowClear:true,onpicked:pickDateAfter});"/>
+									<% } else { %>
+										<#form:input path="dstartdate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true" />
+									<% } %>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('合同终止日')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<% if(isEdit) {%>
+										<#form:input path="denddate" maxlength="20" class="form-control Wdate required" 
+											dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(dstartdate,{d:1})}',isShowClear:true,onpicked:pickDateAfter2});"/>
+									<% } else { %>
+										<#form:input path="denddate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true" />
+									<% } %>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('首期付款日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<% if(isEdit) {%>
+										<#form:input path="dfirstfkdate" maxlength="20" class="form-control Wdate required" 
+											dataFormat="date" onclick="WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true});"/>
+									<% } else { %>
+										<#form:input path="dfirstfkdate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true" />
+									<% } %>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('租赁方式')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:select path="renttype" dictType="wg_renttype" class="form-control required" readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ${isEdit?'':'hide'}">*</span> ${text('合同税率')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:select path="ntaxrate" dictType="wg_taxrate" blankOption="true" class="form-control required" readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('附加条款')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="exremarks" maxlength="200" class="form-control" readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('租金单价')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="nprice" class="form-control number3" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('日租金')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="ndayprice" class="form-control number" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('月租金')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="nmonthprice" class="form-control number" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('年租金')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="nyearprice" class="form-control number" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('租赁总面积')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="nallarea" class="form-control number" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required ">*</span> ${text('部门')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:treeselect id="pkDept" title="${text('部门选择')}" 
+										path="pkDept.pkDept" labelPath="pkDept.deptName" class=" required" 
+										url="${ctx}/base/bdDept/treeData" allowClear="true" 
+										readonly="${!isEdit}" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('合同状态')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:select path="htstatus" dictType="wg_htstatus" class="form-control" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('退租日期')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:input path="dtzdate" maxlength="20" class="form-control Wdate disabled" dataFormat="date" readonly="true"/>
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('单据状态')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:select path="vbillstatus" dictType="wg_billstatus" class="form-control" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span> ${text('单据类型')}：<i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:select path="billtype" dictType="wg_billtype" class="form-control" readonly="true" />
+								</div>
+							</div>
+						</div>
+						<div class="col-xs-3">
+							<div class="form-group">
+								<label class="control-label col-sm-5" title="">
+									<span class="required hide">*</span><i class="fa icon-question hide"></i></label>
+								<div class="col-sm-7">
+									<#form:checkbox path="iswyht" label="是否纯物业合同" class="form-control" />
+								</div>
+							</div>
+						</div>
+					</div>
+			<div class="c_tab_nav">
+				<ul class="c_nav">
+					<li class="c_active">客户信息</li>
+					<li>房产信息</li>
+					<li>物业信息</li>
+					<li>其他周期费用</li>
+					<li>押金</li>
+					<li>租赁支付方式</li>
+					<li>物业支付方式</li>
+					<li>免租期</li>
+					<li>增长期</li>
+				</ul>
+				<div class="c_nav_content">
+					<div class="ml10 mr10">
+						<table id="wgContractCustDataGrid"></table>
+						<a href="#" id="wgContractCustDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractHouseDataGrid"></table>
+							<a href="#" id="wgContractHouseDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractWyfDataGrid"></table>
+							<a href="#" id="wgContractWyfDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractZqfyDataGrid"></table>
+							<a href="#" id="wgContractZqfyDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractYjDataGrid"></table>
+							<a href="#" id="wgContractYjDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractZltypeDataGrid"></table>
+							<a href="#" id="wgContractZltypeDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractWytypeDataGrid"></table>
+							<a href="#" id="wgContractWytypeDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractMzqDataGrid"></table>
+							<a href="#" id="wgContractMzqDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+					<div class="ml10 mr10 hide" style="overflow:auto">
+						<table id="wgContractZzqDataGrid"></table>
+							<a href="#" id="wgContractZzqDataGridAddRowBtn" class="btn btn-primary btn-sm mt10 mb10 hide"><i class="fa fa-plus"></i> ${text('增行')}</a>
+					</div>
+				</div>
+				</div>
+			<div class="c_footer_box">
+				<h4 class="form-unit">${text('表尾信息')}</h4>
+				<div class="row">
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('制单人')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="creator" title="${text('用户选择')}"
+									path="creator.userCode" labelPath="creator.userName"
+									url="${ctx}/sys/office/treeData?isLoadUser=true"
+									class="" allowClear="true" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('制单时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="createdtime" maxlength="20" class="form-control Wdate disabled" dataFormat="datetime2" readonly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('最后修改人')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="modifier" title="${text('用户选择')}"
+									path="modifier.userCode" labelPath="modifier.userName"
+									url="${ctx}/sys/office/treeData?isLoadUser=true"
+									class="" allowClear="true" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('最后修改时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="modifiedtime" maxlength="20" class="form-control Wdate disabled" dataFormat="datetime2" readonly="true"/>
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('审核人')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:treeselect id="approver" title="${text('用户选择')}"
+									path="approver.userCode" labelPath="approver.userName"
+									url="${ctx}/sys/office/treeData?isLoadUser=true"
+									class="" allowClear="true" readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="col-xs-3">
+						<div class="form-group">
+							<label class="control-label col-sm-5" title="">
+								<span class="required hide">*</span> ${text('审核时间')}：<i class="fa icon-question hide"></i></label>
+							<div class="col-sm-7">
+								<#form:input path="approvedtime" maxlength="20" class="form-control Wdate disabled" dataFormat="datetime2" readonly="true"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			</div>
+			<div class="box-footer hide">
+				<div class="row">
+					<div class="col-sm-offset-2 col-sm-10">
+						<% if (hasPermi('wght:wgContract:edit')){ %>
+							<button type="submit" class="btn btn-sm btn-primary" id="btnSubmit"><i class="fa fa-check"></i> ${text('保 存')}</button>&nbsp;
+						<% } %>
+						<button type="button" class="btn btn-sm btn-default" id="btnCancel" onclick="js.closeCurrentTabPage()"><i class="fa fa-reply-all"></i> ${text('关 闭')}</button>
+					</div>
+				</div>
+			</div>
+		</#form:form>
+	</div>
+</div>
+<% } %>
+<script>
+//初始化合同管理表体-客户信息DataGrid对象
+$("#wgContractCustDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractCustList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractCust', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("客户名称")}', name:'pkCustomer', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCustomer.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkCustomer') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"listselectTpl":"listselectTpl2"}', {
+						id: 'cCust_'+editOptions.id, title: '客户选择', 
+						path: 'pkCustomer.pkCustomer', value: val.split('|')[0], 
+						labelPath: 'pkCustomer.name', labelValue: val.split('|')[1],
+						itemCode:'pkCustomer', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/base/bdCustomer/bdCustomerSelect', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("身份证号")}', name:'idno', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control','readonly':'true'}},
+		{header:'${text("社会统一信用代码")}', name:'shtyxydm', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control','readonly':'true'}},
+		{header:'${text("税号")}', name:'taxnum', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control','readonly':'true'}},
+		{header:'${text("地址")}', name:'address', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':'true'}},
+		{header:'${text("电话")}', name:'tel', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'50', 'class':'form-control','readonly':'true'}},
+		{header:'${text("开户行")}', name:'openbank', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control','readonly':'true'}},
+		{header:'${text("账户")}', name:'accountnum', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'100', 'class':'form-control','readonly':'true'}},
+		{header:'${text("操作")}', name:'actions', hidden:true, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractCustDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractCustDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowInitData: {pkContractCust: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractCustList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractCust,pkContract.pkContract,pkCustomer.pkCustomer,idno,shtyxydm,taxnum,address,tel,openbank,accountnum,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化合同管理表体-房产信息DataGrid对象
+$("#wgContractHouseDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractHouseList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractHouse', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("客户名称")}', name:'pkCustomer', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCustomer.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkCustomer') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('listselectTpl2', {
+						id: 'hCust_'+editOptions.id, title: '客户选择', 
+						path: 'pkCustomer.pkCustomer', value: val.split('|')[0], 
+						labelPath: 'pkCustomer.name', labelValue: val.split('|')[1],
+						itemCode:'pkCustomer', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/base/bdCustomer/bdCustomerSelect', cssClass: ''
+					});
+				}
+			}
+		},
+		{header:'${text("楼栋")}', name:'pkBuild', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkBuild.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkBuildingfile') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"listselectTpl":"listselectTpl2"}', {
+						id: 'hBuild_'+editOptions.id, title: '楼栋选择', 
+						path: 'pkBuild.pkBuildingfile', value: val.split('|')[0], 
+						labelPath: 'pkBuild.name', labelValue: val.split('|')[1],
+						itemCode:'pkBuildingfile', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/zl/zlBuildingfile/buildingSelect', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("房产名称")}', name:'pkHouse', width:250, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkHouse.estatename')==undefined?"":js.val(row, 'pkHouse.estatename');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkHousesource') + '|' + js.val(obj.colModel.data[obj.rowId], 'estatename');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"listselectTpl":"listselectTpl2"}', {
+						id: 'hHouse_'+editOptions.id, title: '房产选择', 
+						path: 'pkHouse.pkHousesource', value: val.split('|')[0], 
+						labelPath: 'pkHouse.estatename', labelValue: val.split('|')[1],
+						itemCode:'pkHousesource', itemName :'estatename',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/zl/zlHousesource/housesourceSelect', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("租赁面积(㎡)")}', name:'narea', width:100, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("租金单价")}', name:'nprice', width:100, editable:true, edittype:'text', editoptions:{'class':'form-control number3 ${isEdit?"required":""}','readonly':${isEdit?'false':'true'},
+			dataInit: function(element){ $(element).on('change', function(){
+				//计算本行
+				var rowId = $('#wgContractHouseDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				var rowprice=toNumber($("#"+rowId+"_nprice").val());
+				var rowarea=toNumber($("#"+rowId+"_narea").val());
+				var rowtzmonth=toNumber($("#"+rowId+"_nmonthtzprice").val());
+				var rowtzyear=toNumber($("#"+rowId+"_nyeartzprice").val());
+				renScalRow(rowId,rowprice,rowarea,rowtzmonth,rowtzyear);
+				//回写表头
+				rentScalHead();
+			});
+		}}},
+		{header:'${text("日租金")}', name:'ndayprice', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("月租金")}', name:'nmonthprice', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("月租金调整额")}', name:'nmonthtzprice', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':${isEdit?'false':'true'},
+			dataInit: function(element){ $(element).on('change', function(){
+				//计算本行
+				var rowId = $('#wgContractHouseDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				var rowprice=toNumber($("#"+rowId+"_nprice").val());
+				var rowarea=toNumber($("#"+rowId+"_narea").val());
+				var rowtzmonth=toNumber($("#"+rowId+"_nmonthtzprice").val());
+				var rowtzyear=toNumber($("#"+rowId+"_nyeartzprice").val());
+				renScalRow(rowId,rowprice,rowarea,rowtzmonth,rowtzyear);
+				//回写表头
+				rentScalHead();
+			});
+		}}},
+		{header:'${text("月租金调整后金额")}', name:'nmonthtzhprice', width:200, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("年租金")}', name:'nyearprice', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("年租金调整额")}', name:'nyeartzprice', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':${isEdit?'false':'true'},
+			dataInit: function(element){ $(element).on('change', function(){
+				//计算本行
+				var rowId = $('#wgContractHouseDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				var rowprice=toNumber($("#"+rowId+"_nprice").val());
+				var rowarea=toNumber($("#"+rowId+"_narea").val());
+				var rowtzmonth=toNumber($("#"+rowId+"_nmonthtzprice").val());
+				var rowtzyear=toNumber($("#"+rowId+"_nyeartzprice").val());
+				renScalRow(rowId,rowprice,rowarea,rowtzmonth,rowtzyear);
+				//回写表头
+				rentScalHead();
+			});
+		}}},
+		{header:'${text("年租金调整后金额")}', name:'nyeartzhprice', width:200, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		<% if(isEdit){ %>
+			{header:'${text("是否物业")}', name:'iswy', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_boolean')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control checkbox_isyes',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_boolean')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+		<% } else { %>
+			{header:'${text("是否物业")}', name:'iswy', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_boolean')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+		<% } %>
+		/* {header:'${text("是否物业")}', name:'iswy0', width:100, align: 'center', editable:true, edittype:'custom', editoptions:{'class':'form-control',
+                custom_element: function(value, editOptions) {
+                	var span = $("<span />");
+                    var check = $("<input>", { type: "checkbox", name:"iswy0", id: "iswy0_"+editOptions.id, rowid:editOptions.id.split("_")[0], class:"checkbox_isyes" });
+                    span.append(check);
+                    return span;
+                },
+			}
+		}, */
+		{header:'${text("操作")}', name:'actions', hidden:${!isEdit}, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){delByHouseChange($(\'#hHouse_'+obj.rowId+'_pkHouseCode\').val());$(\'#wgContractHouseDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\');rentScalHeadArea();rentScalHead();});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){delByHouseChange($(\'#hHouse_'+obj.rowId+'_pkHouseCode\').val());$(\'#wgContractHouseDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');rentScalHeadArea();rentScalHead();});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractHouseDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: ${isEdit},	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkContractHouse: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractHouseList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractHouse,pkContract.pkContract,pkCustomer.pkCustomer,pkBuild.pkBuildingfile,pkHouse.pkHousesource,narea,nprice,ndayprice,nmonthprice,nmonthtzprice,nmonthtzhprice,nyearprice,nyeartzprice,nyeartzhprice,iswy,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化合同管理表体-物业信息DataGrid对象
+$("#wgContractWyfDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractWyfList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractWyf', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("楼栋")}', name:'pkBuild', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkBuild.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkBuildingfile') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('listselectTpl2', {
+						id: 'wyBuild_'+editOptions.id, title: '楼栋选择', 
+						path: 'pkBuild.pkBuildingfile', value: val.split('|')[0], 
+						labelPath: 'pkBuild.name', labelValue: val.split('|')[1],
+						itemCode:'pkBuildingfile', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/zl/zlBuildingfile/buildingSelect', cssClass: ''
+					});
+				}
+			}
+		},
+		{header:'${text("房产名称")}', name:'pkHouse', width:250, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkHouse.estatename')==undefined?"":js.val(row, 'pkHouse.estatename');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkHousesource') + '|' + js.val(obj.colModel.data[obj.rowId], 'estatename');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('listselectTpl2', {
+						id: 'wyHouse_'+editOptions.id, title: '房产选择', 
+						path: 'pkHouse.pkHousesource', value: val.split('|')[0], 
+						labelPath: 'pkHouse.estatename', labelValue: val.split('|')[1],
+						itemCode:'pkHousesource', itemName :'estatename',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/zl/zlHousesource/housesourceSelect', cssClass: ''
+					});
+				}
+			}
+		},
+		<% if(isEdit){ %>
+			{header:'${text("开始日期")}', name:'dstartdate', width:150, formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required',  
+					dataInit: function(element){ $(element).on('focus', function(){
+						WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}'});
+					});
+				}}
+			},
+		<% } else { %>
+			{header:'${text("开始日期")}', name:'dstartdate', width:150, formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("收费标准")}', name:'pkFeescale', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkFeescale.name')==undefined?"":js.val(row, 'pkFeescale.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkFeescale') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"listselectTpl":"listselectTpl2"}', {
+						id: 'wyFeescale_'+editOptions.id, title: '收费标准选择', 
+						path: 'pkFeescale.pkFeescale', value: val.split('|')[0], 
+						labelPath: 'pkFeescale.name', labelValue: val.split('|')[1],
+						itemCode:'pkFeescale', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/bd/bdFeescale/feescaleSelect', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'租赁面积(㎡)', name:'vdef1', editable:true, hidden:true},
+		{header:'${text("收费金额")}', name:'nfeemny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		<% if(isEdit){ %>
+			{header:'${text("税率")}', name:'ntaxrate', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required wytaxchange',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_taxrate')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+		<% } else { %>
+			{header:'${text("税率")}', name:'ntaxrate', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("操作")}', name:'actions', hidden:true, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractWyfDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractWyfDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractWyfDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowInitData: {pkContractWyf: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractWyfList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractWyf,pkContract.pkContract,pkBuild.pkBuildingfile,pkHouse.pkHousesource,dstartdate,pkFeescale.pkFeescale,nfeemny,ntaxrate,vmemo,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化合同管理表体-其他周期费用DataGrid对象
+$("#wgContractZqfyDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractZqfyList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractZqfy', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("客户名称")}', name:'pkCustomer', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCustomer.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkCustomer') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('listselectTpl2', {
+						id: 'zqCust_'+editOptions.id, title: '客户选择', 
+						path: 'pkCustomer.pkCustomer', value: val.split('|')[0], 
+						labelPath: 'pkCustomer.name', labelValue: val.split('|')[1],
+						itemCode:'pkCustomer', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/base/bdCustomer/bdCustomerSelect', cssClass: ''
+					});
+				}
+			}
+		},
+		{header:'${text("收支项目")}', name:'pkYsproject', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkYsproject.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"treeselectTpl":"treeselectTpl2"}', {
+						id: 'zqYspro_'+editOptions.id, title: '收支项目选择', 
+						name: 'pkYsproject.pkProject', value: val.split('|')[0], 
+						labelName: 'pkYsproject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/bd/bdProject/treeData', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("收费标准")}', name:'pkFeescale', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkFeescale.name')==undefined?"":js.val(row, 'pkFeescale.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkFeescale') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"listselectTpl":"listselectTpl2"}', {
+						id: 'zqFeescale_'+editOptions.id, title: '收费标准选择', 
+						path: 'pkFeescale.pkFeescale', value: val.split('|')[0], 
+						labelPath: 'pkFeescale.name', labelValue: val.split('|')[1],
+						itemCode:'pkFeescale', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/bd/bdFeescale/feescaleSelect', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'计算方式', name:'vdef1', editable:true, hidden:true},
+		{header:'计算数额', name:'vdef2', editable:true, hidden:true},
+		{header:'${text("数量")}', name:'num', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number required','readonly':${isEdit?'false':'true'}, 
+			dataInit: function(element){ $(element).on('change', function(){
+				var rowId = $('#wgContractZqfyDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				var jsfs=$("#"+rowId+"_vdef1").val();
+				var jsse=toNumber($("#"+rowId+"_vdef2").val());
+				if(jsfs==""){
+					return;
+				}else{
+					var nfee=0.0;
+					if(jsfs=="0"){//按面积计算
+						nfee=jsse*num;
+					}else if(jsfs=="1"){//固定金额
+						nfee=jsse;
+					}
+					$("#"+rowid+"_nfeemny").val(nfee);
+				}
+				form_jine();//增加千分位符
+			});
+		}}},
+		{header:'${text("收费金额")}', name:'nfeemny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		<% if(isEdit){ %>
+			{header:'${text("开始日期")}', name:'dstartdate', width:150, formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required', 
+					dataInit: function(element){ $(element).on('focus', function(){
+						WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}',minDate:'#F{$dp.$D(dstartdate)}'});
+					});
+				}}
+			},
+		<% } else { %>
+			{header:'${text("开始日期")}', name:'dstartdate', width:150, formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("收费周期(月)")}', name:'dsfzq', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'18', 'class':'form-control digits required','readonly':${isEdit?'false':'true'}}},
+		<% if(isEdit){ %>
+			{header:'${text("税率")}', name:'ntaxrate', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_taxrate')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+		<% } else { %>
+			{header:'${text("税率")}', name:'ntaxrate', width:100, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_taxrate')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("操作")}', name:'actions', hidden:${!isEdit}, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractZqfyDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractZqfyDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractZqfyDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: ${isEdit},	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkContractZqfy: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractZqfyList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractZqfy,pkContract.pkContract,pkCustomer.pkCustomer,pkYsproject.pkProject,pkFeescale.pkFeescale,num,nfeemny,dstartdate,dsfzq,ntaxrate,vmemo,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化合同管理表体-押金DataGrid对象
+$("#wgContractYjDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractYjList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractYj', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("客户名称")}', name:'pkCustomer', width:150, formatter: function(val, obj, row, act){
+				return js.val(row, 'pkCustomer.name');
+			}, unformat: function(val, obj, cell){
+	            return js.val(obj.colModel.data[obj.rowId], 'pkCustomer') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('listselectTpl2', {
+						id: 'yjCust_'+editOptions.id, title: '客户选择', 
+						path: 'pkCustomer.pkCustomer', value: val.split('|')[0], 
+						labelPath: 'pkCustomer.name', labelValue: val.split('|')[1],
+						itemCode:'pkCustomer', itemName :'name',
+						boxWidth:900,boxHeight:$(top.window).height()*3/4,
+						url: '${ctx}/base/bdCustomer/bdCustomerSelect', cssClass: ''
+					});
+				}
+			}
+		},
+		{header:'${text("收支项目")}', name:'pkYsproject', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkYsproject.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"treeselectTpl":"treeselectTpl2"}', {
+						id: 'yjYspro_'+editOptions.id, title: '收支项目选择', 
+						name: 'pkYsproject.pkProject', value: val.split('|')[0], 
+						labelName: 'pkYsproject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/bd/bdProject/treeData', cssClass: ' required'
+					});
+				}
+			}
+		},
+		{header:'${text("应交金额")}', name:'nrecmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number required','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("已收金额")}', name:'nrealmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("欠收金额")}', name:'nqsmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("应退日期")}', name:'dygtdate', width:150, formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+			editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled','readonly':'true'}
+		},
+		{header:'${text("应退金额")}', name:'nygtmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("已退金额")}', name:'nyjtmny', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("操作")}', name:'actions', hidden:${!isEdit}, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractYjDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractYjDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractYjDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: ${isEdit},	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkContractYj: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractYjList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractYj,pkContract.pkContract,pkCustomer.pkCustomer,pkYsproject.pkProject,drecdate,nrecmny,nrealmny,nqsmny,dygtdate,nygtmny,nyjtmny,vmemo,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化合同管理表体-租赁支付方式DataGrid对象
+$("#wgContractZltypeDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractZltypeList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractZltype', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("收支项目")}', name:'pkYsproject', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkYsproject.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"treeselectTpl":"treeselectTpl2"}', {
+						id: 'zltYspro_'+editOptions.id, title: '收支项目选择', 
+						name: 'pkYsproject.pkProject', value: val.split('|')[0], 
+						labelName: 'pkYsproject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/bd/bdProject/treeData', cssClass: ' required'
+					});
+				}
+			}
+		},
+		<% if(isEdit){ %>
+			{header:'${text("租赁开始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required datachangeafter1', 
+					dataInit: function(element){ $(element).on('focus', function(){
+							WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}',minDate:'#F{$dp.$D(dstartdate)}',onpicked:pickBodyDateAfter1("wgContractZltypeDataGrid")});
+					});
+				}}
+			},
+			{header:'${text("年")}', name:'payyear', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payyear')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_payyear')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+			{header:'${text("月")}', name:'paymonth', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_paymonth')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_paymonth')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+			{header:'${text("日")}', name:'payday', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payday')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_payday')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+		<% } else { %>
+			{header:'${text("租赁开始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+			{header:'${text("年")}', name:'payyear', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payyear')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+			{header:'${text("月")}', name:'paymonth', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_paymonth')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+			{header:'${text("日")}', name:'payday', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payday')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("操作")}', name:'actions', hidden:${!isEdit}, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" id="'+obj.rowId+'_del" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractZltypeDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" id="'+obj.rowId+'_del" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractZltypeDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractZltypeDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: ${isEdit},	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkContractZltype: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractZltypeList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractZltype,pkContract.pkContract,pkYsproject.pkProject,dstartdate,paystyle,payyear,paymonth,payday,vmemo,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	groupHeaders: {
+     	twoLevel:[
+     		{startColumnName: 'payyear', numberOfColumns:3, titleText:'付款方式'}
+     	],
+    },
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化合同管理表体-物业支付方式DataGrid对象
+$("#wgContractWytypeDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractWytypeList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractWytype', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		{header:'${text("收支项目")}', name:'pkYsproject', width:150,
+			formatter: function(val, obj, row, act){
+				return js.val(row, 'pkYsproject.name');
+			}, unformat: function(val, obj, cell){
+                return js.val(obj.colModel.data[obj.rowId], 'pkProject') + '|' + js.val(obj.colModel.data[obj.rowId], 'name');
+			}, editable: true, edittype: "custom", editoptions: {
+				custom_element: function(val, editOptions) {
+					return js.template('${isEdit?"treeselectTpl":"treeselectTpl2"}', {
+						id: 'wytYspro_'+editOptions.id, title: '收支项目选择', 
+						name: 'pkYsproject.pkProject', value: val.split('|')[0], 
+						labelName: 'pkYsproject.name', labelValue: val.split('|')[1],
+						url: '${ctx}/bd/bdProject/treeData', cssClass: ' required'
+					});
+				}
+			}
+		},
+		<% if(isEdit){ %>
+			{header:'${text("租赁开始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required datachangeafter1', 
+					dataInit: function(element){ $(element).on('focus', function(){
+							WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}',minDate:'#F{$dp.$D(dstartdate)}',onpicked:pickBodyDateAfter1("wgContractWytypeDataGrid")});
+					});
+				}}
+			},
+			{header:'${text("年")}', name:'payyear', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payyear')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_payyear')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+			{header:'${text("月")}', name:'paymonth', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_paymonth')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_paymonth')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+			{header:'${text("日")}', name:'payday', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payday')}, val, '${text("")}', true);
+				}, unformat: function(val, obj, cell){
+					return val;
+				},editable:true, edittype:'select', editoptions:{'class':'form-control required',
+		            items: $.merge([],${@DictUtils.getDictListJson('wg_payday')}),
+					itemLabel: 'dictLabel', itemValue: 'dictValue', dataInit: function(element){
+						$(element).select2().on("change",function(){$(this).resetValid()});
+					}
+				}
+			},
+		<% } else { %>
+			{header:'${text("租赁开始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+			{header:'${text("年")}', name:'payyear', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payyear')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+			{header:'${text("月")}', name:'paymonth', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_paymonth')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+			{header:'${text("日")}', name:'payday', width:60, formatter: function(val, obj, row, act){
+		            return js.getDictLabel(${@DictUtils.getDictListJson('wg_payday')}, val, '${text("")}', true);
+				},editable:true, editoptions:{'class':'form-control disabled','readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("操作")}', name:'actions', hidden:${!isEdit}, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" id="'+obj.rowId+'_del" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractWytypeDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" id="'+obj.rowId+'_del" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractWytypeDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractWytypeDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: ${isEdit},	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkContractWytype: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractWytypeList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractWytype,pkContract.pkContract,pkYsproject.pkProject,dstartdate,paystyle,payyear,paymonth,payday,vmemo,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	groupHeaders: {
+     	twoLevel:[
+     		{startColumnName: 'payyear', numberOfColumns:3, titleText:'付款方式'}
+     	],
+    },
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+
+//初始化合同管理表体-免租期DataGrid对象
+$("#wgContractMzqDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractMzqList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractMzq', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		<% if(isEdit){ %>
+			{header:'${text("免租开始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate datachangeafter1',  
+					dataInit: function(element){ $(element).on('focus', function(){
+						WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}',minDate:'#F{$dp.$D(dstartdate)}',onpicked:pickBodyDateAfter1("wgContractMzqDataGrid")});
+					});
+				}}
+			},
+			{header:'${text("免租结束日期")}', name:'denddate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate datachangeafter1', 
+					dataInit: function(element){ $(element).on('focus', function(){
+						WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}',minDate:'#F{$dp.$D(dstartdate)}',onpicked:pickBodyDateAfter1("wgContractMzqDataGrid")});
+					});
+				}}
+			},
+		<% } else { %>
+			{header:'${text("免租开始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+			{header:'${text("免租结束日期")}', name:'denddate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+		<% } %>
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("操作")}', name:'actions', hidden:${!isEdit}, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractMzqDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractMzqDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractMzqDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: ${isEdit},	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkContractMzq: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractMzqList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractMzq,pkContract.pkContract,dstartdate,denddate,vmemo,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+//初始化合同管理表体-增长期DataGrid对象
+$("#wgContractZzqDataGrid").dataGrid({
+
+	data: ${toJson(wgContract.wgContractZzqList)},
+	datatype: "local", // 设置本地数据
+	autoGridHeight: function(){return 'auto'}, // 设置自动高度
+	
+	// 设置数据表格列
+	columnModel: [
+		{header:'状态', name:'status', editable:true, hidden:true},
+		{header:'主键', name:'pkContractZzq', editable:true, hidden:true},
+		{header:'${text("表头主键")}', name:'pkContract.pkContract', editable:true, hidden:true},
+		<% if(isEdit){ %>
+			{header:'${text("起始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required datachangeafter1',  
+					dataInit: function(element){ $(element).on('focus', function(){
+						WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}',minDate:'#F{$dp.$D(dstartdate)}',onpicked:pickBodyDateAfter1("wgContractZzqDataGrid")});
+					});
+				}}
+			},
+			/* {header:'${text("截止日期")}', name:'denddate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate required datachangeafter1', 'readonly':'true', 
+					dataInit: function(element){ $(element).on('focus', function(){
+						WdatePicker({dateFmt:'yyyy-MM-dd',isShowClear:true,maxDate:'#F{$dp.$D(denddate)}',minDate:'#F{$dp.$D(dstartdate)}',onpicked:pickBodyDateAfter1("wgContractZzqDataGrid")});
+					});
+				}}
+			}, */
+		<% } else { %>
+			{header:'${text("起始日期")}', name:'dstartdate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			},
+			/* {header:'${text("截止日期")}', name:'denddate', width:150, 
+				formatter:'date', formatoptions:{srcformat:'Y-m-d',newformat:'Y-m-d'},
+				editable:true, edittype:'text', editoptions:{'class':'form-control Wdate disabled', 'readonly':'true'}
+			}, */
+		<% } %>
+		{header:'${text("增长比例(%)")}', name:'zzrate', width:100, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':${isEdit?'false':'true'}, 
+			dataInit: function(element){ $(element).on('change', function(){
+				var rowId = $('#wgContractZzqDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				var nzzmny=$("#"+rowId+"_nzzmny").val();
+				$("#"+rowId+"_nzzmny").val(null);
+				renScalRow2(rowId,"zzrate");
+			});
+		}}},
+		{header:'${text("增长金额")}', name:'nzzmny', width:100, editable:true, edittype:'text', editoptions:{'class':'form-control number3','readonly':${isEdit?'false':'true'}, 
+			dataInit: function(element){ $(element).on('change', function(){
+				var rowId = $('#wgContractZzqDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				$("#"+rowId+"_zzrate").val(null);
+				renScalRow2(rowId,"nzzmny");
+			});
+		}}},
+		{header:'${text("增长后单价")}', name:'nzzprice', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number3','readonly':'true'}},
+		{header:'${text("增长后日租金")}', name:'nzzdayp', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("增长后月租金")}', name:'nzzmonthp', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("增长后月租金调整额")}', name:'nzzmonthptz', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':${isEdit?'false':'true'}, 
+			dataInit: function(element){ $(element).on('change', function(){
+				var rowId = $('#wgContractZzqDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				renScalRow2(rowId,"nzzmonthptz");
+			});
+		}}},
+		{header:'${text("增长后月租金调整后金额")}', name:'nzzmonthptzh', width:200, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("增长后年租金")}', name:'nzzyearp', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("增长后年租金调整额")}', name:'nzzyearptz', width:150, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':${isEdit?'false':'true'}, 
+			dataInit: function(element){ $(element).on('change', function(){
+				var rowId = $('#wgContractZzqDataGrid').dataGrid('getSelectRow'); // 获取选择行Id
+				renScalRow2(rowId,"nzzmonthptz");
+			});
+		}}},
+		{header:'${text("增长后年租金调整后金额")}', name:'nzzyearptzh', width:200, editable:true, edittype:'text', editoptions:{'class':'form-control number','readonly':'true'}},
+		{header:'${text("备注")}', name:'vmemo', width:150, editable:true, edittype:'text', editoptions:{'maxlength':'200', 'class':'form-control','readonly':${isEdit?'false':'true'}}},
+		{header:'${text("操作")}', name:'actions', hidden:${!isEdit}, width:80, sortable:false, fixed:true, formatter: function(val, obj, row, act){
+			var actions = [];
+			if (val == 'new'){
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractZzqDataGrid\').dataGrid(\'delRowData\',\''+obj.rowId+'\')});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}else{
+				actions.push('<a href="#" onclick="js.confirm(\'${text("你确认要删除这条数据吗？")}\', function(){$(\'#wgContractZzqDataGrid\').dataGrid(\'setRowData\',\''+obj.rowId+'\',null,{display:\'none\'});$(\'#'+obj.rowId+'_status\').val(\''+Global.STATUS_DELETE+'\');});return false;"><i class="fa fa-trash-o"></i></a>&nbsp;');
+			}
+			return actions.join('');
+		}, editoptions: {defaultValue: 'new'}}
+	],
+	
+	// 编辑表格参数
+	editGrid: true,				// 是否是编辑表格
+	sortableColumn: false,   // 列表是否允许排序（设置为false后，整个列表不允许排序）
+	shrinkToFit: false, 	    // 是否按百分比自动调整列宽，当列比较多时，开启水平滚动，可设置为false
+	editGridInitRowNum: 0,		// 编辑表格的初始化新增行数
+	editGridAddRowBtn: $('#wgContractZzqDataGridAddRowBtn'),	// 子表增行按钮
+	editGridAddRowBtnToHeader: ${isEdit},	// 子表增行按钮是否显示到表头上 v4.1.7
+	editGridAddRowInitData: {pkContractZzq: '', status: Global.STATUS_NORMAL},	// 新增行的时候初始化的数据
+	
+	// 编辑表格的提交数据参数
+	editGridInputFormListName: 'wgContractZzqList', // 提交的数据列表名
+	editGridInputFormListAttrs: 'status,pkContractZzq,pkContract.pkContract,dstartdate,denddate,zzrate,nzzmny,nzzprice,nzzdayp,nzzmonthp,nzzmonthptz,nzzmonthptzh,nzzyearp,nzzyearptz,nzzyearptzh,vmemo,vdef1,vdef2,vdef3,vdef4,vdef5,', // 提交数据列表的属性字段
+	groupHeaders: {
+     	twoLevel:[
+     		{startColumnName: 'zzrate', numberOfColumns:2, titleText:'增长方式(二选一填写)'}
+     	],
+    },
+	
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		
+	}
+});
+</script>
+<script id="treeselectTpl" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}" 
+	class="{{d.cssClass}}" btnClass="" allowClear="true" canSelectParent="true" canSelectRoot="true" />
+</div>//--></script>
+<script id="treeselectTpl2" type="text/template">//<!--<div>
+<#form:treeselect id="{{d.id}}" title="{{d.title}}" name="{{d.name}}" value="{{d.value}}"
+	labelName="{{d.labelName}}" labelValue="{{d.labelValue}}" url="{{d.url}}" readonly="true" 
+	class="{{d.cssClass}}" btnClass="" allowClear="true" canSelectParent="true" canSelectRoot="true" />
+</div>//--></script>
+<script id="listselectTpl" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.path}}" value="{{d.value}}"
+	labelName="{{d.labelPath}}" labelValue="{{d.labelValue}}" url="{{d.url}}" checkbox="{{d.checkbox}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}" boxWidth="{{d.boxWidth}}" boxHeight="{{d.boxHeight}}"
+	class="{{d.cssClass}}" btnClass="" allowClear="true"/>
+</div>//--></script>
+<script id="listselectTpl2" type="text/template">//<!--<div>
+<#form:listselect id="{{d.id}}" title="{{d.title}}" name="{{d.path}}" value="{{d.value}}"
+	labelName="{{d.labelPath}}" labelValue="{{d.labelValue}}" url="{{d.url}}" checkbox="{{d.checkbox}}"
+	itemCode="{{d.itemCode}}" itemName="{{d.itemName}}" boxWidth="{{d.boxWidth}}" boxHeight="{{d.boxHeight}}"
+	class="{{d.cssClass}}" btnClass="" allowClear="true" readonly="true" />
+</div>//--></script>
+<script>
+if(isEdit.defaultValue=="true"){
+	$("#iswyht input[type='checkbox']").removeAttr("disabled");
+}else{
+	$("#iswyht input[type='checkbox']").attr("disabled","disabled");
+}
+$("#inputForm").validate({
+	submitHandler: function(form){
+		canEdit();
+		js.ajaxSubmitForm($(form), function(data){
+			if(data.result == Global.TRUE){
+				js.showMessage(data.message);
+				js.closeCurrentTabPage(function(contentWindow){
+					contentWindow.page();
+				});
+			}else{
+				notEdit();
+				js.showMessage(data.message,'','info',3000);
+			}
+		}, "json");
+    }
+});
+</script>
+<script src="${ctxStatic}/wght/wgContract/wgContractForm.js"></script>

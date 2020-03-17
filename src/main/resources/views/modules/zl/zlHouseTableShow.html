@@ -1,0 +1,302 @@
+﻿<% layout('/layouts/default.html', {title: '房源表', libs: ['dataGrid']}){ %>
+<link rel="stylesheet" type="text/css" href="${ctxStatic}/css/zlHouseTableShow.css" />
+<link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/>
+<body>
+    <div class="homePage">
+        <div class="charsBox">
+			<#form:form id="searchForm" model="${zlHousesource}" method="post" class="form-inline">
+				<div class="query-group">
+					<label class="query-label"><span class="required">*</span> ${text('组织')}：</label>
+					<div class="query-input" >
+						<#form:treeselect id="pkOrg" title="${text('组织选择')}"
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData" allowClear="false" />
+					</div>
+				</div>
+				<div class="query-group">
+					<label class="query-label"><span class="required">*</span> ${text('项目')}：</label>
+					<div class="query-input">
+						<#form:hidden id="pkProject" />
+						<#form:hidden id="projectname" />
+						<#form:treeselect id="pkProject" title="${text('项目选择')}"
+							path="pkProject.pkProject" labelPath="pkProject.name" 
+							url="${ctx}/zl/zlProject/treeData" allowClear="true"/>
+					</div>
+				</div>
+				<div class="query-group">
+					<label class="query-label"><span class="required">*</span> ${text('楼栋')}：</label>
+					<div class="query-input">
+						<#form:listselect id="pkBuilding" title="楼栋选择" 
+							path="pkBuilding.pkBuildingfile" labelPath="pkBuilding.name" 
+							url="${ctx}/zl/zlBuildingfile/buildingSelect" allowClear="true" 
+							boxWidth="900" boxHeight="$(top.window).height()*3/4" 
+							checkbox="false" itemCode="pkBuildingfile" itemName="name"/>
+					</div>
+				</div>
+				<div class="box-tools pull-right">
+					<a href="#" class="btn btn-default" onclick="showData()"><i class="fa fa-filter"></i> ${text('查询')}</a>
+					<a href="#" class="btn btn-default" onclick="linkCustomer()"><i class="fa fa-chain"></i> ${text('联查住户')}</a>
+				</div>
+			</#form:form>
+			<div class="content" id="job">
+           	 	<div class="chars_title">
+               		<div class="chars_title_left">
+                   		<span class="glyphicon glyphicon-th-list"></span>
+                    	<span>房源表（展示物业费欠缴已缴情况）</span>
+                	</div>
+                	<div class="chars_title_right" id="refresh">
+                    	<span class="glyphicon glyphicon-refresh"></span>
+                    	<span>刷新</span>
+               	 	</div>
+            	</div>
+            	<div class="xk_page hide">
+		            <div class="page_left">
+		                <div class="lenged">
+		                	<div class="yishou"><span></span> 欠缴</div>
+		                   	<div class="keshou"><span></span> 缴清</div>
+		                    <div>
+		                        	(欠缴 <span class="qianjiao"></span> 户 ，总共 <span class="zongTao"></span> 户 )
+		                    </div>
+		                </div>
+                		<div class="guDing">
+                    		<table class="gudingTab">
+                        		<thead class="fh_thead">
+
+                       			</thead>
+                    		</table>
+		                	<div class="FH_content">
+		                    	<table class="F_table">
+		                        	<thead class="fh_thead">
+		                            
+		                        	</thead>
+		                        	<tbody id="fh_tbody">
+		
+		                        	</tbody>
+		                    	</table>
+		                	</div>
+                		</div>
+		            </div>
+		        </div>
+        	</div>
+        	<div id="showRefData">
+				<ul>
+					<!-- 动态存放参照模糊查询数据 -->
+				</ul>
+			</div>
+        </div>
+    </div>
+</body>
+<% } %>
+<script src="${ctxStatic}/zl/zlHouseTable/zlHouseTable.js"></script>
+<script>
+$(document).ready(function() {
+	$(".input-group input").unbind("click");//移除参照选择
+	$(".input-group input").attr("readonly",false);
+	$(".input-group input").attr("autocomplete","off");
+	
+	var oldrefCode,oldrefName,refName,
+	refCode,
+	refList=new Array();
+	/****参照查询input框 start*****/
+	$(".input-group input").bind("focus propertychange",function (){//鼠标点击input触发事件
+		//查询区域初始化
+		$("#showRefData").css("display","none");
+		$("#showRefData").children().html("");
+		refList=new Array();
+		var refUrl=$(this).parent().attr("data-url");//参照路径
+		refName=$(this)[0].id;//用于存放参照名称
+		refCode=$(this)[0].nextElementSibling.id;//用于存放参照主键
+		oldrefCode=$("#"+refCode).val();//用于存放之前的主键
+		oldrefName=$("#"+refName).val();//用于存放之前的名称
+		if(refUrl.indexOf("zlBuildingfile")!=-1){//路径是列表的转换查数据路径，可重写模糊查询方法
+			var pkp=$("#pkProjectCode").val();
+			refUrl="${ctx}/zl/zlBuildingfile/listData";
+			if(pkp==""){
+				refUrl+="?pkProjectid=' '"
+			}else{
+				refUrl+="?pkProjectid="+pkp;
+			}
+		}
+		var JSONDATA={};
+		$.ajax({
+			url: refUrl,
+			datatype: 'json',
+			data: JSONDATA,
+			contentType: 'application/json;charset=utf-8',
+			success: function (data) {
+				if(refName.startsWith("pkOrg")){
+					if(data!=null&&data.length>0){
+						for(var j=0;j<data.length;j++){
+							refList[j]={
+								"id":data[j].id,
+								"code":data[j].id,
+								"name":data[j].name
+							};
+						}
+					}
+				}else if(refName.startsWith("pkProject")){
+					if(data!=null&&data.length>0){
+						for(var j=0;j<data.length;j++){
+							refList[j]={
+									"id":data[j].id,
+									"code":data[j].code,
+									"name":data[j].name
+							};
+						}
+					}
+				}else if(refName.startsWith("pkBuilding")){
+					if(data.list!=null&&data.list.length>0){
+						for(var j=0;j<data.list.length;j++){
+							refList[j]={
+									"id":data.list[j].id,
+									"code":data.list[j].code,
+									"name":data.list[j].name
+							};
+						}
+					}
+				}
+				var html_li="";
+				if(refList!=null&&refList.length>0){
+					for(var i=0;i<refList.length;i++){
+						html_li+="<li>";
+						html_li+="<span style='display:none'>"+refList[i].id+"</span>";//存放主键
+						html_li+="<span style='display:none'>"+refList[i].code+"</span>";//存放编码
+						html_li+="<span>"+refList[i].name+"</span>";//存放名称
+						html_li+="</li>";
+					}
+				}
+				$("#showRefData").children().html(html_li);
+			}
+		});
+	});
+	$(".input-group input").on("dblclick",function (){//inpu值双击事件
+		var id=$("#"+refCode).val();
+		for(var i=0;i<refList.length;i++){
+			if(refList[i].id==id){
+				$("#"+refName).val(refList[i].code);
+				break;
+			}
+		}
+	});
+	$(".input-group input").bind("blur propertychange",function (){//input框光标移出事件
+		var s_value = $(this).val();//input框值
+		var val_id,val_code,val_name;
+		if(refName.startsWith("pkProject")){
+			//判断值是否变更
+			if(s_value==null||s_value==""){
+				$("#"+refCode).val(null);
+				$("#"+refName).val(null);
+				if(oldrefCode==null||oldrefCode==""){
+					return;
+				}
+				$('#pkBuildingCode').val(null);
+				$('#pkBuildingName').val(null);
+				$("#pkProject").val(null);
+				$("#projectname").val(null);
+				return;
+			}
+			var count=0;
+			for(var i=0;i<refList.length;i++){
+				if(refList[i].code==s_value||refList[i].name==s_value){
+					$("#"+refCode).val(refList[i].id);
+					$("#"+refName).val(refList[i].name);
+					val_id=refList[i].id;
+					val_code=refList[i].code;
+					val_name=refList[i].name;
+					count++;
+				}
+			}
+			if(count!=1){
+				$("#"+refName).val(oldrefName);
+				$("#"+refCode).val(oldrefCode);
+				return;
+			}
+			if(oldrefCode!=val_id){
+				$('#pkBuildingCode').val(null);
+				$('#pkBuildingName').val(null);
+				$("#pkProject").val(val_id);
+				$("#projectname").val(val_name);
+			}
+		}else{
+			//判断值是否变更
+			if(s_value==null||s_value==""){
+				$("#"+refCode).val(null);
+				$("#"+refName).val(null);
+				if(oldrefCode==null||oldrefCode==""){
+					return;
+				}
+				return;
+			}
+			var count=0;
+			for(var i=0;i<refList.length;i++){
+				if(refList[i].code==s_value||refList[i].name==s_value){
+					$("#"+refCode).val(refList[i].id);
+					$("#"+refName).val(refList[i].name);
+					count++;
+				}
+			}
+			if(count!=1){
+				$("#"+refName).val(oldrefName);
+				$("#"+refCode).val(oldrefCode);
+				return;
+			}
+		}
+	});
+	$(".input-group input").bind("input propertychange",function (){//input框改变值事件
+		var s_value = $(this).val();//input框值
+		if(s_value==null||s_value==""){
+			$("#showRefData").css("display","none");
+			return;
+		}
+	    //匹配值
+	    var count=0;
+	    $("#showRefData").children().children("li").each(function(){
+	    	var code=$(this).children()[1].innerText;
+	    	var name=$(this).children()[2].innerText;
+	    	if(code.indexOf(s_value)!=-1||name.indexOf(s_value)!=-1){
+	    		$(this).css("display","block");
+	    		count++;
+	    	}else{
+	    		$(this).css("display","none");
+	    	}
+	    });
+		var obj=$(this);//用于定位
+		var viewh=document.documentElement.clientHeight;//可见区域高度
+		var bodyh=document.body.clientHeight;//body区域高度
+		var thistop=parseInt(obj.offset().top+obj.outerHeight());
+		var refh=$("#showRefData").height();
+		if(refh>(viewh-thistop)){
+			thistop=parseInt(obj.offset().top)-refh;
+		}
+		//显示模糊查询区域
+		$("#showRefData").css("left",parseInt(obj.offset().left));
+	   	$("#showRefData").css("top",thistop);
+	    $("#showRefData").css("min-width",parseInt(obj[0].parentNode.clientWidth));
+	    $("#showRefData").css('display', 'block');
+	    if(count==0){
+	    	$("#showRefData").css("display","none");
+	    }
+	});
+	$(".charsBox").bind("click propertychange",function (){//页面点击事件
+		$("#showRefData").css("display","none");
+	});
+	$("#showRefData").on("click","li",function(){//模糊查询值区域点击事件
+		var val_id=$(this).children()[0].innerText;
+		var val_code=$(this).children()[1].innerText;
+		var val_name=$(this).children()[2].innerText;
+		$("#"+refCode).val(val_id);
+		$("#"+refName).val(val_name);
+		if(refName.startsWith("pkProject")){
+			//判断值是否变更
+			if(oldrefCode!=val_id){
+				$('#pkBuildingCode').val(null);
+				$('#pkBuildingName').val(null);
+				$("#pkProject").val(val_id);
+				$("#projectname").val(val_name);
+			}
+		}
+		$("#showRefData").css("display","none");
+	});
+	/****参照查询input框 end*****/
+});
+</script>

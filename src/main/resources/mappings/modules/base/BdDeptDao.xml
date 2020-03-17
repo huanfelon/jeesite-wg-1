@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jeesite.modules.base.dao.BdDeptDao">
+	  <resultMap id="attrMap" type="hashMap">
+     <id  column="pk_dept" property="pk_dept"/>
+     <result column="pk_org" property="pk_org"/>
+      <result column="parent_codes" property="parent_codes"/>
+       <result column="parent_code" property="parent_code"/>
+       <result column="tree_names" property="tree_names"/>
+        <result column="dept_name" property="dept_name"/>
+         <result column="creator" property="creator"/>
+       
+          
+	</resultMap>
+ 	  <resultMap id="attMap" type="hashMap">
+     <id  column="user_code" property="user_code"/>
+     <result column="user_name" property="user_name"/>
+    
+	</resultMap>
+ 	  <resultMap id="atMap" type="hashMap">
+ 	    <id  column="post_code" property="post_code"/>
+ 	     <result column="post_name" property="post_name"/>
+ 	       <result column="pk_org" property="pk_org"/>
+ 	         <result column="pk_dept" property="pk_dept"/>
+ 	  	</resultMap>
+	<!-- 查询数据
+	<select id="findList" resultType="BdDept">
+		SELECT ${sqlMap.column.toSql()}
+		FROM ${sqlMap.table.toSql()}
+		<where>
+			${sqlMap.where.toSql()}
+		</where>
+		ORDER BY ${sqlMap.order.toSql()}
+	</select> -->
+	
+	<select id="findOrgBycode" resultMap="attrMap" parameterType="hashMap">
+		SELECT b.pk_dept,b.pk_org,b.parent_code,j.office_code,office_name
+	FROM bd_dept b LEFT JOIN  js_sys_office j ON b.pk_org= j.office_code
+	WHERE
+	b.pk_dept=#{parent_code} 
+
+	</select>
+	
+		<!-- 查找经办人 -->
+	<select id="findDeptBycode" resultMap = "attMap" parameterType="map">
+	   select  j.user_code,j.user_name
+	   
+	    from js_sys_user j
+	    where 
+	    j.user_code =#{user_code}
+	
+	
+	</select>
+			<!-- 查找岗位 -->
+	<select id="findPostBycode" resultMap = "attMap" parameterType="map">
+		   SELECT  j.post_code,j.post_name,j.pk_org,j.pk_dept
+	   
+	    FROM js_sys_post j    
+	    WHERE 
+	    j.pk_dept =#{dept_code}
+	    
+	</select>
+	<select id="selectNameByCode" resultType="java.lang.String" parameterType="java.util.List">
+	SELECT wm_concat(to_char(j.user_name)) FROM js_sys_user j WHERE j.user_code IN 
+	<foreach item="code" index="index" collection="list" open="(" separator="," close=")">#{code}</foreach>
+	<!-- (#{user_code}) -->
+	</select>
+	
+</mapper>

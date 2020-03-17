@@ -1,0 +1,223 @@
+<% layout('/layouts/default.html', {title: '检验表', libs: ['dataGrid']}){ %>
+<style>
+.proxj {
+	background-color: #ffd7df;
+}
+table tr,table td {
+	border:1px solid #7b7b7b;
+}
+table tr:first-child,table tr:first-child td{
+	border:none;
+}
+.ui-jqgrid .ui-jqgrid-htable .ui-jqgrid-labels th {
+    border: 1px solid #fff !important;
+}
+.color-red {
+	color: red;
+}
+</style>
+<link href="${ctxStatic}/css/zlListShow.css" rel="stylesheet" type="text/css"/>
+<div class="main-content">
+	<div class="box box-main">
+		<div class="box-header">
+			<div class="box-tools pull-left">
+				<a href="#" class="btn btn-default" id="btnSearch" title="${text('查询')}"><i class="fa fa-filter"></i> ${text('查询')}</a>
+				<a href="#" class="btn btn-default hide" id="btnExport"><i class="glyphicon glyphicon-export"></i> 导出</a>
+			</div>
+		</div>
+		<div class="box-body">
+			<#form:form id="searchForm" model="${ctYsSrCheck}" action="${ctx}/reports/ctYsSrCheck/listData" method="post" class="form-inline hide" data-order-by="${parameter.orderBy}">
+				<div class="query-group">
+					<label class="query-label"><span class="required">*</span> ${text('组织')}：</label>
+					<div class="query-input" >
+						<#form:treeselect id="pkOrg" title="${text('组织选择')}"
+							path="pkOrg.officeCode" labelPath="pkOrg.officeName" 
+							url="${ctx}/sys/office/treeData" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" />
+					</div>
+				</div>
+				<div class="query-group">
+					<label class="query-label"><span class="required">*</span>${text('项目信息')}：</label>
+					<div class="query-input">
+						<#form:treeselect id="pkProject" title="${text('项目选择')}" 
+							path="pkProject.pkProject" labelPath="pkProject.name" 
+							url="${ctx}/zl/zlProject/treeData?isShowCode=true" allowClear="true" 
+							canSelectParent="true" canSelectRoot="true" checkbox="true" />
+					</div>
+				</div>
+				<div class="query-group">
+					<label class="query-label">${text('合同号')}：</label>
+					<div class="query-input">
+						<#form:input path="htcode" class="form-control"/>
+					</div>
+				</div>
+				<div class="form-group pull-right">
+					<button type="button" id="btnSubmit" onclick="queryData()" class="btn btn-primary btn-sm">${text('查询')}</button>
+					<button type="button" id="btnCancel" onclick="resetBtn()" class="btn btn-default btn-sm">${text('重置')}</button>
+				</div>
+			</#form:form>
+			<table id="dataGrid" class="bbShowStyle"></table>
+		</div>
+	</div>
+</div>
+<% } %>
+<script>
+// 初始化DataGrid对象
+$('#dataGrid').dataGrid({
+	searchForm: $("#searchForm"),
+	columnModel: [
+		      	{header:'${text("合同号")}', name:'htcode',  width:150, align:"left"},
+		      	{header:'${text("客户名称")}', name:'custname',  width:150, align:"left"},
+		      	{header:'${text("收费项目")}', name:'pkcost', width:120, align:"left"},
+		      	{header:'${text("合同总价")}', name:'htze',  width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+	      			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+	      		}},
+	      		{header:'${text("合同期限")}', name:'htqj', width:150, align:"left"},
+	      		{header:'${text("实收款")}', name:'ssk',  width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+	      			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+	      		}},
+	      		{header:'${text("发票项目")}', name:'kpcostp', width:120, align:"left"},
+	      		{header:'${text("发票号")}', name:'fpcode', width:200, align:"left"},
+	    		{header:'${text("开票不含税金额")}', name:'kpnotax',  width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+	      			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+	      		}},
+	    		{header:'${text("开票税金")}', name:'kptax',  width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+	      			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+	      		}},
+	      		{header:'${text("确认收入金额")}', name:'qrsr',  width:150, align:"right", classes:"color-area-label", formatter: function(val, obj, row, act){
+	      			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+	      		}},
+	      		{header:'${text("合同总价与实收差额")}', name:'ysce',  width:150, align:"right", classes:"", formatter: function(val, obj, row, act){
+	      			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+	      		}},
+	      		{header:'${text("开票不含税与确认收入差额")}', name:'srce',  width:150, align:"right", classes:"", formatter: function(val, obj, row, act){
+	      			return js.formatNumber(val, 2, true, ''); // 数值类型格式化 (原始数值, 小数位数, 是否千分位, 默认值，金额情况下设置0.00);
+	      		}},
+	      		
+	],
+	shrinkToFit: false,
+	sortableColumn: true,
+	altRows: false, 		    // 斑马线样式，交替行altclass
+	// 加载成功后执行事件
+	ajaxSuccess: function(data){
+		var ids=$('#dataGrid').dataGrid('getDataIDs');
+	    if(ids.length==0){
+	    	return;
+	    }
+	    for(var i=0;i<ids.length;i++){
+	    	var ysce=$('#dataGrid').dataGrid('getRowData', ids[i]).ysce;
+		    if(toNumber(ysce)!=0){
+	    		$("#"+ids[i]+" td[aria-describedby=dataGrid_ysce]").addClass("color-red");
+	    	}else{
+	    		$("#"+ids[i]+" td[aria-describedby=dataGrid_ysce]").addClass("color-area-label");
+	    	}
+		    var srce=$('#dataGrid').dataGrid('getRowData', ids[i]).srce;
+		    if(toNumber(srce)!=0){
+	    		$("#"+ids[i]+" td[aria-describedby=dataGrid_srce]").addClass("color-red");
+	    	}else{
+	    		$("#"+ids[i]+" td[aria-describedby=dataGrid_srce]").addClass("color-area-label");
+	    	}
+	    } 
+	}
+});
+</script>
+<script>
+var oldRefCode,oldRefName;//存放参照选择之前的值
+$(document).ready(function() {
+	InitQuery();
+	$('#dataGrid').dataGrid('refresh');
+	
+	//参照字段选择前过滤
+	$(".input-group").on("mousedown",function showDeptTreeRef(){
+		var id=$(this).attr("id");
+		oldRefName=$(this).context.children[0].value;
+		oldRefCode=$(this).context.children[1].value;
+		resetDataUrl(id);
+	});
+})
+
+/**
+ * 重新定位参照URL地址
+ * @param id
+ */
+function resetDataUrl(id){
+	if(id=="pkProjectDiv"){
+		var pkorg=$("#pkOrgCode").val();
+		var newurl='${ctx}/zl/zlProject/treeData?isShowCode=true';
+		if(pkorg==""){
+			newurl+="&pkOrg=' '";
+		}else{
+			newurl+="&pkOrg="+pkorg;
+		}
+		$("#"+id).attr("data-url",newurl);
+	}
+}
+
+/**
+ * 选择回调方法
+ * @param id  标签的id
+ * @param act 动作事件：ok、clear、cancel
+ * @param index layer的索引号
+ * @param layero layer内容的jQuery对象
+ * @param nodes 当前选择的树节点数组
+ */
+function treeselectCallback(id, act, index, layero, nodes){
+	if(id=='pkOrg' && (act == 'ok' || act == 'clear')){//组织选择
+		if(nodes!=null&&nodes!=undefined){
+			var newpro=$("#pkOrgCode").val();
+			if(oldRefCode==newpro){
+				return;
+			}
+		}
+		$("#pkProjectCode").val(null);
+		$("#pkProjectName").val(null);
+	}
+}
+
+//初始化查询条件
+function InitQuery(){
+	$(".query-group input").val("");
+	$("#pkOrgCode").val(getMainOrgCode());
+	$("#pkOrgName").val(getMainOrgName());
+}
+ //获取当前主组织主键
+function getMainOrgCode(){
+	var obj=window.parent.document.getElementById('officeCode').innerText;//获取当前登录人主键
+	return obj;
+}
+//获取当前主组织名称
+function getMainOrgName(){
+	var obj=window.parent.document.getElementById('officeName').innerText;//获取当前登录人名称
+	if(obj=='未选择主组织'){
+		obj="";
+	}
+	return obj;
+} 
+/**查询条件必输项校验**/
+ function checkQueryNotNull(){
+	var num=0;
+	var pkOrg=$("#pkOrgCode").val();
+	if (pkOrg=="") {
+		layer.tips('请输入组织', '#pkOrgDiv',{tips: [2,"#ff0000b5"],tipsMore: true});
+		return ++num;
+	}
+	var pkpro=$("#pkProjectCode").val();
+	if (pkpro=="") {
+		layer.tips('请输入项目', '#pkProjectDiv',{tips: [2,"#c7360c"],tipsMore: true});
+		num++;
+	}
+	return num;
+} 
+/***查询***/
+function queryData(){
+	var num=checkQueryNotNull();
+	if(num==0){
+		$('#dataGrid').dataGrid('refresh');
+		$("#btnExport").removeClass("hide");
+	}
+}
+/**重置**/
+function resetBtn(){
+	InitQuery();
+}
+</script>
